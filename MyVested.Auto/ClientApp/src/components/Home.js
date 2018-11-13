@@ -1,26 +1,39 @@
 import React, { Component } from 'react';
 
-export class Home extends Component {
-  displayName = Home.name
+import GridLayout from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import { MarketWatch } from './Widgets/MarketWatch';
+import { Navigator } from './Widgets/Navigator';
+import { Output } from './Widgets/Output';
 
-  render() {
-    return (
-      <div>
-        <h1>Hello, world!</h1>
-        <p>Welcome to your new single-page application, built with:</p>
-        <ul>
-          <li><a href='https://get.asp.net/'>ASP.NET Core</a> and <a href='https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx'>C#</a> for cross-platform server-side code</li>
-          <li><a href='https://facebook.github.io/react/'>React</a> for client-side code</li>
-          <li><a href='http://getbootstrap.com/'>Bootstrap</a> for layout and styling</li>
-        </ul>
-        <p>To help you get started, we've also set up:</p>
-        <ul>
-          <li><strong>Client-side navigation</strong>. For example, click <em>Counter</em> then <em>Back</em> to return here.</li>
-          <li><strong>Development server integration</strong>. In development mode, the development server from <code>create-react-app</code> runs in the background automatically, so your client-side resources are dynamically built on demand and the page refreshes when you modify any file.</li>
-          <li><strong>Efficient production builds</strong>. In production mode, development-time features are disabled, and your <code>dotnet publish</code> configuration produces minified, efficiently bundled JavaScript files.</li>
-        </ul>
-        <p>The <code>ClientApp</code> subdirectory is a standard React application based on the <code>create-react-app</code> template. If you open a command prompt in that directory, you can run <code>npm</code> commands such as <code>npm test</code> or <code>npm install</code>.</p>
-      </div>
-    );
-  }
+export class Home extends Component {
+    displayName = Home.name
+
+    render() {
+        // layout is an array of objects
+        var layout = [
+            { i: 'a', x: 0, y: 0, w: 7, h: 11, minW: 3 },
+            { i: 'b', x: 7, y: 0, w: 4, h: 11, minH: 10, minW: 4 },
+            { i: 'c', x: 11, y: 0, w: 6, h: 11, minH: 6, minW: 6 },
+            { i: 'output', x: 11, y: 12, w: 24, h: 8, minH: 6 }
+        ];
+
+        return (
+            <GridLayout layout={layout} cols={24} rowHeight={7} width={1200} draggableHandle=".widgetHandle">
+                <div className="widget" key="a">
+                    <MarketWatch />
+                </div>
+                <div className="widget" key="b">
+                    <Navigator />
+                </div>
+                <div className="widget" key="c">
+                    <div className="widgetHandle">Chart</div>
+                    <div className="widgetBody">Body</div>
+                </div>
+                <div className="widget" key="output">
+                    <Output />
+                </div>
+            </GridLayout>
+        );
+    }
 }
