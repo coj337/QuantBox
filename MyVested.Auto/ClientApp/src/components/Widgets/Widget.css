@@ -1,0 +1,67 @@
+﻿/* Generic Widget Styles */
+.widget {
+    background: grey;
+    color: white;
+}
+
+/* Widget Body Styles */
+.widgetBody {
+    padding: 0px 5px;
+    overflow: auto;
+    height: calc(100% - 35px);
+}
+
+/* Widget Header Styles */
+.widgetHandle {
+    background-color: brown;
+    height: 25px;
+    padding: 2px 5px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.widgetTitle{
+    display: inline-block;
+    margin-right: -8px;
+}
+.closeButton {
+    float: right;
+    margin-right: 2px;
+    margin-top: 2px;
+}
+.closeButton:hover {
+    font-weight: 600;
+    margin-left: -2px;
+}
+
+/* Output styles */
+.outputSelect {
+    width: 150px;
+}
+.outputSelect > div {
+
+}
+
+/* Navigator Styles */
+.treeview {
+    overflow: hidden;
+}
+.treeview svg[style*="opacity: 0.3"] {
+    display: none;
+}
+.treeview svg[style*="opacity: 0.3"] + span {
+    margin-left: 15px;
+}
+.treeview svg[style*="opacity: 0.3"] + span + span {
+    cursor: pointer;
+}
+
+/* Market Watch Styles */
+.widget table {
+    border: solid 1px black;
+    width: 100%;
+}
+.widget td, .widget th {
+    border: solid 1px black;
+    padding: 0px 5px;
+}

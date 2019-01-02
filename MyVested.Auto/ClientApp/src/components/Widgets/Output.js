@@ -1,5 +1,6 @@
 ﻿import React, { Component } from 'react';
 import Select from 'react-select';
+import { Widget } from './Widget';
 
 export class Output extends Component {
     state = {
@@ -18,18 +19,15 @@ export class Output extends Component {
         ];
         const { selectedOption } = this.state;
         return (
-            <span>
-                <div className="widgetHandle">Output</div>
-                <div className="widgetBody">
-                    <Select
-                        value={selectedOption}
-                        onChange={this.handleChange}
-                        options={options}
-                        className="outputSelect"
-                        defaultValue="All"
-                    />
-                </div>
-            </span>
+            <div>
+                <Select
+                    value={selectedOption}
+                    onChange={this.handleChange}
+                    options={options}
+                    className="outputSelect"
+                    defaultValue="All"
+                />
+            </div>
         );
     }
 }

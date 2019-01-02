@@ -1,14 +1,15 @@
 ﻿import React, { Component } from 'react';
 
 export class DepthChart extends Component {
+    constructor(props) {
+        super(props);
+    }
+
     render() {
         return (
-            <span>
-                <div className="widgetHandle">Market Depth (Symbol)</div>
-                <div className="widgetBody">
-                    Depth Stuff
-                </div>
-            </span>
+            <div>
+                Depth Stuff
+            </div>
         );
     }
 }

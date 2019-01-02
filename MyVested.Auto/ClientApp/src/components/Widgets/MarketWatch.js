@@ -2,6 +2,7 @@
 
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import { Widget } from './Widget';
 
 export class MarketWatch extends Component {
     constructor(props) {
@@ -51,17 +52,14 @@ export class MarketWatch extends Component {
             return <div>Loading...</div>;
         } else {
             return (
-                <span>
-                    <div className="widgetHandle">Market Watch</div>
-                    <div className="widgetBody">
-                        <ReactTable
-                            data={marketData}
-                            columns={columns}
-                            minRows={1}
-                            showPagination={false}
-                        />
-                    </div>
-                </span>
+                <div>
+                    <ReactTable
+                        data={marketData}
+                        columns={columns}
+                        minRows={1}
+                        showPagination={false}
+                    />
+                </div>
             );
         }
     }
