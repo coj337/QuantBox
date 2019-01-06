@@ -19,7 +19,13 @@ export class Output extends Component {
         ];
         const { selectedOption } = this.state;
         return (
-            <div>
+            <Widget
+                title={"Output"}
+                minH={2}
+                minW={2}
+                currentH={2}
+                currentW={2}
+            >
                 <Select
                     value={selectedOption}
                     onChange={this.handleChange}
@@ -27,7 +33,7 @@ export class Output extends Component {
                     className="outputSelect"
                     defaultValue="All"
                 />
-            </div>
+            </Widget>
         );
     }
 }

@@ -52,14 +52,20 @@ export class MarketWatch extends Component {
             return <div>Loading...</div>;
         } else {
             return (
-                <div>
-                    <ReactTable
-                        data={marketData}
-                        columns={columns}
-                        minRows={1}
-                        showPagination={false}
-                    />
-                </div>
+               <Widget
+                   title={"Market Watch"}
+                   minH={2}
+                   minW={2}
+                   currentH={2}
+                   currentW={2}
+               >
+                   <ReactTable
+                       data={marketData}
+                       columns={columns}
+                       minRows={1}
+                       showPagination={false}
+                   />
+                </Widget>
             );
         }
     }

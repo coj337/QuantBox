@@ -5,7 +5,13 @@ import { Widget } from './Widget';
 export class Navigator extends Component {
     render() {
         return (
-            <div>
+            <Widget
+                title={"Navigator"}
+                minH={2}
+                minW={2}
+                currentH={2}
+                currentW={2}
+            >
                 <Tree content="Accounts">
                     <Tree content="Poloniex" />
                     <Tree content="Bittrex" />
@@ -24,7 +30,7 @@ export class Navigator extends Component {
                 <Tree content="Scripts">
                     <Tree content="Tax Calculator" />
                 </Tree>
-            </div>
+            </Widget>
         );
     }
 }
