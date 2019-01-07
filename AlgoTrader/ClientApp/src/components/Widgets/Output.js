@@ -25,6 +25,8 @@ export class Output extends Component {
                 minW={2}
                 currentH={2}
                 currentW={2}
+                x={4}
+                y={0}
             >
                 <Select
                     value={selectedOption}

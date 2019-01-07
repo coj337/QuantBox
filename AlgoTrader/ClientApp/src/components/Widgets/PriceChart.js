@@ -10,6 +10,8 @@ export class PriceChart extends Component {
                 minW={2}
                 currentH={2}
                 currentW={2}
+                x={2}
+                y={0}
             >
                 Price Chart Stuff
             </Widget>

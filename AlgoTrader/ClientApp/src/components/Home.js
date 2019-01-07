@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { WidthProvider, Responsive } from "react-grid-layout";
-import 'react-grid-layout/css/styles.css';
+import RGL, { WidthProvider } from "react-grid-layout";import 'react-grid-layout/css/styles.css';
 import _ from "lodash";
 
 import { MarketWatch } from './Widgets/MarketWatch';
@@ -11,26 +10,33 @@ import { RecentTrades } from './Widgets/RecentTrades';
 import { Orderbook } from './Widgets/Orderbook';
 import { Output } from './Widgets/Output';
 
-const ResponsiveReactGridLayout = WidthProvider(Responsive);
-const originalLayouts = getFromLS("layouts") || {};
+const ReactGridLayout = WidthProvider(RGL);
+const originalLayout = getFromLS("layout") || [];
 const originalWidgets = getFromLS("widgets") || [
-    { type: MarketWatch },
-    { type: Navigator },
-    { type: PriceChart },
-    { type: DepthChart },
-    { type: RecentTrades },
-    { type: Orderbook },
-    { type: Output }
+    MarketWatch,
+    Navigator,
+    PriceChart,
+    DepthChart,
+    RecentTrades,
+    Orderbook,
+    Output
 ];
 
 export class Home extends Component {
+    static defaultProps = {
+        className: "gridLayout",
+        cols: 12,
+        rowHeight: 30,
+        onLayoutChange: function () { }
+    };
+
     displayName = Home.name
 
     constructor(props) {
         super(props);
 
         this.state = {
-            layouts: originalLayouts,
+            layout: JSON.parse(JSON.stringify(originalLayout)),
             widgets: originalWidgets
         };
 
@@ -40,17 +46,19 @@ export class Home extends Component {
     }
 
     resetLayout() {
-        this.setState({ layouts: {} });
+        this.setState({
+            layout: []
+        });
     }
 
-    onLayoutChange(layouts) {
-        saveToLS("layouts", layouts);
-        this.setState({ layouts });
+    onLayoutChange(layout) {
+        saveToLS("layout", layout);
+        this.setState({ layout });
     }
 
     onAddWidget(name) {
         this.setState({
-            layouts: this.state.layouts.concat({
+            layout: this.state.layout.concat({
                 i: name,
                 x: this.state.widgets.length * 2 % (this.state.cols || 24),
                 y: Infinity, // puts it at the bottom
@@ -61,25 +69,23 @@ export class Home extends Component {
     }
 
     onRemoveWidget(name) {
-        this.setState({ layouts: _.reject(this.state.layouts, { name: name }) });
+        this.setState({ layout: _.reject(this.state.layout, { name: name }) });
     }
 
     createWidget(WidgetType) {
-        return <WidgetType key={WidgetType.name}/>;
+        return <WidgetType key={WidgetType.name} />;
     }
 
     render() {
         return (
-            <ResponsiveReactGridLayout
-                layouts={this.state.layouts}
-                onLayoutChange={(layouts) =>
-                    this.onLayoutChange(layouts)
-                }
-                onBreakpointChange={this.onBreakpointChange}
+            <ReactGridLayout
+                {...this.props}
+                layout={this.state.layout}
+                onLayoutChange={this.onLayoutChange}
                 draggableHandle=".widgetHandle"
             >
-                {this.state.widgets.map(x => this.createWidget(x.type))} 
-            </ResponsiveReactGridLayout>
+                {this.state.widgets.map(x => this.createWidget(x))}
+            </ReactGridLayout>
         );
     }
 }

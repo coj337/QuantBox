@@ -58,6 +58,8 @@ export class MarketWatch extends Component {
                    minW={2}
                    currentH={2}
                    currentW={2}
+                   x={10}
+                   y={0}
                >
                    <ReactTable
                        data={marketData}

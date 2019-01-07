@@ -11,6 +11,8 @@ export class Navigator extends Component {
                 minW={2}
                 currentH={2}
                 currentW={2}
+                x={8}
+                y={0}
             >
                 <Tree content="Accounts">
                     <Tree content="Poloniex" />

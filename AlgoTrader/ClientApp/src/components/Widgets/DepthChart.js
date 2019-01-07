@@ -4,10 +4,6 @@ import { Widget } from './Widget';
 export class DepthChart extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            error: null,
-            isLoaded: false
-        };
     }
 
     render() {
@@ -18,6 +14,8 @@ export class DepthChart extends Component {
                 minW={2}
                 currentH={2}
                 currentW={2}
+                x={0}
+                y={2}
             >
                 Depth Stuff
             </Widget>

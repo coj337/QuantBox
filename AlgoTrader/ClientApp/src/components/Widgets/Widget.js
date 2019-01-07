@@ -12,7 +12,9 @@ export class Widget extends Component {
             minH: props.minH,
             minW: props.minW,
             currentH: props.currentH,
-            currentW: props.currentW
+            currentW: props.currentW,
+            x: props.x,
+            y: props.y
         };
     }
 
@@ -22,7 +24,7 @@ export class Widget extends Component {
 
     render() {
         return (
-            <div className="widget" data-grid={{ w: this.state.currentW, h: this.state.currentH, x: 0, y: 0, minW: this.state.minW, minH: this.state.minH }}>
+            <div key={this.state.title} className="widget" data-grid={{ w: this.state.currentW, h: this.state.currentH, x: this.state.x, y: this.state.y, minW: this.state.minW, minH: this.state.minH }}>
                 <div className="widgetHandle">
                     <p className="widgetTitle">{this.state.title}</p>
                     <Glyphicon className="closeButton" onClick={this.handleRemove} glyph='remove' />

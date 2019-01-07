@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2050
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MT2", "MyVested.Auto\MT2.csproj", "{48EE41DC-F99A-4DD9-8A83-3481C38920EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "AlgoTrader\Frontend.csproj", "{48EE41DC-F99A-4DD9-8A83-3481C38920EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{32815021-BDEB-4667-BC7C-1EDE1E29EFFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Historey.API", "Historey.API\Historey.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.API", "Historey.API\History.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "History.Domain", "History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Domain", "History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "History.Infrastructure", "History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
