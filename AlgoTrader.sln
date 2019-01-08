@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "AlgoTrader\Fron
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{32815021-BDEB-4667-BC7C-1EDE1E29EFFF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "Services\History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.API", "History.API\History.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.API", "Services\History\History.API\History.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Domain", "History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Domain", "Services\History\History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "Services\History\History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
