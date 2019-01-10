@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Sentiment.Infrastructure;
 
 namespace MyVested.Pro.Controllers{
     [Route("[controller]")]
-    public class PricesController : Controller{
+    public class PricesController : Controller {
         [HttpGet("[action]")]
         public JsonResult Tickers(){
             return Json(new List<Price>(){
@@ -27,7 +28,6 @@ namespace MyVested.Pro.Controllers{
                 }
             });
         }
-
 
         public class Price {
             public string Symbol { get; set; }

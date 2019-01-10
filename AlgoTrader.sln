@@ -1,19 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.168
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "AlgoTrader\Frontend.csproj", "{48EE41DC-F99A-4DD9-8A83-3481C38920EC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{32815021-BDEB-4667-BC7C-1EDE1E29EFFF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "Services\History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.API", "Services\History\History.API\History.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Domain", "Services\History\History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "Services\History\History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentiment", "Sentiment", "{2EF750B7-49E2-4B04-AACF-B927777B8F47}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.API", "Sentiment.API\Sentiment.API.csproj", "{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.Domain", "Sentiment.Domain\Sentiment.Domain.csproj", "{BA631FF4-8015-4A46-B500-C3E0BA18385C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.Infrastructure", "Sentiment.Infrastructure\Sentiment.Infrastructure.csproj", "{3C075D57-1C39-4CD4-BE15-00A12E7C708E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,6 +45,18 @@ Global
 		{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA631FF4-8015-4A46-B500-C3E0BA18385C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA631FF4-8015-4A46-B500-C3E0BA18385C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA631FF4-8015-4A46-B500-C3E0BA18385C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA631FF4-8015-4A46-B500-C3E0BA18385C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +66,10 @@ Global
 		{EAEE6A38-51D4-4D25-BA33-B5D74651AABE} = {9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}
 		{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A} = {9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}
 		{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7} = {9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}
+		{2EF750B7-49E2-4B04-AACF-B927777B8F47} = {32815021-BDEB-4667-BC7C-1EDE1E29EFFF}
+		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
+		{BA631FF4-8015-4A46-B500-C3E0BA18385C} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
+		{3C075D57-1C39-4CD4-BE15-00A12E7C708E} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1D69107-5C23-469A-A8EC-5B9EEA105C0C}
