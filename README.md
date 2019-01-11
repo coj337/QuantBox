@@ -37,5 +37,5 @@ Sentiment Analysis is useful for manual or automated trading but it's hard, for 
   
 ### Exchange Support
 Support a million exchanges isn't very high on the list while this is a small project but I'll work on requested exchanges as a priority.
-  - Binance 
+  - Binance  
   Next: BtcMarkets
