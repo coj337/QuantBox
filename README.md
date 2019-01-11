@@ -35,7 +35,18 @@ Sentiment Analysis is useful for manual or automated trading but it's hard, for 
   - Time-per-loop calculation
   - API-less exchange support (Exchanges without an API are much more likely to allow arbitrage!)
   
+### Portfolio Tracking!
+Lots of pretty charts, I promise.
+  - Calculate PNL based off:
+    - Trade and price history on all or individual exchanges
+    - On each exchange
+    - For each coin
+    - A mix of both
+  - Tax calculations (Tax is hard and I'm not an accountant, don't take this as financial advice etc.) 
+  - Stats! Stats! Stats! 
+  - Maybe portfolio management (e.g. Automatic re-balancing)
+
 ### Exchange Support
-Support a million exchanges isn't very high on the list while this is a small project but I'll work on requested exchanges as a priority.
+Supporting a million exchanges isn't very high on the list while this is a small project but I'll work on requested exchanges as a priority.
   - Binance  
   Next: BtcMarkets
