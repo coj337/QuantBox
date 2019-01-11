@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="CodingUpAStorm.VaderSharp" Version="1.0.4" />
     <PackageReference Include="TweetinviAPI" Version="4.0.0" />
   </ItemGroup>
