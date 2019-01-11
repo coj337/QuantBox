@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { HubConnectionBuilder } from '@aspnet/signalr';
-import './Sentiment.css';
+import { SentimentPanel } from './SentimentPanel';
 
 export class Sentiment extends Component {
   displayName = Sentiment.name
@@ -11,44 +10,31 @@ export class Sentiment extends Component {
 
         this.state = {
             hubConnection: null,
-            sentiments: []
+            assets: []
         };
     }
 
-    componentWillMount() {
-        const hubConnection = new HubConnectionBuilder().withUrl('/sentimentHub').build();
-        this.setState({
-            hubConnection: hubConnection
-        }, () => {
-            this.state.hubConnection
-                .start()
-                .then(() => console.log('Connection started!'))
-                .catch(err => console.log('Error while establishing connection :( (' + err + ')'));
-        });
-    }
-
     componentDidMount() {
-        this.state.hubConnection.on('ReceiveSentiments', (receivedMessage) => {
-            var sentiments = receivedMessage;
-            this.setState({
-                sentiments: sentiments
-            });
-        });
+        fetch("/Sentiment/GetSupportedAssets")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        assets: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
     render() {
         return (
             <Row>
-                {this.state.sentiments.map((sentiment, i) => (
+                {this.state.assets.map((asset, i) => (
                     <Col xs={6} md={4} lg={3} key={i}>
-                        <div className="sentimentPanel" >
-                            Asset: {sentiment.name} ({sentiment.symbol})<br/>
-                            Positive: {Math.floor(sentiment.positive * 100)}<br />
-                            Neutral: {Math.floor(sentiment.neutral * 100)}<br />
-                            Negative: {Math.floor(sentiment.negative * 100)}<br />
-                            Compound: {Math.floor(sentiment.compound * 100)}<br />
-                            Tweets Analyzed: {sentiment.itemsChecked}
-                        </div>
+                        <SentimentPanel name={asset.name} symbol={asset.symbol}/>
                     </Col>
                 ))}
             </Row>

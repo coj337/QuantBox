@@ -23,9 +23,14 @@ export class NavMenu extends Component {
                 <Glyphicon glyph='home' /> Dashboard
               </NavItem>
             </LinkContainer>
-            <LinkContainer to={'/settings'}>
+            <LinkContainer to={'/sentiment'}>
               <NavItem>
-                <Glyphicon glyph='cog' /> Settings
+                <Glyphicon glyph='cog' /> Sentiment
+              </NavItem>
+            </LinkContainer>
+            <LinkContainer to={'/arbitrage'}>
+              <NavItem>
+                <Glyphicon glyph='cog' /> Arbitrage
               </NavItem>
             </LinkContainer>
           </Nav>

@@ -11,6 +11,12 @@
     color: white;
 }
 
+body {
+    padding-top: 25px;
+    background-color: #272D3A;
+    color: white;
+}
+
 @media (min-width: 768px) {
     /* On large screens, convert the nav menu to a vertical sidebar */
     .navbar {

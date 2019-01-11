@@ -19,7 +19,7 @@ namespace Sentiment.Infrastructure
             //TODO: For each listener too
             foreach (var asset in _twitterSentiment.GetSupportedAssets())
             {
-                _twitterSentiment.StartSentimentListener(new List<string> { asset.symbol, asset.name });
+                _twitterSentiment.StartRealTimeSentimentListener(new List<string> { asset.symbol, asset.name });
             }
         }
     }

@@ -78,9 +78,9 @@ namespace AlgoTrader
                 }
             });
 
-            Task.Run(() => 
-                sentimentService.StartSentimentListeners()
-            );
+            //Task.Run(() => 
+            //    sentimentService.StartSentimentListeners()
+            //);
         }
     }
 }

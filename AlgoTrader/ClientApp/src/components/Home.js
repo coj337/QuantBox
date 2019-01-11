@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import RGL, { WidthProvider } from "react-grid-layout";import 'react-grid-layout/css/styles.css';
+import RGL, { WidthProvider } from "react-grid-layout";
+import 'react-grid-layout/css/styles.css';
 import _ from "lodash";
 
 import { MarketWatch } from './Widgets/MarketWatch';

@@ -17,11 +17,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentiment", "Sentiment", "{2EF750B7-49E2-4B04-AACF-B927777B8F47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.API", "Sentiment.API\Sentiment.API.csproj", "{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sentiment.API", "Sentiment.API\Sentiment.API.csproj", "{8FF92B05-8DAC-418A-AA3A-70BC2C986F70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.Domain", "Sentiment.Domain\Sentiment.Domain.csproj", "{BA631FF4-8015-4A46-B500-C3E0BA18385C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sentiment.Domain", "Sentiment.Domain\Sentiment.Domain.csproj", "{BA631FF4-8015-4A46-B500-C3E0BA18385C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.Infrastructure", "Sentiment.Infrastructure\Sentiment.Infrastructure.csproj", "{3C075D57-1C39-4CD4-BE15-00A12E7C708E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sentiment.Infrastructure", "Sentiment.Infrastructure\Sentiment.Infrastructure.csproj", "{3C075D57-1C39-4CD4-BE15-00A12E7C708E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Arbitrage", "Arbitrage", "{E19A7DBD-FE1D-4B46-AB9B-2CF7AAC224F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbitrage.API", "Arbitrage.API\Arbitrage.API.csproj", "{8FB940DB-5F3A-427B-95CF-3D452FC0B126}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbitrage.Domain", "Arbitrage.Domain\Arbitrage.Domain.csproj", "{7D0A42B5-7A8B-4705-83B2-C548F1950B93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbitrage.Infrastructure", "Arbitrage.Infrastructure\Arbitrage.Infrastructure.csproj", "{FE745231-38ED-4172-B2DD-8C16581D14CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +65,18 @@ Global
 		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C075D57-1C39-4CD4-BE15-00A12E7C708E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FB940DB-5F3A-427B-95CF-3D452FC0B126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FB940DB-5F3A-427B-95CF-3D452FC0B126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FB940DB-5F3A-427B-95CF-3D452FC0B126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FB940DB-5F3A-427B-95CF-3D452FC0B126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D0A42B5-7A8B-4705-83B2-C548F1950B93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D0A42B5-7A8B-4705-83B2-C548F1950B93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D0A42B5-7A8B-4705-83B2-C548F1950B93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D0A42B5-7A8B-4705-83B2-C548F1950B93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE745231-38ED-4172-B2DD-8C16581D14CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE745231-38ED-4172-B2DD-8C16581D14CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE745231-38ED-4172-B2DD-8C16581D14CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE745231-38ED-4172-B2DD-8C16581D14CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +90,10 @@ Global
 		{8FF92B05-8DAC-418A-AA3A-70BC2C986F70} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
 		{BA631FF4-8015-4A46-B500-C3E0BA18385C} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
 		{3C075D57-1C39-4CD4-BE15-00A12E7C708E} = {2EF750B7-49E2-4B04-AACF-B927777B8F47}
+		{E19A7DBD-FE1D-4B46-AB9B-2CF7AAC224F8} = {32815021-BDEB-4667-BC7C-1EDE1E29EFFF}
+		{8FB940DB-5F3A-427B-95CF-3D452FC0B126} = {E19A7DBD-FE1D-4B46-AB9B-2CF7AAC224F8}
+		{7D0A42B5-7A8B-4705-83B2-C548F1950B93} = {E19A7DBD-FE1D-4B46-AB9B-2CF7AAC224F8}
+		{FE745231-38ED-4172-B2DD-8C16581D14CC} = {E19A7DBD-FE1D-4B46-AB9B-2CF7AAC224F8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1D69107-5C23-469A-A8EC-5B9EEA105C0C}

@@ -6,7 +6,7 @@ namespace Sentiment.Domain
 {
     public interface ISentimentListener
     {
-        void StartSentimentListener(List<string> keywords, bool translate = false);
+        SentimentAnalysisResult GetSentiment(string[] keywords, int duration, bool translate = false);
 
         List<SentimentAsset> GetSupportedAssets();
     }
