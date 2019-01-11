@@ -8,6 +8,10 @@ namespace Arbitrage.Domain
     {
         public string Pair { get; set; }
 
+        public SupportedExchange startExchange { get; set; }
 
+        public SupportedExchange endExchange { get; set; }
+
+        public decimal spread { get; set; }
     }
 }

@@ -10,7 +10,7 @@ using Sentiment.Infrastructure;
 using System.Threading.Tasks;
 using System;
 
-namespace AlgoTrader
+namespace QuantBox
 {
     public class Startup
     {
