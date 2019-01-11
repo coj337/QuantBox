@@ -38,10 +38,10 @@ Sentiment Analysis is useful for manual or automated trading but it's hard, for 
 ### Portfolio Tracking!
 Lots of pretty charts, I promise.
   - Calculate PNL based off:
-    - Trade and price history on all or individual exchanges
-    - On each exchange
-    - For each coin
-    - A mix of both
+    - Trade and price history on all exchanges
+    - On individual exchanges
+    - For individual coins
+    - A mix of anything in between
   - Tax calculations (Tax is hard and I'm not an accountant, don't take this as financial advice etc.) 
   - Stats! Stats! Stats! 
   - Maybe portfolio management (e.g. Automatic re-balancing)
