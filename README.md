@@ -1,4 +1,6 @@
 # QuantBox
+![Build Badge](https://img.shields.io/azure-devops/build/coj337/df822579-9f76-4f6a-b881-dcf966f0e0b0/2.svg)
+![Coverage Badge](https://img.shields.io/azure-devops/coverage/coj337/QuantBox/2.svg)  
 
 The purpose of QuantBox is to be a easy to use, all in one microservices based platform for cryptocurrency traders, think of it as [Coinigy](https://www.coinigy.com/) x [TradingView](https://www.tradingview.com/) x [Haasbot](https://www.haasonline.com/) x [MetaTrader](https://www.metatrader5.com/en).
 
