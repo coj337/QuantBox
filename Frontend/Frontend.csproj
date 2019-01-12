@@ -23,8 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Services\Arbitrage\Arbitrage.Infrastructure\Arbitrage.Infrastructure.csproj" />
+    <ProjectReference Include="..\Services\Market\Market.Infrastructure\Market.Infrastructure.csproj" />
     <ProjectReference Include="..\Services\Sentiment\Sentiment.Infrastructure\Sentiment.Infrastructure.csproj" />
-    <ProjectReference Include="..\Services\History\History.Infrastructure\History.Infrastructure.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

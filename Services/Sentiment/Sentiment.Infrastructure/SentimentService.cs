@@ -12,6 +12,10 @@ namespace Sentiment.Infrastructure
         public SentimentService(TwitterSentimentAnalyser twitterSentiment)
         {
             _twitterSentiment = twitterSentiment;
+
+            //Task.Run(() => 
+            //    StartSentimentListeners()
+            //);
         }
 
         public void StartSentimentListeners()

@@ -9,7 +9,6 @@ namespace Sentiment.Infrastructure
 {
     public interface ISentimentHub
     {
-        Task SendSentiments(SentimentAnalysisResult[] sentimentResults);
         Task ReceiveSentiments(SentimentAnalysisResult[] sentimentResults);
     }
 }

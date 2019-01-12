@@ -7,13 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "Frontend\Fronte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{32815021-BDEB-4667-BC7C-1EDE1E29EFFF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "History", "History", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Market", "Market", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.API", "Services\History\History.API\History.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.API", "Services\Market\Market.API\Market.API.csproj", "{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Domain", "Services\History\History.Domain\History.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Domain", "Services\Market\Market.Domain\Market.Domain.csproj", "{AD9D7309-2CF6-4FD2-A276-710B7EE2D30A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "History.Infrastructure", "Services\History\History.Infrastructure\History.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Market.Infrastructure", "Services\Market\Market.Infrastructure\Market.Infrastructure.csproj", "{F5CA57F0-8BC5-40A8-8E92-BE59505A6DF7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentiment", "Sentiment", "{2EF750B7-49E2-4B04-AACF-B927777B8F47}"
 EndProject
@@ -31,11 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arbitrage.Domain", "Service
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arbitrage.Infrastructure", "Services\Arbitrage\Arbitrage.Infrastructure\Arbitrage.Infrastructure.csproj", "{FE745231-38ED-4172-B2DD-8C16581D14CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.UnitTests", "Sentiment.UnitTests\Sentiment.UnitTests.csproj", "{CB35F1D2-96D6-46FA-9A35-4FD0E7721CC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentiment.UnitTests", "Services\Sentiment\Sentiment.UnitTests\Sentiment.UnitTests.csproj", "{CB35F1D2-96D6-46FA-9A35-4FD0E7721CC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "History.UnitTests", "History.UnitTests\History.UnitTests.csproj", "{D8DBFDA4-D1E9-4C5A-B36E-9619A7E97AF5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Market.UnitTests", "Services\Market\Market.UnitTests\Market.UnitTests.csproj", "{D8DBFDA4-D1E9-4C5A-B36E-9619A7E97AF5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbitrage.UnitTests", "Arbitrage.UnitTests\Arbitrage.UnitTests.csproj", "{B27191E2-6EEC-4A19-851E-5300FFCA0113}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arbitrage.UnitTests", "Services\Arbitrage\Arbitrage.UnitTests\Arbitrage.UnitTests.csproj", "{B27191E2-6EEC-4A19-851E-5300FFCA0113}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

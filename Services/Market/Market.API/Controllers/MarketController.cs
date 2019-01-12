@@ -8,7 +8,7 @@ namespace Historey.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class MarketController : ControllerBase
     {
         // GET api/values
         [HttpGet]

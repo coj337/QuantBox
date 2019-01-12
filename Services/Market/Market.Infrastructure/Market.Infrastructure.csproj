@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\History.Domain\History.Domain.csproj" />
+    <ProjectReference Include="..\Market.Domain\Market.Domain.csproj" />
   </ItemGroup>
 
 </Project>

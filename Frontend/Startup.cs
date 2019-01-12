@@ -9,6 +9,7 @@ using History.Domain.Exchanges;
 using Sentiment.Infrastructure;
 using System.Threading.Tasks;
 using System;
+using Arbitrage.Infrastructure;
 
 namespace QuantBox
 {
@@ -24,9 +25,12 @@ namespace QuantBox
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHostedService<Binance>();
+
             services.AddSingleton<SentimentService>();
             services.AddSingleton<TwitterSentimentAnalyser>();
-            services.AddHostedService<Binance>();
+
+            services.AddSingleton<ArbitrageService>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
@@ -59,6 +63,7 @@ namespace QuantBox
             app.UseSignalR(routes =>
             {
                 routes.MapHub<SentimentHub>("/sentimentHub");
+                routes.MapHub<ArbitrageHub>("/arbitrageHub");
             });
 
             app.UseMvc(routes =>
@@ -77,10 +82,6 @@ namespace QuantBox
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
-
-            //Task.Run(() => 
-            //    sentimentService.StartSentimentListeners()
-            //);
         }
     }
 }

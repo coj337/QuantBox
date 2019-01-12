@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Arbitrage.Infrastructure
+namespace Arbitrage.Domain
 {
     public interface IArbitrageHub
     {
-        List<ArbitrageResult> ReceiveArbitrageMatrix();
+        List<ArbitrageResult> ReceiveArbitrageOppurtunities(ArbitrageResult[] arbResults);
     }
 }
