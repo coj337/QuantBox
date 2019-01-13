@@ -6,6 +6,10 @@ The purpose of QuantBox is to be a easy to use, all in one microservices based p
 
 With QuantBox the aim is to be able to do anything you want from setting up your trading desk exactly how you want to automating your existing strategy without writing a line of code.
 
+## Getting Started
+QuantBox is in early stages and doesn't have most features implemented yet.
+To run it simply open it up in Visual Studio and run the Frontend project.
+
 ## Features
 There's many plans for this and some are sure to get dropped and some will be added, ***suggestions are welcome!***  
 **NOTE: Most of this hasn't been made*** (e.g. Multiple dashboards) ***or is a naive implementation** (e.g. Sentiment Analysis)  
