@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentiment.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,15 +8,12 @@ namespace Sentiment.Infrastructure
 {
     public class SentimentService
     {
+        public Dictionary<string, Dictionary<string, MarketData>> Markets { get; set; }
         private readonly TwitterSentimentAnalyser _twitterSentiment;
 
         public SentimentService(TwitterSentimentAnalyser twitterSentiment)
         {
             _twitterSentiment = twitterSentiment;
-
-            //Task.Run(() => 
-            //    StartSentimentListeners()
-            //);
         }
 
         public void StartSentimentListeners()

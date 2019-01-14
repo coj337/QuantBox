@@ -1,18 +1,20 @@
-FROM microsoft/dotnet:3.0-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime-stretch-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM microsoft/dotnet:3.0-sdk AS build
+FROM microsoft/dotnet:2.2-sdk-stretch AS build
 WORKDIR /src
-COPY ["Sentiment.API/Sentiment.API.csproj", "Sentiment.API/"]
-RUN dotnet restore "Sentiment.API/Sentiment.API.csproj"
+COPY Services/Sentiment/Sentiment.API/Sentiment.API.csproj Services/Sentiment/Sentiment.API/
+COPY Services/Sentiment/Sentiment.Infrastructure/Sentiment.Infrastructure.csproj Services/Sentiment/Sentiment.Infrastructure/
+COPY Services/Sentiment/Sentiment.Domain/Sentiment.Domain.csproj Services/Sentiment/Sentiment.Domain/
+RUN dotnet restore Services/Sentiment/Sentiment.API/Sentiment.API.csproj
 COPY . .
-WORKDIR "/src/Sentiment.API"
-RUN dotnet build "Sentiment.API.csproj" -c Release -o /app
+WORKDIR /src/Services/Sentiment/Sentiment.API
+RUN dotnet build Sentiment.API.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "Sentiment.API.csproj" -c Release -o /app
+RUN dotnet publish Sentiment.API.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app

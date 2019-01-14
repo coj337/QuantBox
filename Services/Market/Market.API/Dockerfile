@@ -1,20 +1,22 @@
-FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime-stretch-slim AS base
 WORKDIR /app
-EXPOSE 65258
-EXPOSE 44331
+EXPOSE 80
+EXPOSE 443
 
-FROM microsoft/dotnet:2.1-sdk AS build
+FROM microsoft/dotnet:2.2-sdk-stretch AS build
 WORKDIR /src
-COPY ["Historey.API/Historey.API.csproj", "Historey.API/"]
-RUN dotnet restore "Historey.API/Historey.API.csproj"
+COPY Services/Market/Market.API/Market.API.csproj Services/Market/Market.API/
+COPY Services/Market/Market.Infrastructure/Market.Infrastructure.csproj Services/Market/Market.Infrastructure/
+COPY Services/Market/Market.Domain/Market.Domain.csproj Services/Market/Market.Domain/
+RUN dotnet restore Services/Market/Market.API/Market.API.csproj
 COPY . .
-WORKDIR "/src/Historey.API"
-RUN dotnet build "Historey.API.csproj" -c Release -o /app
+WORKDIR /src/Services/Market/Market.API
+RUN dotnet build Market.API.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "Historey.API.csproj" -c Release -o /app
+RUN dotnet publish Market.API.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
-ENTRYPOINT ["dotnet", "Historey.API.dll"]
+ENTRYPOINT ["dotnet", "Market.API.dll"]

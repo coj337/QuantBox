@@ -1,18 +1,18 @@
-FROM microsoft/dotnet:3.0-aspnetcore-runtime AS base
+FROM microsoft/dotnet:2.2-aspnetcore-runtime-stretch-slim AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM microsoft/dotnet:3.0-sdk AS build
+FROM microsoft/dotnet:2.2-sdk-stretch AS build
 WORKDIR /src
-COPY ["Arbitrage.API/Arbitrage.API.csproj", "Arbitrage.API/"]
-RUN dotnet restore "Arbitrage.API/Arbitrage.API.csproj"
+COPY Services/Arbitrage/Arbitrage.API/Arbitrage.API.csproj Services/Arbitrage/Arbitrage.API/
+RUN dotnet restore Services/Arbitrage/Arbitrage.API/Arbitrage.API.csproj
 COPY . .
-WORKDIR "/src/Arbitrage.API"
-RUN dotnet build "Arbitrage.API.csproj" -c Release -o /app
+WORKDIR /src/Services/Arbitrage/Arbitrage.API
+RUN dotnet build Arbitrage.API.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "Arbitrage.API.csproj" -c Release -o /app
+RUN dotnet publish Arbitrage.API.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app

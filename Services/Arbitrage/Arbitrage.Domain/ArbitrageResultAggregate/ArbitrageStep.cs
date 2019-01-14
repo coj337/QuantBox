@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arbitrage.Domain.ArbitrageResultAggregate;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,9 +7,9 @@ namespace Arbitrage.Domain
 {
     public class ArbitrageStep
     {
-        public Exchange Exchange { get; set; }
+        public ExchangeData Exchange { get; set; }
 
-        public Pair Pair { get; set; }
+        public PairData Pair { get; set; }
 
         public decimal TransactionFee { get; set; } // Transaction fee incurred to get the asset from first exchange to second
 

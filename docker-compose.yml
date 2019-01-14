@@ -1,0 +1,57 @@
+version: '3.4'
+
+services:
+  ## UI Services ##
+  frontend:
+    image: ${DOCKER_REGISTRY-}frontend
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+
+  ## Service Bus ##
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+
+  ## Internal API Services ##
+  arbitrage.api:
+    image: ${DOCKER_REGISTRY-}arbitrageapi
+    build:
+      context: .
+      dockerfile: Services/Arbitrage/Arbitrage.API/Dockerfile
+    depends_on:
+      - market.api
+      - rabbitmq
+
+  market.api:
+    image: ${DOCKER_REGISTRY-}marketapi
+    build:
+      context: .
+      dockerfile: Services/Market/Market.API/Dockerfile
+    depends_on:
+      - rabbitmq
+
+  sentiment.api:
+    image: ${DOCKER_REGISTRY-}sentimentapi
+    build:
+      context: .
+      dockerfile: Services/Sentiment/Sentiment.API/Dockerfile
+    depends_on:
+      - rabbitmq
+      - market.api
+
+  ## Public API Services ##
+  trading-apigw:
+    image: ${DOCKER_REGISTRY-}apigwbase
+    build:
+      context: .
+      dockerfile: ApiGateways/ApiGw-Base/Dockerfile
+    depends_on:
+      - arbitrage.api
+      - sentiment.api
+      - market.api
+
+  trading-agg:
+    image: ${DOCKER_REGISTRY-}webtrading
+    build:
+      context: .
+      dockerfile: ApiGateways/Web.Trading/Dockerfile

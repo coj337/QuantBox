@@ -17,7 +17,7 @@ export class SentimentPanel extends Component {
     }
 
     componentDidMount() {
-        fetch("/Sentiment/GetTwitterSentiment?name=" + this.state.name + "&symbol=" + this.state.symbol)
+        fetch("/Sentiment/TwitterSentiment?name=" + this.state.name + "&symbol=" + this.state.symbol)
             .then(res => res.json())
             .then(
                 (result) => {

@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-namespace History.UnitTests
+namespace Market.UnitTests
 {
     public class UnitTest1
     {

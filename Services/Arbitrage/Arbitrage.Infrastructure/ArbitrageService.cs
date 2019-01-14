@@ -1,4 +1,5 @@
 ﻿using Arbitrage.Domain;
+using Arbitrage.Domain.ExchangeAggregate;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,45 +9,34 @@ namespace Arbitrage.Infrastructure
 {
     public class ArbitrageService
     {
-        private readonly List<Exchange> _exchanges;
+        public Dictionary<string, Dictionary<string, MarketData>> Markets { get; set; }
 
         public ArbitrageService()
         {
-            _exchanges = new List<Exchange>() //TODO: Get from market service
-            {
-                new Exchange()
-                {
-                    Name = "Binance",
-                    TradeFee = 0.2m,
-                    Pairs = new List<Pair>()
-                    {
-                        new Pair()
-                        {
-                            BaseCurrency = new Currency()
-                            {
-                                symbol = "BTC"
-                            },
-                            AltCurrency = new Currency()
-                            {
-                                symbol = "ETH"
-                            }
-                        }
-                    }
-                }
-            };
-
+            Markets = new Dictionary<string, Dictionary<string, MarketData>>();
             Task.Run(() =>
                 StartArbitrageListener()
             );
         }
 
+        public void UpdatePrice(ExchangeData marketData)
+        {
+            if (!Markets.ContainsKey(marketData.Exchange))
+            {
+                Markets.Add(marketData.Exchange, new Dictionary<string, MarketData>());
+            }
+            if (!Markets[marketData.Exchange].ContainsKey(marketData.Pair))
+            {
+                Markets[marketData.Exchange].Add(marketData.Pair, new MarketData());
+            }
+            Markets[marketData.Exchange][marketData.Pair].Ask = marketData.Data.Ask;
+            Markets[marketData.Exchange][marketData.Pair].Bid = marketData.Data.Bid;
+        }
+
         //Calculate arb chances for everything and pass it to the UI via SignalR
         public void StartArbitrageListener()
         {
-            foreach(var exchange in _exchanges)
-            {
-
-            }
+            //TODO: Do arb things
         }
     }
 }

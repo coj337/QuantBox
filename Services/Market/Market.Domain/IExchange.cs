@@ -1,15 +1,15 @@
-﻿using ExchangeSharp;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Market.Domain
 {
-    public interface IExchange
+    public interface IExchange : IHostedService
     {
         string Name { get; }
-        List<Market> Markets { get; }
+
+        Dictionary<string, MarketData> Markets { get; }
 
         bool Authenticate(string publicKey, string privateKey);
 

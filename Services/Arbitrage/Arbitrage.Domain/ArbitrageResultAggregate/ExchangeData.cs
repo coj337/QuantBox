@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Market.Domain
+namespace Arbitrage.Domain.ArbitrageResultAggregate
 {
-    public class Currency
+    public class ExchangeData
     {
-        public string Symbol { get; set; }
-
         public string Name { get; set; }
     }
 }

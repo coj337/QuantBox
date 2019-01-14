@@ -5,18 +5,8 @@ using System.Text;
 
 namespace Market.Domain
 {
-    public class Market
+    public class MarketData
     {
-        public Market(string baseCurrency, string altCurrency)
-        {
-            BaseCurrency = baseCurrency;
-            AltCurrency = altCurrency;
-        }
-
-        public string BaseCurrency { get; set; }
-
-        public string AltCurrency { get; set; }
-
         public decimal Bid { get; set; }
 
         public decimal Ask { get; set; }

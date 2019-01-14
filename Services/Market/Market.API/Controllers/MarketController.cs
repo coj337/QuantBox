@@ -2,44 +2,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Market.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Historey.API.Controllers
+namespace Market.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class MarketController : ControllerBase
     {
-        // GET api/values
+        private readonly MarketService _marketService;
+
+        public MarketController(MarketService marketService)
+        {
+            _marketService = marketService;
+        }
+
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public IActionResult GetSupportedExchanges()
         {
-            return new string[] { "value1", "value2" };
+            return Ok(_marketService.GetSupportedExchanges());
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        [HttpGet]
+        public IActionResult GetSupportedAssets()
         {
-            return "value";
-        }
-
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            return Ok(_marketService.GetSupportedAssets());
         }
     }
 }
