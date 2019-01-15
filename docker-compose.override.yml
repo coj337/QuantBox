@@ -14,7 +14,16 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     build:
       dockerfile: Frontend/Dockerfile.Development
-      
+  
+  ## Databases ##
+  sql.data:
+    environment:
+      - SA_PASSWORD=<Password>
+      - ACCEPT_EULA=Y
+    ports:
+      - "5433:1433" # Important: In a production environment your should remove the external port
+
+  ## Internal API Services ##
   arbitrage.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -51,6 +60,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
+  ## Public API Services ##
   trading-apigw:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

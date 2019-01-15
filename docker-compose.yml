@@ -8,6 +8,10 @@ services:
       context: .
       dockerfile: Frontend/Dockerfile
 
+  ## Database ##
+  sql.data:
+    image: microsoft/mssql-server-linux:latest
+
   ## Service Bus ##
   rabbitmq:
     image: rabbitmq:3-management-alpine
