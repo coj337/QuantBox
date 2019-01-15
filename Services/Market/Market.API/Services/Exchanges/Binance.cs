@@ -56,12 +56,13 @@ namespace Market.API.Exchanges
             }
         }
 
-        public async Task StartPriceListener()
+        private readonly ManualResetEvent _priceListenerStoppedEvent = new ManualResetEvent(false);
+        public Task StartPriceListener()
         {
             //Subscribe to ticker websockets
-            using (var socket = _client.GetTickersWebSocket((tickers) =>
+            var socket = _client.GetTickersWebSocket((tickers) =>
             {
-                for(var i = 0; i < tickers.Count(); i++)
+                for (var i = 0; i < tickers.Count(); i++)
                 {
                     MarketData foundMarket;
                     var ticker = tickers.ElementAt(i);
@@ -87,10 +88,22 @@ namespace Market.API.Exchanges
                     var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.Bid, foundMarket.Ask);
                     _eventBus.Publish(@event);
                 }
-            }))
-            {
-                Console.ReadLine(); //TODO: Keep it open more gracefully
-            }
+            });
+
+            socket.Disconnected += SocketStoppedEvent;
+
+            _priceListenerStoppedEvent.WaitOne(); //This thread will block here until the reset event is sent.
+            _priceListenerStoppedEvent.Reset();
+
+            return Task.CompletedTask;
+        }
+
+        private Task SocketStoppedEvent(object sender)
+        {
+            //Log once logger's implemented
+            _priceListenerStoppedEvent.Set();
+
+            return Task.CompletedTask;
         }
     }
 }

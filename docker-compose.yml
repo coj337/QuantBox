@@ -53,9 +53,3 @@ services:
       - arbitrage.api
       - sentiment.api
       - market.api
-
-  trading-agg:
-    image: ${DOCKER_REGISTRY-}webtrading
-    build:
-      context: .
-      dockerfile: ApiGateways/Web.Trading/Dockerfile

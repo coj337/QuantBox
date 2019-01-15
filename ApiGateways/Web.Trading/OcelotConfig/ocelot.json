@@ -2,11 +2,11 @@
   "ReRoutes": [
     {
       "DownstreamPathTemplate": "/api/{version}/arbitrage/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "arbitrage.api",
-          "Port": 443
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/{version}/arbitrage/{everything}",
@@ -14,11 +14,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/{version}/market/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "market.api",
-          "Port": 443
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/{version}/market/{everything}",
@@ -26,11 +26,11 @@
     },
     {
       "DownstreamPathTemplate": "/api/{version}/sentiment/{everything}",
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "sentiment.api",
-          "Port": 443
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/{version}/sentiment/{everything}",

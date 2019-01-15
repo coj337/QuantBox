@@ -23,11 +23,6 @@ namespace Market.API.Services
             {
                 new Binance(eventBus)
             };
-
-            foreach (var exchange in _supportedExchanges)
-            {
-                exchange.StartPriceListener();
-            }
         }
 
         public List<IExchange> GetSupportedExchanges()
@@ -42,6 +37,19 @@ namespace Market.API.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            var priceListeners = new List<Task>();
+            foreach (var exchange in _supportedExchanges)
+            {
+                priceListeners.Add(
+                    Task.Run(() =>
+                    {
+                        exchange.StartPriceListener();
+                    })
+                );
+            }
+
+            Task.WaitAll(priceListeners.ToArray());
+
             return Task.CompletedTask;
         }
 

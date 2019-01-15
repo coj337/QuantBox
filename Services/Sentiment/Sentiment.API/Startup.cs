@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using Sentiment.Infrastructure;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sentiment.API
 {
@@ -34,11 +35,17 @@ namespace Sentiment.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            // Register the Swagger generator
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Sentiment API", Version = "v1" });
+            });
+
             services.AddCustomMvc();
 
             services.AddSingleton<TwitterSentimentAnalyser>();
 
-            RegisterEventBus(services);
+            //RegisterEventBus(services);
 
             //configure autofac
             var container = new ContainerBuilder();
@@ -50,24 +57,14 @@ namespace Sentiment.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            var pathBase = Configuration["PATH_BASE"];
-
-            if (!string.IsNullOrEmpty(pathBase))
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UsePathBase(pathBase);
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sentiment.API V1");
+            });
 
             app.UseCors("CorsPolicy");
-
             app.UseMvcWithDefaultRoute();
-
-            app.UseSwagger()
-               .UseSwaggerUI(c =>
-               {
-                   c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Sentiment.API V1");
-                   c.OAuthClientId("sentimentswaggerui");
-                   c.OAuthAppName("Sentiment Swagger UI");
-               });
 
             //ConfigureEventBus(app);
         }

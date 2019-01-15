@@ -21,6 +21,7 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using Market.API.Services;
 using Autofac.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Market.API
 {
@@ -36,6 +37,12 @@ namespace Market.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            // Register the Swagger generator
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Market API", Version = "v1" });
+            });
+
             services.AddCustomMvc();
 
             RegisterEventBus(services);
@@ -52,24 +59,14 @@ namespace Market.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            var pathBase = Configuration["PATH_BASE"];
-
-            if (!string.IsNullOrEmpty(pathBase))
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UsePathBase(pathBase);
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Market.API V1");
+            });
 
             app.UseCors("CorsPolicy");
-
             app.UseMvcWithDefaultRoute();
-
-            app.UseSwagger()
-               .UseSwaggerUI(c =>
-               {
-                   c.SwaggerEndpoint($"{ (!string.IsNullOrEmpty(pathBase) ? pathBase : string.Empty) }/swagger/v1/swagger.json", "Market.API V1");
-                   c.OAuthClientId("marketswaggerui");
-                   c.OAuthAppName("Market Swagger UI");
-               });
         }
 
         private void RegisterEventBus(IServiceCollection services)
