@@ -1,28 +1,51 @@
-﻿using Sentiment.Domain;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Sentiment.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Sentiment.Infrastructure
 {
-    public class SentimentService
+    public class SentimentService : IHostedService
     {
-        public Dictionary<string, Dictionary<string, MarketData>> Markets { get; set; }
-        private readonly TwitterSentimentAnalyser _twitterSentiment;
+        private readonly List<ISentimentAnalyser> _supportedAnalysers;
 
-        public SentimentService(TwitterSentimentAnalyser twitterSentiment)
+        public SentimentService(IConfiguration configuration)
         {
-            _twitterSentiment = twitterSentiment;
+            //Twitter creds
+            string consumerKey = configuration["Twitter:ApiKey"];
+            string consumerSecret = configuration["Twitter:ApiSecret"];
+            string accessToken = configuration["Twitter:AccessToken"];
+            string accessTokenSecret = configuration["Twitter:AccessTokenSecret"];
+
+            _supportedAnalysers = new List<ISentimentAnalyser>()
+            {
+                new TwitterSentimentAnalyser(consumerKey, consumerSecret, accessToken, accessTokenSecret)
+            };
         }
 
-        public void StartSentimentListeners()
+        public SentimentAnalysisResult GetSentiment(string source, string symbol, string name, int duration = 100, bool translate = false)
         {
-            //TODO: For each listener too
-            foreach (var asset in _twitterSentiment.GetSupportedAssets())
+            var sourceAnalyser = _supportedAnalysers.FirstOrDefault(x => x.Name == source);
+            if(sourceAnalyser == null)
             {
-                _twitterSentiment.StartRealTimeSentimentListener(new List<string> { asset.symbol, asset.name });
+                throw new Exception("Analyser " + source + " not found!");
             }
+
+            return sourceAnalyser.GetSentiment(new string[] { symbol, name }, duration, translate);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

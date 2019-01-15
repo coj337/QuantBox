@@ -1,7 +1,6 @@
 ﻿using BuildingBlocks.EventBus.Abstractions;
 using Market.Domain;
 using Microsoft.Extensions.Configuration;
-using System;
 using System.Collections.Generic;
 using Market.API.Exchanges;
 using Microsoft.Extensions.Hosting;

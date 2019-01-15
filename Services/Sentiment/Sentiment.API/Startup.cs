@@ -43,7 +43,7 @@ namespace Sentiment.API
 
             services.AddCustomMvc();
 
-            services.AddSingleton<TwitterSentimentAnalyser>();
+            services.AddHostedService<SentimentService>();
 
             //RegisterEventBus(services);
 

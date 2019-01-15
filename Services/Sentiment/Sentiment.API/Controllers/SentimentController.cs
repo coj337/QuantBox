@@ -9,11 +9,49 @@ namespace Sentiment.API.Controllers
     [ApiController]
     public class SentimentController : ControllerBase
     {
-        private readonly TwitterSentimentAnalyser _twitterSentiment;
+        private readonly SentimentService _sentimentService;
 
-        public SentimentController(TwitterSentimentAnalyser twitterSentiment)
+        public SentimentController(SentimentService sentimentService)
         {
-            _twitterSentiment = twitterSentiment;
+            _sentimentService = sentimentService;
+        }
+
+        [HttpGet]
+        public ActionResult<SentimentAsset[]> GetSupportedAssets()
+        {
+            return new SentimentAsset[]
+            {
+                new SentimentAsset()
+                {
+                    symbol = "BTC",
+                    name = "Bitcoin"
+                },
+                new SentimentAsset()
+                {
+                    symbol = "ETH",
+                    name = "Ethereum"
+                },
+                new SentimentAsset()
+                {
+                    symbol = "XRP",
+                    name = "Ripple"
+                },
+                new SentimentAsset()
+                {
+                    symbol = "XLM",
+                    name = "Stellar"
+                },
+                new SentimentAsset()
+                {
+                    symbol = "BCH",
+                    name = "Bitcoin Cash"
+                },
+                new SentimentAsset()
+                {
+                    symbol = "EOS",
+                    name = "EOS"
+                }
+            };
         }
 
         [Route("TwitterSentiment")]
@@ -22,7 +60,8 @@ namespace Sentiment.API.Controllers
         //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public ActionResult<SentimentAnalysisResult> GetTwitterSentiment(string symbol, string name, int duration = 100, bool translate = false)
         {
-            return Ok(_twitterSentiment.GetSentiment(new string[] { symbol, name }, duration, translate));
+            var sentimentResult = _sentimentService.GetSentiment("Twitter", symbol, name, duration, translate);
+            return Ok(sentimentResult);
         }
     }
 }
