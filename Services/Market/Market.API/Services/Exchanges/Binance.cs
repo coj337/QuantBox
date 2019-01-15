@@ -92,15 +92,5 @@ namespace Market.API.Exchanges
                 Console.ReadLine(); //TODO: Keep it open more gracefully
             }
         }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

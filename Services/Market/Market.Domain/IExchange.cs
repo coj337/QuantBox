@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Market.Domain
 {
-    public interface IExchange : IHostedService
+    public interface IExchange
     {
         string Name { get; }
 
