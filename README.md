@@ -7,10 +7,10 @@ The purpose of QuantBox is to be a easy to use, all in one microservices based p
 With QuantBox the aim is to be able to do anything you want from setting up your trading desk exactly how you want to automating your existing strategy without writing a line of code.
 
 ## Getting Started
-Step 1. Open the project in VS and run Docker Compose or run "docker compose up" in a terminal.
-Step 2. Run "npm start" from the Frontend folder
-Step 3. ???
-Step 4. Profit!
+Step 1. Open the project in VS and run Docker Compose or run "docker compose up" in a terminal.  
+Step 2. Run "npm start" from the Frontend folder  
+Step 3. ???  
+Step 4. Profit!  
 
 ## Features
 There's many plans for this and some are sure to get dropped and some will be added, ***suggestions are welcome!***  
