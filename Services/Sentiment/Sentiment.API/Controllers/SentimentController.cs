@@ -17,6 +17,7 @@ namespace Sentiment.API.Controllers
         }
 
         [HttpGet]
+        [Route("SupportedAssets")]
         public ActionResult<SentimentAsset[]> GetSupportedAssets()
         {
             return new SentimentAsset[]
@@ -54,8 +55,8 @@ namespace Sentiment.API.Controllers
             };
         }
 
-        [Route("TwitterSentiment")]
         [HttpGet]
+        [Route("TwitterSentiment")]
         [ProducesResponseType(typeof(SentimentAnalysisResult), (int)HttpStatusCode.OK)]
         //[ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public ActionResult<SentimentAnalysisResult> GetTwitterSentiment(string symbol, string name, int duration = 100, bool translate = false)

@@ -2,11 +2,11 @@ version: '3.4'
 
 services:
   ## UI Services ##
-  frontend:
-    image: ${DOCKER_REGISTRY-}frontend
-    build:
-      context: .
-      dockerfile: Frontend/Dockerfile
+  #frontend:
+  #  image: ${DOCKER_REGISTRY-}frontend
+  #  build:
+  #    context: .
+  #    dockerfile: Frontend/Dockerfile
 
   ## Database ##
   sql.data:
@@ -53,3 +53,4 @@ services:
       - arbitrage.api
       - sentiment.api
       - market.api
+      - rabbitmq

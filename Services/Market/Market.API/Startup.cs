@@ -47,7 +47,8 @@ namespace Market.API
 
             RegisterEventBus(services);
 
-            services.AddHostedService<MarketService>();
+            services.AddSingleton<MarketService>();
+            services.AddApplicationInsightsTelemetry(Configuration);
 
             //configure autofac
             var container = new ContainerBuilder();
@@ -155,7 +156,7 @@ namespace Market.API
     {
         public static IServiceCollection AddCustomMvc(this IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices();
 
             services.AddCors(options =>
             {

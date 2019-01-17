@@ -11,6 +11,7 @@ namespace Arbitrage.API.Controllers
     public class ArbitrageController : ControllerBase
     {
         [HttpGet]
+        [Route("Get")]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };

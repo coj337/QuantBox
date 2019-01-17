@@ -1,6 +1,5 @@
 ﻿import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { SentimentPanel } from './SentimentPanel';
 
 export class Settings extends Component {
     displayName = Settings.name

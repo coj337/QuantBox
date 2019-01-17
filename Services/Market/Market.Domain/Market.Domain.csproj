@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.5.8" />
+    <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.5.9" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
   </ItemGroup>
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Market.API.Services
 {
-    public class MarketService : IHostedService
+    public class MarketService
     {
         private readonly IConfiguration _configuration;
 
@@ -22,6 +22,14 @@ namespace Market.API.Services
             {
                 new Binance(eventBus)
             };
+
+            foreach (var exchange in _supportedExchanges)
+            {
+                Task.Run(() =>
+                {
+                    exchange.StartPriceListener();
+                });
+            }
         }
 
         public List<IExchange> GetSupportedExchanges()
@@ -32,29 +40,6 @@ namespace Market.API.Services
         public List<string> GetSupportedAssets()
         {
             return new List<string>() { "BTC", "ETH", "XRP", "XLM" }; //TODO: Enumerate the exchanges for this
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            var priceListeners = new List<Task>();
-            foreach (var exchange in _supportedExchanges)
-            {
-                priceListeners.Add(
-                    Task.Run(() =>
-                    {
-                        exchange.StartPriceListener();
-                    })
-                );
-            }
-
-            Task.WaitAll(priceListeners.ToArray());
-
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }

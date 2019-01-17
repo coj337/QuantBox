@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Frontend", "Frontend\Frontend.csproj", "{48EE41DC-F99A-4DD9-8A83-3481C38920EC}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{32815021-BDEB-4667-BC7C-1EDE1E29EFFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Market", "Market", "{9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}"
@@ -40,9 +38,6 @@ EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{6DAE9CB2-74E1-4B24-BB7A-3A4B67832032}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{CA29C4C8-A5FF-42ED-A050-FBABA15719F6}"
-	ProjectSection(SolutionItems) = preProject
-		ApiGateways\Web.Trading\OcelotConfig\ocelot.json = ApiGateways\Web.Trading\OcelotConfig\ocelot.json
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGw-Base", "ApiGateways\ApiGw-Base\ApiGw-Base.csproj", "{9EC47A96-2F36-4F87-8B93-00D639FC0313}"
 EndProject
@@ -62,16 +57,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus.Tests", "BuildingB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "BuildingBlocks\EventBus\EventBus\EventBus.csproj", "{73622817-EAE0-4D8E-8F2B-AC672FA88555}"
 EndProject
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Frontend", "Frontend\Frontend.njsproj", "{D8A0AF63-B085-4081-A218-679417333785}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{48EE41DC-F99A-4DD9-8A83-3481C38920EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48EE41DC-F99A-4DD9-8A83-3481C38920EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48EE41DC-F99A-4DD9-8A83-3481C38920EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48EE41DC-F99A-4DD9-8A83-3481C38920EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAEE6A38-51D4-4D25-BA33-B5D74651AABE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -148,6 +141,10 @@ Global
 		{73622817-EAE0-4D8E-8F2B-AC672FA88555}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73622817-EAE0-4D8E-8F2B-AC672FA88555}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73622817-EAE0-4D8E-8F2B-AC672FA88555}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8A0AF63-B085-4081-A218-679417333785}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8A0AF63-B085-4081-A218-679417333785}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8A0AF63-B085-4081-A218-679417333785}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8A0AF63-B085-4081-A218-679417333785}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -81,8 +81,8 @@ namespace Market.API.Exchanges
                     //Update the market
                     foundMarket.Bid = ticker.Value.Bid;
                     foundMarket.Ask = ticker.Value.Ask;
-                    foundMarket.BaseVolume = ticker.Value.Volume.BaseVolume;
-                    foundMarket.AltVolume = ticker.Value.Volume.ConvertedVolume;
+                    foundMarket.BaseVolume = ticker.Value.Volume.BaseCurrencyVolume;
+                    foundMarket.AltVolume = ticker.Value.Volume.QuoteCurrencyVolume;
 
                     //Send integration event for other services
                     var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.Bid, foundMarket.Ask);

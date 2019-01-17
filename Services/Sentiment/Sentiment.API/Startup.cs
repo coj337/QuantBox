@@ -33,7 +33,7 @@ namespace Sentiment.API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
             // Register the Swagger generator
             services.AddSwaggerGen(c =>
@@ -43,15 +43,9 @@ namespace Sentiment.API
 
             services.AddCustomMvc();
 
-            services.AddHostedService<SentimentService>();
+            services.AddSingleton<SentimentService>();
 
             //RegisterEventBus(services);
-
-            //configure autofac
-            var container = new ContainerBuilder();
-            container.Populate(services);
-
-            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

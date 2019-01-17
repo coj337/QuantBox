@@ -19,12 +19,14 @@ namespace Market.API.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public IActionResult GetSupportedExchanges()
         {
             return Ok(_marketService.GetSupportedExchanges());
         }
 
         [HttpGet]
+        [Route("[action]")]
         public IActionResult GetSupportedAssets()
         {
             return Ok(_marketService.GetSupportedAssets());

@@ -15,7 +15,7 @@ export class Sentiment extends Component {
     }
 
     componentDidMount() {
-        fetch("/Sentiment/GetSupportedAssets")
+        fetch("/Sentiment/SupportedAssets")
             .then(res => res.json())
             .then(
                 (result) => {

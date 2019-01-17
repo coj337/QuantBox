@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Sentiment.Infrastructure
 {
-    public class SentimentService : IHostedService
+    public class SentimentService
     {
         private readonly List<ISentimentAnalyser> _supportedAnalysers;
 
@@ -36,16 +36,6 @@ namespace Sentiment.Infrastructure
             }
 
             return sourceAnalyser.GetSentiment(new string[] { symbol, name }, duration, translate);
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }

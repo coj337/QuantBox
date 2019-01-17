@@ -1,27 +1,27 @@
 version: '3.4'
 
 services:
-  frontend:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=44352
-    ports:
-      - "53116:80"
-      - "44352:443"
-    volumes:
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-    build:
-      dockerfile: Frontend/Dockerfile.Development
+  #frontend:
+  #  environment:
+  #    - ASPNETCORE_ENVIRONMENT=Development
+  #    - ASPNETCORE_URLS=https://+:443;http://+:80
+  #    - ASPNETCORE_HTTPS_PORT=44352
+  #  ports:
+  #    - "53116:80"
+  #    - "44352:443"
+  #  volumes:
+  #    - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+  #    - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+  #  build:
+  #    dockerfile: Frontend/Dockerfile.Development
   
   ## Databases ##
-  sql.data:
-    environment:
-      - SA_PASSWORD=<Password>
-      - ACCEPT_EULA=Y
-    ports:
-      - "5433:1433" # Important: In a production environment your should remove the external port
+#  sql.data:
+#    environment:
+#      - SA_PASSWORD=<Password>
+#      - ACCEPT_EULA=Y
+#    ports:
+#      - "5433:1433" # Important: In a production environment your should remove the external port
 
   ## Internal API Services ##
   arbitrage.api:
@@ -72,4 +72,4 @@ services:
     volumes:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ./ApiGateways/Web.Trading/OcelotConfig:/app/configuration
+      - ./ApiGateways/ApiGw-Base/configuration:/app/configuration
