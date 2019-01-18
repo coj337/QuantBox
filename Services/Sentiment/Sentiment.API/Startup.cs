@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using Sentiment.API.IntegrationEvents.EventHandling;
+using Sentiment.API.IntegrationEvents.Events;
 using Sentiment.Infrastructure;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -33,7 +35,7 @@ namespace Sentiment.API
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             // Register the Swagger generator
             services.AddSwaggerGen(c =>
@@ -45,7 +47,13 @@ namespace Sentiment.API
 
             services.AddSingleton<SentimentService>();
 
-            //RegisterEventBus(services);
+            RegisterEventBus(services);
+
+            //configure autofac
+            var container = new ContainerBuilder();
+            container.Populate(services);
+
+            return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,13 +68,13 @@ namespace Sentiment.API
             app.UseCors("CorsPolicy");
             app.UseMvcWithDefaultRoute();
 
-            //ConfigureEventBus(app);
+            ConfigureEventBus(app);
         }
 
         private void ConfigureEventBus(IApplicationBuilder app)
         {
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
-            //eventBus.Subscribe<PriceUpdatedIntegrationEvent, PriceUpdatedIntegrationEventHandler>();
+            eventBus.Subscribe<AssetAddedIntegrationEvent, AssetAddedIntegrationEventHandler>();
         }
 
         private void RegisterEventBus(IServiceCollection services)
@@ -125,8 +133,7 @@ namespace Sentiment.API
                     var logger = sp.GetRequiredService<ILogger<EventBusServiceBus>>();
                     var eventBusSubcriptionsManager = sp.GetRequiredService<IEventBusSubscriptionsManager>();
 
-                    return new EventBusServiceBus(serviceBusPersisterConnection, logger,
-                        eventBusSubcriptionsManager, subscriptionClientName, iLifetimeScope);
+                    return new EventBusServiceBus(serviceBusPersisterConnection, logger, eventBusSubcriptionsManager, subscriptionClientName, iLifetimeScope);
                 });
             }
             else
@@ -149,7 +156,7 @@ namespace Sentiment.API
             }
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-            //services.AddTransient<PriceUpdatedIntegrationEventHandler>();
+            services.AddTransient<AssetAddedIntegrationEventHandler>();
         }
     }
 

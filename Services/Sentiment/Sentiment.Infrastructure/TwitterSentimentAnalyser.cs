@@ -20,8 +20,6 @@ namespace Sentiment.Infrastructure
     public class TwitterSentimentAnalyser : ISentimentAnalyser
     {
         public string Name { get => "Twitter"; }
-        public Dictionary<string, SentimentAnalysisResult> SentimentResults = new Dictionary<string, SentimentAnalysisResult>();
-
 
         public TwitterSentimentAnalyser(string consumerKey, string consumerSecret, string accessToken, string accessTokenSecret)
         {
@@ -47,7 +45,15 @@ namespace Sentiment.Infrastructure
                     searchParameter.Lang = LanguageFilter.English;
                 }
 
-                tweets.AddRange(Search.SearchTweets(searchParameter));
+                var someTweets = Search.SearchTweets(searchParameter);
+                if (someTweets != null)
+                {
+                    tweets.AddRange(someTweets);
+                }
+                else
+                {
+                    throw new Exception("Twitter rate limit reached.");
+                }
             }
 
             //Translate them to sentiment results

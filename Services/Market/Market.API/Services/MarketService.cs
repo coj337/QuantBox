@@ -6,6 +6,7 @@ using Market.API.Exchanges;
 using Microsoft.Extensions.Hosting;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Market.API.Services
 {
@@ -39,7 +40,22 @@ namespace Market.API.Services
 
         public List<string> GetSupportedAssets()
         {
-            return new List<string>() { "BTC", "ETH", "XRP", "XLM" }; //TODO: Enumerate the exchanges for this
+            List<string> assets = new List<string>();
+            foreach (var exchange in _supportedExchanges)
+            {
+                assets.AddRange(exchange.Currencies.Select(x => x.Symbol));
+            }
+            return assets;
+        }
+
+        public List<MarketData> GetTickers()
+        {
+            List<MarketData> tickers = new List<MarketData>();
+            foreach (var exchange in _supportedExchanges)
+            {
+                tickers.AddRange(exchange.Markets.Values);
+            }
+            return tickers;
         }
     }
 }

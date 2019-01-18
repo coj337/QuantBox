@@ -4,17 +4,18 @@ using Sentiment.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sentiment.Infrastructure
 {
     public class SentimentService
     {
         private readonly List<ISentimentAnalyser> _supportedAnalysers;
+        private List<SentimentAsset> SentimentAssets;
 
         public SentimentService(IConfiguration configuration)
         {
+            SentimentAssets = new List<SentimentAsset>();
+
             //Twitter creds
             string consumerKey = configuration["Twitter:ApiKey"];
             string consumerSecret = configuration["Twitter:ApiSecret"];
@@ -27,6 +28,11 @@ namespace Sentiment.Infrastructure
             };
         }
 
+        public void AddAsset(SentimentAsset asset)
+        {
+            SentimentAssets.Add(asset);
+        }
+
         public SentimentAnalysisResult GetSentiment(string source, string symbol, string name, int duration = 100, bool translate = false)
         {
             var sourceAnalyser = _supportedAnalysers.FirstOrDefault(x => x.Name == source);
@@ -36,6 +42,11 @@ namespace Sentiment.Infrastructure
             }
 
             return sourceAnalyser.GetSentiment(new string[] { symbol, name }, duration, translate);
+        }
+
+        public List<SentimentAsset> GetAssets()
+        {
+            return SentimentAssets;
         }
     }
 }

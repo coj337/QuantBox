@@ -31,5 +31,12 @@ namespace Market.API.Controllers
         {
             return Ok(_marketService.GetSupportedAssets());
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult Tickers()
+        {
+            return Ok(_marketService.GetTickers());
+        }
     }
 }

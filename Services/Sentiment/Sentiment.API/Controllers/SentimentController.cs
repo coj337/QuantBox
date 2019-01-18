@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Sentiment.Domain;
 using Sentiment.Infrastructure;
@@ -18,41 +20,9 @@ namespace Sentiment.API.Controllers
 
         [HttpGet]
         [Route("SupportedAssets")]
-        public ActionResult<SentimentAsset[]> GetSupportedAssets()
+        public ActionResult<IEnumerable<SentimentAsset>> GetSupportedAssets(int limit = 20)
         {
-            return new SentimentAsset[]
-            {
-                new SentimentAsset()
-                {
-                    symbol = "BTC",
-                    name = "Bitcoin"
-                },
-                new SentimentAsset()
-                {
-                    symbol = "ETH",
-                    name = "Ethereum"
-                },
-                new SentimentAsset()
-                {
-                    symbol = "XRP",
-                    name = "Ripple"
-                },
-                new SentimentAsset()
-                {
-                    symbol = "XLM",
-                    name = "Stellar"
-                },
-                new SentimentAsset()
-                {
-                    symbol = "BCH",
-                    name = "Bitcoin Cash"
-                },
-                new SentimentAsset()
-                {
-                    symbol = "EOS",
-                    name = "EOS"
-                }
-            };
+            return Ok(_sentimentService.GetAssets().Take(20));
         }
 
         [HttpGet]

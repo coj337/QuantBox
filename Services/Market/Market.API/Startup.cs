@@ -7,8 +7,6 @@ using BuildingBlocks.EventBus;
 using BuildingBlocks.EventBus.Abstractions;
 using BuildingBlocks.EventBusRabbitMQ;
 using BuildingBlocks.EventBusServiceBus;
-using Market.API.IntegrationEvents.Events;
-using Market.API.Exchanges;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;

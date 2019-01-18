@@ -15,7 +15,7 @@ export class MarketWatch extends Component {
     }
 
     componentDidMount() {
-        fetch("/Prices/Tickers")
+        fetch("/Market/Tickers")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -35,8 +35,8 @@ export class MarketWatch extends Component {
 
     render() {
         const columns = [{
-            Header: 'Symbol',
-            accessor: 'symbol'
+            Header: 'Pair',
+            accessor: 'pair'
         }, {
             Header: 'Bid',
             accessor: 'bid'

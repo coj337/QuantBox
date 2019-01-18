@@ -21,12 +21,14 @@ namespace Market.API.Exchanges
 
         public string Name { get => "Binance"; }
         public Dictionary<string, MarketData> Markets { get; private set; }
+        public List<CurrencyData> Currencies { get; private set; }
 
         public Binance(IEventBus eventBus)
         {
             _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
             _client = new ExchangeBinanceAPI();
             Markets = new Dictionary<string, MarketData>();
+            Currencies = new List<CurrencyData>();
         }
 
         public bool Authenticate(string publicKey, string privateKey)
@@ -57,8 +59,27 @@ namespace Market.API.Exchanges
         }
 
         private readonly ManualResetEvent _priceListenerStoppedEvent = new ManualResetEvent(false);
-        public Task StartPriceListener()
+
+        public async Task StartPriceListener()
         {
+            var currencies = await _client.GetCurrenciesAsync();
+            foreach(var currency in currencies)
+            {
+                Currencies.Add(new CurrencyData() {
+                    Name = currency.Value.FullName,
+                    Symbol = currency.Key,
+                    DepositEnabled = currency.Value.DepositEnabled,
+                    WithdrawalEnabled = currency.Value.WithdrawalEnabled,
+                    WithdrawalFee = currency.Value.TxFee,
+                    MinWithdrawal = currency.Value.MinWithdrawalSize,
+                    MinConfirmations = currency.Value.MinConfirmations
+                });
+
+                //Send integration event for services that just need assets
+                var @newAssetEvent = new AssetAddedIntegrationEvent(currency.Key, currency.Value.FullName);
+                _eventBus.Publish(@newAssetEvent);
+            }
+
             //Subscribe to ticker websockets
             var socket = _client.GetTickersWebSocket((tickers) =>
             {
@@ -67,18 +88,18 @@ namespace Market.API.Exchanges
                     MarketData foundMarket;
                     var ticker = tickers.ElementAt(i);
 
-                    if (Markets.ContainsKey(ticker.Key))
+                    if (!Markets.ContainsKey(ticker.Key))
                     {
-                        foundMarket = Markets[ticker.Key];
-                    }
-                    else
-                    {
-                        //A new currency has appeared in the sockets, add it
+                        //A new currency has appeared in the sockets (or this is first start), add it
                         Markets.Add(ticker.Key, new MarketData());
-                        foundMarket = Markets[ticker.Key];
+                        //TODO: Find name and send integration event on new symbol
                     }
+                    foundMarket = Markets[ticker.Key];
 
                     //Update the market
+                    foundMarket.Pair = ticker.Key;
+                    foundMarket.AltCurrency = ticker.Key.Substring(0, 3);
+                    foundMarket.BaseCurrency = ticker.Key.Substring(3);
                     foundMarket.Bid = ticker.Value.Bid;
                     foundMarket.Ask = ticker.Value.Ask;
                     foundMarket.BaseVolume = ticker.Value.Volume.BaseCurrencyVolume;
@@ -94,8 +115,6 @@ namespace Market.API.Exchanges
 
             _priceListenerStoppedEvent.WaitOne(); //This thread will block here until the reset event is sent.
             _priceListenerStoppedEvent.Reset();
-
-            return Task.CompletedTask;
         }
 
         private Task SocketStoppedEvent(object sender)

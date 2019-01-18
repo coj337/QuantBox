@@ -11,6 +11,8 @@ namespace Market.Domain
 
         Dictionary<string, MarketData> Markets { get; }
 
+        List<CurrencyData> Currencies { get; }
+
         bool Authenticate(string publicKey, string privateKey);
 
         bool IsAuthenticated();
