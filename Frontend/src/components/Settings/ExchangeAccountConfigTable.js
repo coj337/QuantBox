@@ -47,10 +47,10 @@ export class ExchangeAccountConfigTable extends Component {
                     this.state.exchangeConfigs.map(function (config, i) {
                         return <AccountConfig key={i} name={config.name} publicKey={config.publicKey} />
                     }) :
-                    <AccountConfig name="Binance" />
+                    <AccountConfig name="Binance" disabled="true" />
                 }
                 
-                <AccountConfig name="BTCMarkets" disabled="true"/>
+                <AccountConfig name="BTCMarkets" disabled="true" />
                 {/*<button id="addAccount"> + </button>*/}
             </div>
         );
