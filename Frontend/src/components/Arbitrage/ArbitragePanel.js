@@ -10,17 +10,17 @@ export class ArbitragePanel extends Component {
         this.state = {
             error: null,
             isLoaded: false,
-            hubConnection: null
+            pair: props.pair
         };
     }
 
     render() {
-        const { error, isLoaded, name, symbol, sentiment } = this.state;
+        const { error, isLoaded } = this.state;
 
         if (error) {
-            return <div>Error: {error.message}</div>;
+            return <div className="arbitragePanel">Error: {error.message}</div>;
         } else if (!isLoaded) {
-            return <div>Loading...</div>;
+            return <div className="arbitragePanel">Loading...</div>;
         } else {
             return (
                 <div className="arbitragePanel">

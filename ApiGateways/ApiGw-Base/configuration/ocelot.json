@@ -13,6 +13,18 @@
       "UpstreamHttpMethod": [ "POST", "GET" ]
     },
     {
+      "DownstreamPathTemplate": "/arbitrageHub/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "arbitrage.api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/arbitrageHub/{everything}",
+      "UpstreamHttpMethod": []
+    },
+    {
       "DownstreamPathTemplate": "/api/{version}/market/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

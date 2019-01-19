@@ -106,7 +106,7 @@ namespace Market.API.Exchanges
                     foundMarket.AltVolume = ticker.Value.Volume.QuoteCurrencyVolume;
 
                     //Send integration event for other services
-                    var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.Bid, foundMarket.Ask);
+                    var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.BaseCurrency, foundMarket.AltCurrency, foundMarket.Bid, foundMarket.Ask);
                     _eventBus.Publish(@event);
                 }
             });

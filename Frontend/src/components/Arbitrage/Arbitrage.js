@@ -11,7 +11,8 @@ export class Arbitrage extends Component {
 
         this.state = {
             hubConnection: null,
-            arbMatrix: []
+            triangleArbMatrix: [],
+            normalArbMatrix: []
         };
     }
 
@@ -28,10 +29,17 @@ export class Arbitrage extends Component {
     }
 
     componentDidMount() {
-        this.state.hubConnection.on('ReceiveArbitrageMatrix', (receivedMessage) => {
+        this.state.hubConnection.on('ReceiveTriangleArbitrage', (receivedMessage) => {
             var arbitrage = receivedMessage;
             this.setState({
-                arbMatrix: arbitrage
+                triangleArbMatrix: arbitrage
+            });
+        });
+
+        this.state.hubConnection.on('ReceiveNormalArbitrage', (receivedMessage) => {
+            var arbitrage = receivedMessage;
+            this.setState({
+                normalArbMatrix: arbitrage
             });
         });
     }
@@ -39,7 +47,20 @@ export class Arbitrage extends Component {
     render() {
         return (
             <Row>
-                {this.state.arbMatrix.map((arbitrage, i) => (
+                <div>Triangle Arbs</div>
+                {this.state.triangleArbMatrix.map((arbitrage, i) => (
+                    <Col xs={6} md={4} lg={3} key={i}>
+                        <ArbitragePanel
+                            pair={arbitrage.pair}
+                            startExchange={arbitrage.startExchange}
+                            endExchange={arbitrage.endExchange}
+                            spread={arbitrage.spread}
+                        />
+                    </Col>
+                ))}
+
+                <div>Two-Way Arbs</div>
+                {this.state.normalArbMatrix.map((arbitrage, i) => (
                     <Col xs={6} md={4} lg={3} key={i}>
                         <ArbitragePanel
                             pair={arbitrage.pair}

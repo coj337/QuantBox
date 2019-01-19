@@ -44,6 +44,7 @@ namespace Arbitrage.API
             });
 
             services.AddCustomMvc();
+            services.AddSignalR();
 
             services.AddSingleton<ArbitrageService>();
 
@@ -63,6 +64,11 @@ namespace Arbitrage.API
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arbitrage.API V1");
+            });
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ArbitrageHub>("/arbitrageHub");
             });
 
             app.UseCors("CorsPolicy");

@@ -21,7 +21,7 @@ namespace Arbitrage.API.IntegrationEvents.EventHandling
 
         public Task Handle(PriceUpdatedIntegrationEvent @event)
         {
-            _arbitrageService.UpdatePrice(new ExchangeData(@event.Exchange, @event.Pair, @event.NewBid, @event.NewAsk));
+            _arbitrageService.UpdatePrice(new ExchangeData(@event.Exchange, @event.Pair, @event.BaseCurrency, @event.AltCurrency, @event.NewBid, @event.NewAsk));
 
             return Task.CompletedTask;
         }

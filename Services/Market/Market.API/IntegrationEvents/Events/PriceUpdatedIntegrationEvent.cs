@@ -10,12 +10,16 @@ namespace Market.API.IntegrationEvents.Events
     {
         public string Exchange { get; set; }
         public string Pair { get; set; }
+        public string BaseCurrency { get; set; }
+        public string AltCurrency { get; set; }
         public decimal NewBid { get; set; }
         public decimal NewAsk { get; set; }
 
-        public PriceUpdatedIntegrationEvent(string exchange, string pair, decimal newBid, decimal newAsk)
+        public PriceUpdatedIntegrationEvent(string exchange, string pair, string baseCurrency, string altCurrency, decimal newBid, decimal newAsk)
         {
             Pair = pair;
+            BaseCurrency = baseCurrency;
+            AltCurrency = altCurrency;
             NewBid = newBid;
             NewAsk = newAsk;
             Exchange = exchange;

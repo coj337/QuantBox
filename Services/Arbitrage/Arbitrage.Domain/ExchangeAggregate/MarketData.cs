@@ -6,6 +6,10 @@ namespace Arbitrage.Domain
 {
     public class MarketData
     {
+        public string BaseCurrency { get; set; }
+
+        public string AltCurrency { get; set; }
+
         public decimal Bid { get; set; }
 
         public decimal Ask { get; set; }
