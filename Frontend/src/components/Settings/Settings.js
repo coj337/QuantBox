@@ -1,5 +1,9 @@
 ﻿import React, { Component } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import "react-tabs/style/react-tabs.css";
+import { ExchangeAccountConfigTable } from './ExchangeAccountConfigTable';
+import { SentimentAccountConfigTable } from './SentimentAccountConfigTable';
+import { WalletAccountConfigTable } from './WalletAccountConfigTable';
 
 export class Settings extends Component {
     displayName = Settings.name
@@ -18,11 +22,23 @@ export class Settings extends Component {
 
     render() {
         return (
-            <Row>
-                <Col xs={6} md={4} lg={3}>
-                    Test
-                </Col>
-            </Row>
+            <Tabs>
+                <TabList>
+                    <Tab>Exchanges</Tab>
+                    <Tab>Sentiment Providers</Tab>
+                    <Tab>Wallets</Tab>
+                </TabList>
+
+                <TabPanel>
+                    <ExchangeAccountConfigTable />
+                </TabPanel>
+                <TabPanel>
+                    <SentimentAccountConfigTable />
+                </TabPanel>
+                <TabPanel>
+                    <WalletAccountConfigTable />
+                </TabPanel>
+            </Tabs>
         );
     }
 }

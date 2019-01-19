@@ -1,0 +1,38 @@
+﻿.accountConfig {
+    background-color: #2E3543;
+    padding: 5px 15px;
+    margin: 5px;
+}
+.accountConfig.disabled {
+    color: #9d9d9d;
+}
+#addAccount {
+    background-color: #2E3543;
+    border: none;
+    display: block;
+    width: calc(100% - 10px);
+    height: 30px;
+    font-size: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+#addAccount:hover {
+    background-color: #424955;
+}
+.accountName, .keyContainer, .configTableTitleHeading {
+    display: inline-block;
+    width: 25%;
+}
+.configTableTitle {
+    margin-left: 5px;
+    margin-right: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.configButton {
+    background-color: #262c37;
+    border: none;
+}
+.configButton:hover {
+    background-color: #424955;
+}

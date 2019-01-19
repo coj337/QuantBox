@@ -1,16 +1,9 @@
 version: '3.4'
 
 services:
-  ## UI Services ##
-  #frontend:
-  #  image: ${DOCKER_REGISTRY-}frontend
-  #  build:
-  #    context: .
-  #    dockerfile: Frontend/Dockerfile
-
   ## Database ##
   sql.data:
-    image: microsoft/mssql-server-linux:latest
+    image: microsoft/mssql-server-linux:2017-latest
 
   ## Service Bus ##
   rabbitmq:

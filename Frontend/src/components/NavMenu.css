@@ -17,6 +17,11 @@ body {
     color: white;
 }
 
+.fa-meh {
+    margin-right: 8px;
+    font-size: 17px;
+}
+
 @media (min-width: 768px) {
     /* On large screens, convert the nav menu to a vertical sidebar */
     .navbar {

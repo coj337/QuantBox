@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Market.API.Services;
+using Market.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Market.API.Controllers
@@ -37,6 +38,21 @@ namespace Market.API.Controllers
         public IActionResult Tickers()
         {
             return Ok(_marketService.GetTickers());
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult Settings()
+        {
+            return Ok(_marketService.GetSettings());
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult SaveSettings([FromBody]ExchangeConfig config)
+        {
+            _marketService.SaveSettings(config);
+            return Ok();
         }
     }
 }

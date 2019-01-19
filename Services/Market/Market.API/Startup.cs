@@ -20,6 +20,10 @@ using RabbitMQ.Client;
 using Market.API.Services;
 using Autofac.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using Market.API.Infrastructure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Market.API
 {
@@ -42,6 +46,7 @@ namespace Market.API
             });
 
             services.AddCustomMvc();
+            services.AddCustomDbContext(Configuration);
 
             RegisterEventBus(services);
 
@@ -66,6 +71,12 @@ namespace Market.API
 
             app.UseCors("CorsPolicy");
             app.UseMvcWithDefaultRoute();
+
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<MarketContext>();
+                context.Database.Migrate();
+            }
         }
 
         private void RegisterEventBus(IServiceCollection services)
@@ -152,6 +163,22 @@ namespace Market.API
     }
     static class CustomExtensionsMethods
     {
+        public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
+            var con = configuration["ConnectionString"];
+            services.AddDbContext<MarketContext>(options =>
+            {
+                options.UseSqlServer(configuration["ConnectionString"],
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                    });
+            });
+
+            return services;
+        }
+
         public static IServiceCollection AddCustomMvc(this IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices();
