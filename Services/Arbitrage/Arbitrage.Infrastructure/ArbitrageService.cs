@@ -1,6 +1,9 @@
 ﻿using Arbitrage.Domain;
+using Arbitrage.Domain.ArbitrageResultAggregate;
 using Arbitrage.Domain.ExchangeAggregate;
+using Microsoft.AspNetCore.SignalR;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,89 +14,129 @@ namespace Arbitrage.Infrastructure
 {
     public class ArbitrageService
     {
-        public Dictionary<string, Dictionary<string, MarketData>> Markets { get; set; }
+        private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
+        private decimal _triProfitThreshold = 1.005m; //0.5% profit default
+        public ConcurrentDictionary<string, ConcurrentDictionary<string, MarketData>> Markets { get; set; }
 
-        public ArbitrageService()
+        public ArbitrageService(IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub)
         {
-            Markets = new Dictionary<string, Dictionary<string, MarketData>>();
+            _arbitrageHub = arbitrageHub;
+            Markets = new ConcurrentDictionary<string, ConcurrentDictionary<string, MarketData>>();
             Task.Run(() =>
                 StartTriangleArbitrageListener()
             );
         }
 
+        public void UpdateTriArbThreshold(decimal newThreshold)
+        {
+            if(newThreshold > 0)
+            {
+                _triProfitThreshold = newThreshold;
+            }
+        }
+
         public void UpdatePrice(ExchangeData marketData)
         {
+
             if (!Markets.ContainsKey(marketData.Exchange))
             {
-                Markets.Add(marketData.Exchange, new Dictionary<string, MarketData>());
+                bool success = Markets.TryAdd(marketData.Exchange, new ConcurrentDictionary<string, MarketData>());
+                if (!success) //TODO: Handle this better
+                    return; //Dont update anything if it fails
             }
-            if (!Markets[marketData.Exchange].ContainsKey(marketData.Pair))
+            if (!Markets[marketData.Exchange].ContainsKey(marketData.Data.Pair))
             {
-                Markets[marketData.Exchange].Add(marketData.Pair, new MarketData());
+                bool success = Markets[marketData.Exchange].TryAdd(marketData.Data.Pair, new MarketData());
+                if (!success) //TODO: Handle this better
+                    return; //Dont update anything if it fails
             }
 
-            Markets[marketData.Exchange][marketData.Pair].BaseCurrency = marketData.BaseCurrency;
-            Markets[marketData.Exchange][marketData.Pair].AltCurrency = marketData.AltCurrency;
-            Markets[marketData.Exchange][marketData.Pair].Ask = marketData.Data.Ask;
-            Markets[marketData.Exchange][marketData.Pair].Bid = marketData.Data.Bid;
+            Markets[marketData.Exchange][marketData.Data.Pair].BaseCurrency = marketData.Data.BaseCurrency;
+            Markets[marketData.Exchange][marketData.Data.Pair].AltCurrency = marketData.Data.AltCurrency;
+            Markets[marketData.Exchange][marketData.Data.Pair].Asks = marketData.Data.Asks;
+            Markets[marketData.Exchange][marketData.Data.Pair].Bids = marketData.Data.Bids;
         }
 
         //Calculate arb chances for triangle arb and pass it to the UI via SignalR
-        public void StartTriangleArbitrageListener()
+        public async Task StartTriangleArbitrageListener()
         {
             while (true)
             {
                 try
                 {
-                    foreach (var exchange in Markets.ToList())
+                    foreach (var exchange in Markets)
                     {
-                        foreach (var market in Markets[exchange.Key].ToList())
-                        {
-                            //Loop every market except itself with the alt currency except itself //TODO: Optimize by starting at i=0 and 
-                            foreach (var market2 in Markets[exchange.Key].ToList().Where(x => x.Key != market.Key && x.Value.AltCurrency == market.Value.AltCurrency || x.Value.BaseCurrency == market.Value.AltCurrency))
-                            {
-                                //TODO: Store all triangles so we can simply iterate through them instead of all this
-                                MarketData finalMarket;
-
-                                //TODO: Count fees in calculations
-                                var baseAmount = 100; //Assume we have 100 of the starting coin (BaseCurrency)
-                                var altAmount = baseAmount / market.Value.Ask; //~3000 ETH or ~1126252 XRP from 100 BTC
-
-                                decimal alt2Amount;
-                                //If the alt bought in step 1 is still an alt, use bid price (e.g. we're selling to the new coin)
-                                if (market2.Value.AltCurrency == market.Value.AltCurrency)
-                                {
-                                    alt2Amount = altAmount * market2.Value.Bid; //~2988 ETH from 1126252 XRP (i.e. BTC->XRP->ETH->BTC)
-                                    finalMarket = Markets[exchange.Key].Values.ToList().FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.BaseCurrency);
-                                }
-                                else //Otherwise it's the base currency (e.g. we're buying to the new coin)
-                                {
-                                    alt2Amount = altAmount / market2.Value.Ask; //~1129420 XRP from 3000 ETH (i.e. BTC->ETH->XRP->BTC)
-                                    finalMarket = Markets[exchange.Key].Values.ToList().FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.AltCurrency);
-                                }
-
-                                //If null, there's no pairs to go Base/Alt->(Alt/Alt2 || Alt2/Alt)->Alt2/Base
-                                if (finalMarket == null)
-                                {
-                                    continue;
-                                }
-
-                                //TODO: Will this sometimes be a buy instead?
-                                var finalAmount = alt2Amount * finalMarket.Bid; //~100.3376728 BTC from 1129420 XRP
-                                Console.WriteLine("Started with " + baseAmount + " " + market.Value.BaseCurrency + " and ended up with " + finalAmount + " " + market.Value.BaseCurrency + " (" + ((finalAmount - baseAmount) / baseAmount * 100).ToString("N4") + "% Change)");
-
-                                if(finalAmount > baseAmount * 1.005m)
-                                {
-                                    Console.WriteLine("Profit found above 0.5%");
-                                }
-                            }
-                        }
+                        CheckExchangeForTriangleArbitrage(exchange.Key);
                     }
-                    Thread.Sleep(1000);
+
+                    await Task.Delay(1000);
                 }
                 catch (Exception e)
                 {
                     continue;
+                }
+            }
+        }
+
+        decimal bestProfit = -100;
+        int profitableCount = 0;
+        //TODO FOR FUTURE COLIN: Make the bid/asks work down the orderbook instead of using the top
+        public void CheckExchangeForTriangleArbitrage(string exchange)
+        {
+            foreach (var market in Markets[exchange])
+            {
+                //CheckMarketForTriangleArbitrage(exchange, market.Key);
+                //Loop every market except itself with the alt currency except itself //TODO: Optimize by starting at i=0 and 
+                foreach (var market2 in Markets[exchange].Where(x => x.Key != market.Key && x.Value.AltCurrency == market.Value.AltCurrency || x.Value.BaseCurrency == market.Value.AltCurrency))
+                {
+                    //TODO: Store all triangles so we can simply iterate through them instead of all this
+                    MarketData finalMarket;
+
+                    //TODO: Count fees in calculations
+                    var baseAmount = 100; //Assume we have 100 of the starting coin (BaseCurrency)
+                    var altAmount = baseAmount / market.Value.Asks.First().Price; //~3000 ETH or ~1126252 XRP from 100 BTC
+
+                    decimal alt2Amount;
+                    //If the alt bought in step 1 is still an alt, use bid price (e.g. we're selling to the new coin)
+                    if (market2.Value.AltCurrency == market.Value.AltCurrency)
+                    {
+                        alt2Amount = altAmount * market2.Value.Bids.First().Price; //~2988 ETH from 1126252 XRP (i.e. BTC->XRP->ETH->BTC)
+                        finalMarket = Markets[exchange].Values.FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.BaseCurrency);
+                    }
+                    else //Otherwise it's the base currency (e.g. we're buying to the new coin)
+                    {
+                        alt2Amount = altAmount / market2.Value.Asks.First().Price; //~1129420 XRP from 3000 ETH (i.e. BTC->ETH->XRP->BTC)
+                        finalMarket = Markets[exchange].Values.FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.AltCurrency);
+                    }
+
+                    //If null, there's no pairs to go Base/Alt->(Alt/Alt2 || Alt2/Alt)->Alt2/Base
+                    if (finalMarket == null)
+                    {
+                        continue;
+                    }
+
+                    //TODO: Will this sometimes be a buy instead?
+                    var finalAmount = alt2Amount * finalMarket.Bids.First().Price; //~100.3376728 BTC from 1129420 XRP
+                    decimal percentProfit = (finalAmount - baseAmount) / baseAmount * 100;
+
+                    if (bestProfit < percentProfit) {
+                        bestProfit = percentProfit;
+                    }
+                    if (finalAmount > baseAmount * _triProfitThreshold)
+                    {
+                        Console.WriteLine("Profit found above 0.5%");
+                        profitableCount++;
+                        /*ArbitrageResult arbResult = new ArbitrageResult()
+                        {
+                            Exchange = exchange,
+                            Path = market.Value.BaseCurrency + "/" + market.Value.AltCurrency + " -> " + market2.Value.BaseCurrency + "/" + market2.Value.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
+                            NetworkFee = 0,
+                            Spread = percentProfit,
+                            TimePerLoop = 0, //TODO: Count properly
+                            TransactionFee = 0.1m * 3
+                        };*/
+                        //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
+                    }
                 }
             }
         }

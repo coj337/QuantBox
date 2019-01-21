@@ -31,6 +31,11 @@ namespace Market.API.Services
                 {
                     exchange.StartPriceListener();
                 });
+
+                Task.Run(() =>
+                {
+                    exchange.StartOrderbookListener();
+                });
             }
         }
 

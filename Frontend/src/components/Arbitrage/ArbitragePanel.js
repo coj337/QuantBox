@@ -10,7 +10,11 @@ export class ArbitragePanel extends Component {
         this.state = {
             error: null,
             isLoaded: false,
-            pair: props.pair
+            exchange: props.exchange,
+            path: props.path,
+            transactionFee: props.transactionFee,
+            networkFee: props.networkFee,
+            timePerLoop: props.timePerLoop
         };
     }
 
@@ -24,7 +28,7 @@ export class ArbitragePanel extends Component {
         } else {
             return (
                 <div className="arbitragePanel">
-                    Test
+                    {this.state.exchange} Testies
                 </div>
             );
         }

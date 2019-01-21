@@ -31,9 +31,9 @@ export class Arbitrage extends Component {
     componentDidMount() {
         this.state.hubConnection.on('ReceiveTriangleArbitrage', (receivedMessage) => {
             var arbitrage = receivedMessage;
-            this.setState({
-                triangleArbMatrix: arbitrage
-            });
+            this.setState((prevState, props) => ({
+                triangleArbMatrix: prevState.triangleArbMatrix.push(arbitrage)
+            }));
         });
 
         this.state.hubConnection.on('ReceiveNormalArbitrage', (receivedMessage) => {
@@ -63,10 +63,11 @@ export class Arbitrage extends Component {
                 {this.state.normalArbMatrix.map((arbitrage, i) => (
                     <Col xs={6} md={4} lg={3} key={i}>
                         <ArbitragePanel
-                            pair={arbitrage.pair}
-                            startExchange={arbitrage.startExchange}
-                            endExchange={arbitrage.endExchange}
-                            spread={arbitrage.spread}
+                            exchange={arbitrage.exchange}
+                            path={arbitrage.path}
+                            transactionFee={arbitrage.transactionFee}
+                            networkFee={arbitrage.networkFee}
+                            timePerLoop={arbitrage.timePerLoop}
                         />
                     </Col>
                 ))}

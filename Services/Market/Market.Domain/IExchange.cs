@@ -18,5 +18,7 @@ namespace Market.Domain
         bool IsAuthenticated();
 
         Task StartPriceListener();
+
+        Task StartOrderbookListener();
     }
 }

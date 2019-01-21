@@ -7,18 +7,13 @@ namespace Arbitrage.Domain.ExchangeAggregate
     public class ExchangeData
     {
         public string Exchange { get; set; }
-        public string BaseCurrency { get; set; }
-        public string AltCurrency { get; set; }
-        public string Pair { get; set; }
         public MarketData Data { get; set; }
 
-        public ExchangeData(string exchange, string pair, string baseCurrency, string altCurrency, decimal bid, decimal ask)
+        public ExchangeData(string exchange, string pair, string baseCurrency, string altCurrency, List<Order> bids, List<Order> asks)
         {
             Exchange = exchange;
-            Pair = pair;
-            BaseCurrency = baseCurrency;
-            AltCurrency = altCurrency;
-            Data = new MarketData(bid, ask);
+            
+            Data = new MarketData(pair, baseCurrency, altCurrency, bids, asks);
         }
     }
 }

@@ -80,7 +80,7 @@ namespace Arbitrage.API
         private void ConfigureEventBus(IApplicationBuilder app)
         {
             var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
-            eventBus.Subscribe<PriceUpdatedIntegrationEvent, PriceUpdatedIntegrationEventHandler>();
+            eventBus.Subscribe<OrderbookUpdatedIntegrationEvent, OrderbookUpdatedIntegrationEventHandler>();
         }
 
         private void RegisterEventBus(IServiceCollection services)
@@ -168,7 +168,7 @@ namespace Arbitrage.API
             }
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-            services.AddTransient<PriceUpdatedIntegrationEventHandler>();
+            services.AddTransient<OrderbookUpdatedIntegrationEventHandler>();
         }
     }
 

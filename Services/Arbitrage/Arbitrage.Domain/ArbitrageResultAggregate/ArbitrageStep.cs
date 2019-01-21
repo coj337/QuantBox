@@ -7,7 +7,7 @@ namespace Arbitrage.Domain
 {
     public class ArbitrageStep
     {
-        public ExchangeData Exchange { get; set; }
+        public string Exchange { get; set; }
 
         public PairData Pair { get; set; }
 

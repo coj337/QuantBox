@@ -81,7 +81,7 @@ namespace Market.API.Exchanges
             }
 
             //Subscribe to ticker websockets
-            var socket = _client.GetTickersWebSocket((tickers) =>
+            /*var socket = _client.GetTickersWebSocket((tickers) =>
             {
                 for (var i = 0; i < tickers.Count(); i++)
                 {
@@ -106,21 +106,74 @@ namespace Market.API.Exchanges
                     foundMarket.AltVolume = ticker.Value.Volume.QuoteCurrencyVolume;
 
                     //Send integration event for other services
-                    var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.BaseCurrency, foundMarket.AltCurrency, foundMarket.Bid, foundMarket.Ask);
-                    _eventBus.Publish(@event);
+                    //Disabled since nothings using them right now
+                    //var @event = new PriceUpdatedIntegrationEvent(this.Name, tickers.ElementAt(i).Key, foundMarket.BaseCurrency, foundMarket.AltCurrency, foundMarket.Bid, foundMarket.Ask);
+                    //_eventBus.Publish(@event);
                 }
             });
 
             socket.Disconnected += SocketStoppedEvent;
 
             _priceListenerStoppedEvent.WaitOne(); //This thread will block here until the reset event is sent.
-            _priceListenerStoppedEvent.Reset();
+            _priceListenerStoppedEvent.Reset();*/
         }
 
         private Task SocketStoppedEvent(object sender)
         {
             //Log once logger's implemented
             _priceListenerStoppedEvent.Set();
+
+            return Task.CompletedTask;
+        }
+
+        private readonly ManualResetEvent _orderbookListenerStoppedEvent = new ManualResetEvent(false);
+
+        public async Task StartOrderbookListener()
+        {
+            /////TEMP WHILE WE AREN'T USING THE OTHER SOCKET
+            var markets = await _client.GetMarketSymbolsMetadataAsync();
+            foreach(var market in markets)
+            {
+                Markets.Add(market.MarketSymbol, new MarketData()
+                {
+                    Pair = market.MarketSymbol,
+                    BaseCurrency = market.QuoteCurrency,
+                    AltCurrency = market.BaseCurrency
+                });
+            }
+
+            //Subscribe to ticker websockets
+            var socket = _client.GetFullOrderBookWebSocket((orderbook) =>
+            {
+                List<Order> bids = new List<Order>();
+                List<Order> asks = new List<Order>();
+
+                foreach(var bid in orderbook.Bids.Values)
+                {
+                    bids.Add(new Order() {Price = bid.Price, Amount = bid.Amount });
+                }
+                foreach (var ask in orderbook.Asks.Values)
+                {
+                    asks.Add(new Order() { Price = ask.Price, Amount = ask.Amount });
+                }
+                
+                //Send integration event for other services
+                if (Markets.ContainsKey(orderbook.MarketSymbol)) {
+                    var @event = new OrderbookUpdatedIntegrationEvent(this.Name, orderbook.MarketSymbol, Markets[orderbook.MarketSymbol].BaseCurrency, Markets[orderbook.MarketSymbol].AltCurrency, bids, asks);
+                    _eventBus.Publish(@event);
+                }
+            });
+
+            socket.Disconnected += OrderbookSocketStoppedEvent;
+
+            _orderbookListenerStoppedEvent.WaitOne(); //This thread will block here until the reset event is sent.
+            _orderbookListenerStoppedEvent.Reset();
+        }
+
+        private Task OrderbookSocketStoppedEvent(object sender)
+        {
+            //Log once logger's implemented
+            _orderbookListenerStoppedEvent.Set();
 
             return Task.CompletedTask;
         }

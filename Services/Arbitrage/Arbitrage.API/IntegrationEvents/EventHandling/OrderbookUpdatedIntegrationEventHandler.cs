@@ -10,18 +10,18 @@ using Arbitrage.Domain.ExchangeAggregate;
 
 namespace Arbitrage.API.IntegrationEvents.EventHandling
 {
-    public class PriceUpdatedIntegrationEventHandler : IIntegrationEventHandler<PriceUpdatedIntegrationEvent>
+    public class OrderbookUpdatedIntegrationEventHandler : IIntegrationEventHandler<OrderbookUpdatedIntegrationEvent>
     {
         private readonly ArbitrageService _arbitrageService;
 
-        public PriceUpdatedIntegrationEventHandler(ArbitrageService arbitrageService)
+        public OrderbookUpdatedIntegrationEventHandler(ArbitrageService arbitrageService)
         {
             _arbitrageService = arbitrageService;
         }
 
-        public Task Handle(PriceUpdatedIntegrationEvent @event)
+        public Task Handle(OrderbookUpdatedIntegrationEvent @event)
         {
-            _arbitrageService.UpdatePrice(new ExchangeData(@event.Exchange, @event.Pair, @event.BaseCurrency, @event.AltCurrency, @event.NewBid, @event.NewAsk));
+            _arbitrageService.UpdatePrice(new ExchangeData(@event.Exchange, @event.Pair, @event.BaseCurrency, @event.AltCurrency, @event.NewBids, @event.NewAsks));
 
             return Task.CompletedTask;
         }

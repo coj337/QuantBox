@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Arbitrage.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Arbitrage.API.Controllers
@@ -10,11 +11,19 @@ namespace Arbitrage.API.Controllers
     [ApiController]
     public class ArbitrageController : ControllerBase
     {
-        [HttpGet]
-        [Route("Get")]
-        public ActionResult<IEnumerable<string>> Get()
+        private readonly ArbitrageService _arbitrageService;
+
+        public ArbitrageController(ArbitrageService arbitrageService)
         {
-            return new string[] { "value1", "value2" };
+            _arbitrageService = arbitrageService;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult UpdateTriArbThreshold(decimal threshold)
+        {
+            _arbitrageService.UpdateTriArbThreshold(threshold);
+            return Ok();
         }
     }
 }

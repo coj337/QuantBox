@@ -6,13 +6,15 @@ namespace Arbitrage.Domain
 {
     public class MarketData
     {
+        public string Pair { get; set; }
+
         public string BaseCurrency { get; set; }
 
         public string AltCurrency { get; set; }
 
-        public decimal Bid { get; set; }
+        public List<Order> Bids { get; set; }
 
-        public decimal Ask { get; set; }
+        public List<Order> Asks { get; set; }
 
         public decimal BaseVolume { get; set; }
 
@@ -23,10 +25,13 @@ namespace Arbitrage.Domain
 
         }
 
-        public MarketData(decimal bid, decimal ask)
+        public MarketData(string pair, string baseCurrency, string altCurrency, List<Order> bids, List<Order> asks)
         {
-            Bid = bid;
-            Ask = ask;
+            Pair = pair;
+            BaseCurrency = baseCurrency;
+            AltCurrency = altCurrency;
+            Bids = bids;
+            Asks = asks;
         }
 
     }
