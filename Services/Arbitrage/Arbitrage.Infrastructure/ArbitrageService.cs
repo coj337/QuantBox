@@ -78,8 +78,8 @@ namespace Arbitrage.Infrastructure
             }
         }
 
-        decimal bestProfit = -100;
-        int profitableCount = 0;
+        private decimal bestProfit = -100;
+        private readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
         //TODO FOR FUTURE COLIN: Make the bid/asks work down the orderbook instead of using the top
         public void CheckExchangeForTriangleArbitrage(string exchange)
         {
@@ -125,18 +125,28 @@ namespace Arbitrage.Infrastructure
                     if (finalAmount > baseAmount * _triProfitThreshold)
                     {
                         Console.WriteLine("Profit found above 0.5%");
-                        profitableCount++;
-                        /*ArbitrageResult arbResult = new ArbitrageResult()
+                        ArbitrageResult arbResult = new ArbitrageResult()
                         {
                             Exchange = exchange,
                             Path = market.Value.BaseCurrency + "/" + market.Value.AltCurrency + " -> " + market2.Value.BaseCurrency + "/" + market2.Value.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
                             NetworkFee = 0,
                             Spread = percentProfit,
                             TimePerLoop = 0, //TODO: Count properly
-                            TransactionFee = 0.1m * 3
-                        };*/
+                        };
+                        if(exchange == "Binance")
+                        {
+                            arbResult.TransactionFee = 0.1m * 3;
+                        }
+                        else if(exchange == "BtcMarkets")
+                        {
+                            arbResult.TransactionFee = 0.22m * 3;
+                        }
+                        profitableTransactions.Add(arbResult);
+
                         //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
                     }
+                    var bCount = profitableTransactions.Count(x => x.Exchange == "Binance");
+                    var btcmCount = profitableTransactions.Count(x => x.Exchange == "BtcMarkets");
                 }
             }
         }

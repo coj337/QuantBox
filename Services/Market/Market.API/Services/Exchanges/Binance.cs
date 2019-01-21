@@ -12,7 +12,7 @@ using Market.Domain;
 using BuildingBlocks.EventBus.Abstractions;
 using Market.API.IntegrationEvents.Events;
 
-namespace Market.API.Exchanges
+namespace Market.API.Services.Exchanges
 {
     public class Binance : IExchange
     {

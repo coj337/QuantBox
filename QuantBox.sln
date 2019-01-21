@@ -59,6 +59,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "BuildingBlocks\
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Frontend", "Frontend\Frontend.njsproj", "{D8A0AF63-B085-4081-A218-679417333785}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExchangeApis", "ExchangeApis", "{923D783C-66C0-4E7A-B998-7576C47EF75A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BtcMarketsApiClient", "Services\Market\ExchangeApis\BtcMarketsClient\BtcMarketsApiClient.csproj", "{71DBC02F-21CC-4721-9FF7-85780718C7F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +149,10 @@ Global
 		{D8A0AF63-B085-4081-A218-679417333785}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8A0AF63-B085-4081-A218-679417333785}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8A0AF63-B085-4081-A218-679417333785}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71DBC02F-21CC-4721-9FF7-85780718C7F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71DBC02F-21CC-4721-9FF7-85780718C7F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71DBC02F-21CC-4721-9FF7-85780718C7F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71DBC02F-21CC-4721-9FF7-85780718C7F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -173,6 +181,8 @@ Global
 		{C3BCC1CB-5DC0-4E9E-BDBA-7F4961582B23} = {98CBE05B-D2FE-45F5-9316-EAE35AAFAE48}
 		{EE27A3B9-309F-4977-B8F7-77237F43DB34} = {98CBE05B-D2FE-45F5-9316-EAE35AAFAE48}
 		{73622817-EAE0-4D8E-8F2B-AC672FA88555} = {98CBE05B-D2FE-45F5-9316-EAE35AAFAE48}
+		{923D783C-66C0-4E7A-B998-7576C47EF75A} = {9A6BA94B-265F-43DA-B9A8-F4CF0C360F72}
+		{71DBC02F-21CC-4721-9FF7-85780718C7F4} = {923D783C-66C0-4E7A-B998-7576C47EF75A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1D69107-5C23-469A-A8EC-5B9EEA105C0C}

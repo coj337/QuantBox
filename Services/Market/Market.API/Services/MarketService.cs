@@ -2,11 +2,11 @@
 using Market.Domain;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using Market.API.Exchanges;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
 using Market.API.Infrastructure;
+using Market.API.Services.Exchanges;
 
 namespace Market.API.Services
 {
@@ -22,7 +22,8 @@ namespace Market.API.Services
 
             _supportedExchanges = new List<IExchange>()
             {
-                new Binance(eventBus)
+                new Binance(eventBus),
+                new BtcMarkets(eventBus)
             };
 
             foreach (var exchange in _supportedExchanges)
