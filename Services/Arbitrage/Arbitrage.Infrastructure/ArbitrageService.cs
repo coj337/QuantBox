@@ -74,53 +74,140 @@ namespace Arbitrage.Infrastructure
                 }
                 catch (Exception e)
                 {
+                    await Task.Delay(1000);
                     continue;
                 }
             }
         }
 
         private decimal bestProfit = -100;
+        private decimal worstProfit = 100;
         private readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
         public void CheckExchangeForTriangleArbitrage(string exchange)
         {
-            foreach (var market in Markets[exchange])
+            MarketData finalMarket;
+            decimal altAmount, alt2Amount, finalAmount, baseAmount;
+            var audInvested = 1000; //Assume we have 1 of the starting coin
+            /*
+             * Assuming we are testing BTC/ETH->ETH/XRP->XRP/BTC
+             * startCurrency == BTC
+             * middleCurrency == ETH
+             * endCurrency == XRP
+            */
+            string startCurrency, middleCurrency, endCurrency; //The currency that's bought/sold from in the first transaction
+
+            foreach (var market in Markets[exchange].Where(x =>/*SKIPPING BECAUSE BTCMARKETS BUG*/x.Key != "BTC/AUD"/**/))
             {
-                //CheckMarketForTriangleArbitrage(exchange, market.Key);
-                //Loop every market except itself with the alt currency //TODO: Optimize by starting at i=0 and 
-                foreach (var market2 in Markets[exchange].Where(x => x.Key != market.Key && x.Value.AltCurrency == market.Value.AltCurrency || x.Value.BaseCurrency == market.Value.AltCurrency))
+
+                //Loop every market with a matching currency except itself (this could start on the base or alt currency)
+                foreach (var market2 in Markets[exchange].Where(x => /*SKIPPING BECAUSE BTCMARKETS BUG*/x.Key != "BTC/AUD" && /**/x.Key != market.Key && (x.Value.AltCurrency == market.Value.AltCurrency || x.Value.BaseCurrency == market.Value.AltCurrency || x.Value.AltCurrency == market.Value.BaseCurrency || x.Value.BaseCurrency == market.Value.BaseCurrency)))
                 {
-                    //TODO: Store all triangles so we can simply iterate through them instead of all this
-                    MarketData finalMarket;
-
-                    //TODO: Count fees in calculations
-                    var baseAmount = 1; //Assume we have 100 of the starting coin (BaseCurrency)
-                    var altAmount = baseAmount / GetPriceQuote(exchange, market.Key, OrderbookType.Ask, baseAmount); //~3000 ETH or ~1126252 XRP from 100 BTC
-
-                    decimal alt2Amount;
-                    //If the alt bought in step 1 is still an alt, use bid price (e.g. we're selling to the new coin)
-                    if (market2.Value.AltCurrency == market.Value.AltCurrency)
+                    //If the base/alt currency for the next market is the base currency, we need to bid (i.e. Buy for first trade)
+                    if (market.Value.BaseCurrency == market2.Value.BaseCurrency || market.Value.BaseCurrency == market2.Value.AltCurrency)
                     {
-                        alt2Amount = altAmount * GetPriceQuote(exchange, market2.Key, OrderbookType.Bid, altAmount); //~2988 ETH from 1126252 XRP (i.e. BTC->XRP->ETH->BTC)
-                        finalMarket = Markets[exchange].Values.FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.BaseCurrency);
+                        baseAmount = ConvertAudToCrypto(exchange, market.Value.AltCurrency, audInvested);
+                        if(baseAmount == 0)
+                        {
+                            continue; //Asset prices not loaded yet
+                        }
+
+                        try
+                        {
+                            altAmount = baseAmount * GetPriceQuote(exchange, market.Key, OrderbookType.Bid, baseAmount);
+                        }
+                        catch(Exception e)
+                        {
+                            continue;
+                        }
+                        startCurrency = market.Value.AltCurrency;
+                        middleCurrency = market.Value.BaseCurrency;
                     }
-                    else //Otherwise it's the base currency (e.g. we're buying to the new coin)
+                    else //Else we need to ask (i.e. Sell for first trade)
                     {
-                        alt2Amount = altAmount / GetPriceQuote(exchange, market2.Key, OrderbookType.Ask, altAmount); //~1129420 XRP from 3000 ETH (i.e. BTC->ETH->XRP->BTC)
-                        finalMarket = Markets[exchange].Values.FirstOrDefault(x => x.BaseCurrency == market.Value.BaseCurrency && x.AltCurrency == market2.Value.AltCurrency);
+                        baseAmount = ConvertAudToCrypto(exchange, market.Value.BaseCurrency, audInvested);
+                        if (baseAmount == 0)
+                        {
+                            continue; //Asset prices not loaded yet
+                        }
+
+                        try
+                        {
+                            ///TODO: Is it enough to just transform baseAmount?
+                            altAmount = baseAmount / GetPriceQuote(exchange, market.Key, OrderbookType.Ask, ConvertBaseToAlt(exchange, market.Value.BaseCurrency, market.Value.AltCurrency, baseAmount)); //~3000 ETH from 100 BTC
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                        startCurrency = market.Value.BaseCurrency;
+                        middleCurrency = market.Value.AltCurrency;
                     }
 
-                    //If null, there's no pairs to go Base/Alt->(Alt/Alt2 || Alt2/Alt)->Alt2/Base
+                    //If the alt bought in step 1 is now a base, use ask price
+                    if (market2.Value.BaseCurrency == middleCurrency)
+                    {
+                        endCurrency = market2.Value.AltCurrency;
+                        try
+                        {
+                            alt2Amount = altAmount / GetPriceQuote(exchange, market2.Key, OrderbookType.Ask, ConvertBaseToAlt(exchange, market2.Value.BaseCurrency, market2.Value.AltCurrency, altAmount));
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                    }
+                    else //Otherwise it's the alt currency (i.e. we're selling to the new coin)
+                    {
+                        endCurrency = market2.Value.BaseCurrency;
+                        try
+                        {
+                            alt2Amount = altAmount * GetPriceQuote(exchange, market2.Key, OrderbookType.Bid, altAmount);
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                    }
+                    //Find the final market (i.e. the market that has the middle and end currencies)
+                    finalMarket = Markets[exchange].Values.SingleOrDefault(x => /*SKIPPING BECAUSE BTCMARKETS BUG*/x.Pair != "BTC/AUD" && /**/(x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
+
+                    //If null, there's no pairs to finish the arb
                     if (finalMarket == null)
                     {
                         continue;
                     }
 
-                    //TODO: Will this sometimes be a buy instead?
-                    var finalAmount = alt2Amount * GetPriceQuote(exchange, finalMarket.Pair, OrderbookType.Bid, altAmount); //~100.3376728 BTC from 1129420 XRP
-                    decimal percentProfit = (finalAmount - baseAmount) / baseAmount * 100;
+                    //If the base currency is the first currency, we need to sell (i.e. use bid)
+                    if(finalMarket.BaseCurrency == startCurrency)
+                    {
+                        try
+                        {
+                            finalAmount = alt2Amount * GetPriceQuote(exchange, finalMarket.Pair, OrderbookType.Bid, alt2Amount);
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                    }
+                    else //Else we buy (i.e. use ask)
+                    {
+                        try
+                        { 
+                            finalAmount = alt2Amount / GetPriceQuote(exchange, finalMarket.Pair, OrderbookType.Ask, ConvertBaseToAlt(exchange, finalMarket.BaseCurrency, finalMarket.AltCurrency, alt2Amount));
+                        }
+                        catch (Exception e)
+                        {
+                            continue;
+                        }
+                    }
 
+                    decimal percentProfit = (finalAmount - baseAmount) / baseAmount * 100;
                     if (bestProfit < percentProfit) {
                         bestProfit = percentProfit;
+                    }
+                    if(worstProfit > percentProfit)
+                    {
+                        worstProfit = percentProfit;
                     }
                     if (finalAmount > baseAmount * _triProfitThreshold)
                     {
@@ -151,6 +238,40 @@ namespace Arbitrage.Infrastructure
             }
         }
 
+        //Converts a base currency to an alt currency at the market rate
+        public decimal ConvertBaseToAlt(string exchange, string baseCurrency, string altCurrency, decimal baseCurrencyAmount)
+        {
+            var price = Markets[exchange].First(x => x.Value.BaseCurrency == baseCurrency && x.Value.AltCurrency == altCurrency).Value.Asks.First().Price;
+
+            var altCurrencyAmount = baseCurrencyAmount / price;
+
+            return altCurrencyAmount;
+        }
+
+        //Converts AUD to crypto at the market rate
+        public decimal ConvertAudToCrypto(string exchange, string asset, decimal audAmount)
+        {
+            try
+            {
+                decimal btcAudPrice = Markets["BtcMarkets"]["BTC/AUD"].Asks.First().Price; //Use BtcMarkets as BTC/AUD price reference since they have the most volume
+                decimal btcFromAud = audAmount / btcAudPrice;
+
+                decimal btcAssetPrice = Markets[exchange].FirstOrDefault(x => x.Value.BaseCurrency == "BTC" && x.Value.AltCurrency == asset || x.Value.AltCurrency == "BTC" && x.Value.BaseCurrency == asset).Value.Asks.First().Price;
+                if (btcAssetPrice == 0)
+                {
+                    return 0;
+                }
+                decimal assetFromBtc = btcFromAud / btcAssetPrice;
+
+                return assetFromBtc;
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+        }
+
+        //Note: Amount should be the amount in the alt, not the amount in the base currency
         public decimal GetPriceQuote(string exchange, string pair, OrderbookType type, decimal amount)
         {
             decimal price = 0;
@@ -171,8 +292,13 @@ namespace Arbitrage.Infrastructure
             //Loop until our order's filled or we run out of orderbook
             while (amountLeft > 0 && i < orders.Count())
             {
-                decimal amountBought = orders[i].Amount;
-                if (orders[i].Amount > amountLeft) //Make sure we only partial fill the last of the order
+                decimal altAmount = orders[i].Amount;
+                //if (pair.EndsWith("USDT"))
+                //{
+                //    altAmount *= orders[i].Price;
+                //}
+                decimal amountBought = altAmount;
+                if (altAmount > amountLeft) //Make sure we only partial fill the last of the order
                 {
                     amountBought = amountLeft;
                 }
@@ -184,6 +310,11 @@ namespace Arbitrage.Infrastructure
                 price = price + (orders[i].Price / (amount / amountBought));
 
                 i++;
+            }
+
+            if(i >= orders.Count())
+            {
+                throw new Exception("Orderbook too thin, couldn't calculate price for " + pair + " on " + exchange + ", requested " + amount + " when only " + orders.Sum(x => x.Amount) + " was available");
             }
 
             return price;

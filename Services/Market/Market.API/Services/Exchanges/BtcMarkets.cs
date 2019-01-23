@@ -68,7 +68,7 @@ namespace Market.API.Services.Exchanges
 
                     List<Order> bids = new List<Order>();
                     List<Order> asks = new List<Order>();
-
+                    
                     foreach (var bid in orderbook.bids)
                     {
                         bids.Add(new Order() { Price = bid[0], Amount = bid[1] });
