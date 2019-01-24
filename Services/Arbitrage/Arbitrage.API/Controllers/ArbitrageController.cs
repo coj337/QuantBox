@@ -18,9 +18,37 @@ namespace Arbitrage.API.Controllers
             _arbitrageService = arbitrageService;
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult GetTriangleResults()
+        {
+            return Ok(_arbitrageService.profitableTransactions);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult GetBestResult()
+        {
+            return Ok(_arbitrageService.bestProfit);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult GetWorstResult()
+        {
+            return Ok(_arbitrageService.worstProfit);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public IActionResult GetTriangleThreshold()
+        {
+            return Ok(_arbitrageService.GetTriangleThreshold());
+        }
+
         [HttpPost]
         [Route("[action]")]
-        public IActionResult UpdateTriArbThreshold(decimal threshold)
+        public IActionResult UpdateTriangleThreshold(decimal threshold)
         {
             _arbitrageService.UpdateTriArbThreshold(threshold);
             return Ok();

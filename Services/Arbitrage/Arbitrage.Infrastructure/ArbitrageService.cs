@@ -16,7 +16,10 @@ namespace Arbitrage.Infrastructure
     public class ArbitrageService : IHostedService
     {
         //private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
+        public readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
         private decimal _triProfitThreshold = 1.0025m; //0.25% profit default
+        public decimal bestProfit = -100;
+        public decimal worstProfit = 100;
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -57,6 +60,11 @@ namespace Arbitrage.Infrastructure
             }
         }
 
+        public decimal GetTriangleThreshold()
+        {
+            return _triProfitThreshold;
+        }
+
         //Calculate arb chances for triangle arb and pass it to the UI (?via SignalR?)
         public async Task StartTriangleArbitrageListener()
         {
@@ -79,9 +87,6 @@ namespace Arbitrage.Infrastructure
             }
         }
 
-        private decimal bestProfit = -100;
-        private decimal worstProfit = 100;
-        private readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
         public void CheckExchangeForTriangleArbitrage(IExchange exchange)
         {
             Orderbook finalMarket;
@@ -248,7 +253,7 @@ namespace Arbitrage.Infrastructure
                             Exchange = exchange.Name,
                             Path = market.BaseCurrency + "/" + market.AltCurrency + " -> " + market2.BaseCurrency + "/" + market2.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
                             NetworkFee = 0,
-                            Spread = percentProfit,
+                            Profit = percentProfit,
                             TimePerLoop = 0, //TODO: Count properly
                         };
                         if(exchange.Name == "Binance")

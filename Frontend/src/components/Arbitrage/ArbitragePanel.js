@@ -12,6 +12,7 @@ export class ArbitragePanel extends Component {
             isLoaded: false,
             exchange: props.exchange,
             path: props.path,
+            profit: props.profit,
             transactionFee: props.transactionFee,
             networkFee: props.networkFee,
             timePerLoop: props.timePerLoop
@@ -28,7 +29,12 @@ export class ArbitragePanel extends Component {
         } else {
             return (
                 <div className="arbitragePanel">
-                    {this.state.exchange} Testies
+                    Exchange: {this.state.exchange}
+                    Path: {this.state.path}
+                    Profit: {this.state.profit}
+                    Transaction Fee: {this.state.transactionFee}
+                    Network Fee: {this.state.networkFee} 
+                    Est Time: {this.state.timePerLoop}
                 </div>
             );
         }

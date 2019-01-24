@@ -10,56 +10,74 @@ export class Arbitrage extends Component {
         super(props);
 
         this.state = {
-            hubConnection: null,
             triangleArbMatrix: [],
+            bestResult: "None yet",
+            worstResult: "None yet",
             normalArbMatrix: []
         };
     }
 
     componentWillMount() {
-        const hubConnection = new HubConnectionBuilder().withUrl('/arbitrageHub').build();
-        this.setState({
-            hubConnection: hubConnection
-        }, () => {
-            this.state.hubConnection
-                .start()
-                .then(() => console.log('Connection started!'))
-                .catch(err => console.log('Error while establishing connection :( (' + err + ')'));
-        });
-    }
+        fetch("/Arbitrage/GetTriangleResults")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        triangleArbResults: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+        );
 
-    componentDidMount() {
-        this.state.hubConnection.on('ReceiveTriangleArbitrage', (receivedMessage) => {
-            var arbitrage = receivedMessage;
-            this.setState((prevState, props) => ({
-                triangleArbMatrix: prevState.triangleArbMatrix.push(arbitrage)
-            }));
-        });
+        fetch("/Arbitrage/GetBestResult")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        bestResult: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+        );
 
-        this.state.hubConnection.on('ReceiveNormalArbitrage', (receivedMessage) => {
-            var arbitrage = receivedMessage;
-            this.setState({
-                normalArbMatrix: arbitrage
-            });
-        });
+        fetch("/Arbitrage/GetWorstResult")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        worstResult: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
     render() {
         return (
             <Row>
                 <div>Triangle Arbs</div>
+                <div>Best: {this.state.bestResult}</div>
+                <div>Worst: {this.state.worstResult}</div>
                 {this.state.triangleArbMatrix.map((arbitrage, i) => (
                     <Col xs={6} md={4} lg={3} key={i}>
                         <ArbitragePanel
-                            pair={arbitrage.pair}
-                            startExchange={arbitrage.startExchange}
-                            endExchange={arbitrage.endExchange}
-                            spread={arbitrage.spread}
+                            exchange={arbitrage.exchange}
+                            path={arbitrage.path}
+                            transactionFee={arbitrage.transactionFee}
+                            networkFee={arbitrage.networkFee}
+                            profit={arbitrage.profit}
+                            timePerLoop={arbitrage.timePerLoop}
                         />
                     </Col>
                 ))}
 
-                <div>Two-Way Arbs</div>
+                {/*<div>Two-Way Arbs</div>
                 {this.state.normalArbMatrix.map((arbitrage, i) => (
                     <Col xs={6} md={4} lg={3} key={i}>
                         <ArbitragePanel
@@ -70,7 +88,7 @@ export class Arbitrage extends Component {
                             timePerLoop={arbitrage.timePerLoop}
                         />
                     </Col>
-                ))}
+                ))}*/}
             </Row>
         );
     }
