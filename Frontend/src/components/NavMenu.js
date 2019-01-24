@@ -14,7 +14,7 @@ export class NavMenu extends Component {
             <Navbar inverse fixedTop fluid collapseOnSelect>
                 <Navbar.Header>
                     <Navbar.Brand>
-                        <Link to={'/'}>*Insert Name*</Link>
+                        <Link to={'/'}>QuantBox</Link>
                     </Navbar.Brand>
                     <Navbar.Toggle />
                 </Navbar.Header>

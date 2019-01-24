@@ -22,19 +22,6 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
 
-  market.api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=44331
-      - ConnectionString=Server=sql.data;Database=MarketDb;User Id=sa;Password=Pass@word
-    ports:
-      - "65258:80"
-      - "44331:443"
-    volumes:
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-
   sentiment.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

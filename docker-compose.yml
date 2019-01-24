@@ -16,15 +16,6 @@ services:
       context: .
       dockerfile: Services/Arbitrage/Arbitrage.API/Dockerfile
     depends_on:
-      - market.api
-      - rabbitmq
-
-  market.api:
-    image: ${DOCKER_REGISTRY-}marketapi
-    build:
-      context: .
-      dockerfile: Services/Market/Market.API/Dockerfile
-    depends_on:
       - rabbitmq
 
   sentiment.api:
@@ -34,7 +25,6 @@ services:
       dockerfile: Services/Sentiment/Sentiment.API/Dockerfile
     depends_on:
       - rabbitmq
-      - market.api
 
   ## Public API Services ##
   trading-apigw:
@@ -45,5 +35,4 @@ services:
     depends_on:
       - arbitrage.api
       - sentiment.api
-      - market.api
       - rabbitmq

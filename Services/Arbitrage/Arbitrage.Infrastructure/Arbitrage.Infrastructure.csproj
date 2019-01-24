@@ -6,6 +6,7 @@
 
   <ItemGroup>
 	<PackageReference Include="Microsoft.AspNetCore.App" />
+	<ProjectReference Include="..\..\..\BuildingBlocks\ExchangeInfrastructure\ExchangeManager\ExchangeManager.csproj" />
     <ProjectReference Include="..\Arbitrage.Domain\Arbitrage.Domain.csproj" />
   </ItemGroup>
 
