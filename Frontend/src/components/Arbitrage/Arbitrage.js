@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
-import { HubConnectionBuilder } from '@aspnet/signalr';
 import { ArbitragePanel } from './ArbitragePanel';
 
 export class Arbitrage extends Component {
@@ -19,7 +18,9 @@ export class Arbitrage extends Component {
 
     componentWillMount() {
         fetch("/Arbitrage/GetTriangleResults")
-            .then(res => res.json())
+            .then(res => {
+                return res.json();
+            })
             .then(
                 (result) => {
                     this.setState({
@@ -32,7 +33,9 @@ export class Arbitrage extends Component {
         );
 
         fetch("/Arbitrage/GetBestResult")
-            .then(res => res.json())
+            .then(res => {
+                return res.json();
+            })
             .then(
                 (result) => {
                     this.setState({
@@ -45,7 +48,9 @@ export class Arbitrage extends Component {
         );
 
         fetch("/Arbitrage/GetWorstResult")
-            .then(res => res.json())
+            .then(res => {
+                return res.json();
+            })
             .then(
                 (result) => {
                     this.setState({
@@ -61,7 +66,7 @@ export class Arbitrage extends Component {
     render() {
         return (
             <Row>
-                <div>Triangle Arbs</div>
+                <h4>Triangle Arbitrage Opportunities</h4>
                 <div>Best: {this.state.bestResult}</div>
                 <div>Worst: {this.state.worstResult}</div>
                 {this.state.triangleArbMatrix.map((arbitrage, i) => (

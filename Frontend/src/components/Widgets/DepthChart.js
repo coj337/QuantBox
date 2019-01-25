@@ -2,10 +2,6 @@
 import { Widget } from './Widget';
 
 export class DepthChart extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <Widget

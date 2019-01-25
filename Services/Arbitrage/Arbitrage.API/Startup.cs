@@ -45,7 +45,8 @@ namespace Arbitrage.API
             services.AddCustomMvc();
             services.AddSignalR();
 
-            services.AddSingleton<IHostedService, ArbitrageService>();
+            services.AddSingleton<ArbitrageService>(); //Workaround to keep this running in the background, solved in .NET Core 3.0
+            services.AddSingleton<IHostedService, ArbitrageService>(provider => provider.GetRequiredService<ArbitrageService>());
 
             //configure autofac
             var container = new ContainerBuilder();

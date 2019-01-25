@@ -73,7 +73,7 @@ namespace ExchangeManager.Clients
                             var orderbook = _client.GetOrderBook(market.Pair);
                             if(orderbook == null)
                             {
-                                continue;
+                                continue; //It breaks sometimes so just skip the pair this loop
                             }
 
                             List<Order> bids = new List<Order>();
@@ -87,6 +87,10 @@ namespace ExchangeManager.Clients
                             {
                                 asks.Add(new Order() { Price = ask[0], Amount = ask[1] });
                             }
+
+                            var thisOrderbook = Orderbooks.First(x => x.Pair == market.Pair);
+                            thisOrderbook.Bids = bids;
+                            thisOrderbook.Asks = asks;
                         }
 
                         Thread.Sleep(1000);

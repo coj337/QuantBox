@@ -53,8 +53,6 @@ namespace ExchangeManager.Clients
             }
         }
 
-        private readonly ManualResetEvent _orderbookListenerStoppedEvent = new ManualResetEvent(false);
-
         public Task StartOrderbookListener()
         {
             var markets = _client.GetMarketSymbolsMetadataAsync().GetAwaiter().GetResult();
@@ -87,21 +85,12 @@ namespace ExchangeManager.Clients
                     {
                         asks.Add(new Order() { Price = ask.Price, Amount = ask.Amount });
                     }
+
+                    var thisOrderbook = Orderbooks.First(x => x.Pair == orderbook.MarketSymbol);
+                    thisOrderbook.Bids = bids;
+                    thisOrderbook.Asks = asks;
                 });
-
-                socket.Disconnected += OrderbookSocketStoppedEvent;
-
-                _orderbookListenerStoppedEvent.WaitOne(); //This thread will block here until the reset event is sent.
-                _orderbookListenerStoppedEvent.Reset();
             });
-
-            return Task.CompletedTask;
-        }
-
-        private Task OrderbookSocketStoppedEvent(object sender)
-        {
-            //Log once logger's implemented
-            _orderbookListenerStoppedEvent.Set();
 
             return Task.CompletedTask;
         }

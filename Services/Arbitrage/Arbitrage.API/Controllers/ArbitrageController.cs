@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Arbitrage.Domain;
 using Arbitrage.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,35 +21,35 @@ namespace Arbitrage.API.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetTriangleResults()
+        public ActionResult<IEnumerable<ArbitrageResult>> GetTriangleResults()
         {
             return Ok(_arbitrageService.profitableTransactions);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetBestResult()
+        public ActionResult<decimal> GetBestResult()
         {
             return Ok(_arbitrageService.bestProfit);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetWorstResult()
+        public ActionResult<decimal> GetWorstResult()
         {
             return Ok(_arbitrageService.worstProfit);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult GetTriangleThreshold()
+        public ActionResult<decimal> GetTriangleThreshold()
         {
             return Ok(_arbitrageService.GetTriangleThreshold());
         }
 
         [HttpPost]
         [Route("[action]")]
-        public IActionResult UpdateTriangleThreshold(decimal threshold)
+        public ActionResult UpdateTriangleThreshold(decimal threshold)
         {
             _arbitrageService.UpdateTriArbThreshold(threshold);
             return Ok();

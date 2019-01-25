@@ -33,12 +33,10 @@ namespace Arbitrage.Infrastructure
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Gathering orders for arbitrage...");
             foreach (var exchange in _exchanges)
             {
                 exchange.StartOrderbookListener();
             }
-            Console.WriteLine("Arbitrage order loading complete!");
 
             Task.Run(() =>
                 StartTriangleArbitrageListener()
@@ -255,15 +253,8 @@ namespace Arbitrage.Infrastructure
                             NetworkFee = 0,
                             Profit = percentProfit,
                             TimePerLoop = 0, //TODO: Count properly
+                            TransactionFee = exchange.Fee * 3
                         };
-                        if(exchange.Name == "Binance")
-                        {
-                            arbResult.TransactionFee = 0.1m * 3;
-                        }
-                        else if(exchange.Name == "BtcMarkets")
-                        {
-                            arbResult.TransactionFee = 0.22m * 3;
-                        }
                         profitableTransactions.Add(arbResult);
 
                         //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
