@@ -13,13 +13,14 @@ using System.Threading.Tasks;
 
 namespace Arbitrage.Infrastructure
 {
-    public class ArbitrageService : IHostedService
+    public class ArbitrageService : BackgroundService
     {
         //private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
+        public readonly List<ArbitrageResult> currentResults = new List<ArbitrageResult>();
         public readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
+        public ArbitrageResult bestProfit = new ArbitrageResult() { Profit = -101 };
+        public ArbitrageResult worstProfit = new ArbitrageResult() { Profit = 101 };
         private decimal _triProfitThreshold = 1.0025m; //0.25% profit default
-        public decimal bestProfit = -100;
-        public decimal worstProfit = 100;
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -31,7 +32,7 @@ namespace Arbitrage.Infrastructure
             //_arbitrageHub = arbitrageHub;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             foreach (var exchange in _exchanges)
             {
@@ -42,11 +43,6 @@ namespace Arbitrage.Infrastructure
                 StartTriangleArbitrageListener()
             );
 
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
             return Task.CompletedTask;
         }
 
@@ -190,7 +186,7 @@ namespace Arbitrage.Infrastructure
                         }
                     }
                     //Find the final market (i.e. the market that has the middle and end currencies)
-                    finalMarket = orderbooks.SingleOrDefault(x => (x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
+                    finalMarket = orderbooks.FirstOrDefault(x => (x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
 
                     //If null, there's no pairs to finish the arb
                     if (finalMarket == null)
@@ -235,33 +231,44 @@ namespace Arbitrage.Infrastructure
                     }
 
                     decimal percentProfit = (finalAmount - baseAmount) / baseAmount * 100;
-                    if (bestProfit < percentProfit)
+                    var result = new ArbitrageResult()
                     {
-                        bestProfit = percentProfit;
-                    }
-                    if(worstProfit > percentProfit)
-                    {
-                        worstProfit = percentProfit;
-                    }
-                    if (finalAmount > baseAmount * _triProfitThreshold && (profitableTransactions.Count() == 0 || profitableTransactions.Last().Path == market.BaseCurrency + "/" + market.AltCurrency + " -> " + market2.BaseCurrency + "/" + market2.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency))
-                    {
-                        Console.WriteLine("Profit found above 0.5%");
-                        ArbitrageResult arbResult = new ArbitrageResult()
-                        {
-                            Exchange = exchange.Name,
-                            Path = market.BaseCurrency + "/" + market.AltCurrency + " -> " + market2.BaseCurrency + "/" + market2.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
-                            NetworkFee = 0,
-                            Profit = percentProfit,
-                            TimePerLoop = 0, //TODO: Count properly
-                            TransactionFee = exchange.Fee * 3
-                        };
-                        profitableTransactions.Add(arbResult);
-
-                        //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
-                    }
-                    var bCount = profitableTransactions.Count(x => x.Exchange == "Binance");
-                    var btcmCount = profitableTransactions.Count(x => x.Exchange == "BtcMarkets");
+                        Exchange = exchange.Name,
+                        Path = market.BaseCurrency + "/" + market.AltCurrency + " -> " + market2.BaseCurrency + "/" + market2.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
+                        NetworkFee = 0,
+                        Profit = percentProfit,
+                        TimePerLoop = 0, //TODO: Count properly
+                        TransactionFee = exchange.Fee * 3
+                    };
+                    StoreResults(result, baseAmount, finalAmount);
                 }
+            }
+        }
+
+        public void StoreResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        {
+            if (bestProfit.Profit < result.Profit)
+            {
+                bestProfit = result;
+            }
+            if (worstProfit.Profit > result.Profit)
+            {
+                worstProfit = result;
+            }
+            if (finalAmount > baseAmount * _triProfitThreshold && (profitableTransactions.Count() == 0 || profitableTransactions.Last().Path != result.Path))
+            {
+                profitableTransactions.Add(result);
+
+                //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
+            }
+            var currentResult = currentResults.FirstOrDefault(x => x.Path == result.Path);
+            if (currentResult == null)
+            {
+                currentResults.Add(result);
+            }
+            else
+            {
+                currentResult = result;
             }
         }
 

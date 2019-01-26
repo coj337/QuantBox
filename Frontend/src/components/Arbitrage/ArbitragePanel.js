@@ -9,7 +9,6 @@ export class ArbitragePanel extends Component {
 
         this.state = {
             error: null,
-            isLoaded: false,
             exchange: props.exchange,
             path: props.path,
             profit: props.profit,
@@ -19,22 +18,31 @@ export class ArbitragePanel extends Component {
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            exchange: nextProps.exchange,
+            path: nextProps.path,
+            profit: nextProps.profit,
+            transactionFee: nextProps.transactionFee,
+            networkFee: nextProps.networkFee,
+            timePerLoop: nextProps.timePerLoop
+        });
+    }
+
     render() {
-        const { error, isLoaded } = this.state;
+        const { error } = this.state;
 
         if (error) {
             return <div className="arbitragePanel">Error: {error.message}</div>;
-        } else if (!isLoaded) {
-            return <div className="arbitragePanel">Loading...</div>;
         } else {
             return (
                 <div className="arbitragePanel">
-                    Exchange: {this.state.exchange}
-                    Path: {this.state.path}
-                    Profit: {this.state.profit}
-                    Transaction Fee: {this.state.transactionFee}
-                    Network Fee: {this.state.networkFee} 
-                    Est Time: {this.state.timePerLoop}
+                    Exchange: {this.state.exchange}<br/>
+                    Path: {this.state.path}<br />
+                    Profit: {this.state.profit}<br />
+                    Transaction Fee: {this.state.transactionFee}<br />
+                    Network Fee: {this.state.networkFee}<br />
+                    Est Time: {this.state.timePerLoop}<br />
                 </div>
             );
         }

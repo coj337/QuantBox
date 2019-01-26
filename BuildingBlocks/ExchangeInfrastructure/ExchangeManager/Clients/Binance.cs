@@ -74,21 +74,25 @@ namespace ExchangeManager.Clients
                 //Subscribe to ticker websockets
                 var socket = _client.GetFullOrderBookWebSocket((orderbook) =>
                 {
-                    List<Order> bids = new List<Order>();
-                    List<Order> asks = new List<Order>();
-
-                    foreach (var bid in orderbook.Bids.Values)
+                    try
                     {
-                        bids.Add(new Order() { Price = bid.Price, Amount = bid.Amount });
-                    }
-                    foreach (var ask in orderbook.Asks.Values)
-                    {
-                        asks.Add(new Order() { Price = ask.Price, Amount = ask.Amount });
-                    }
+                        List<Order> bids = new List<Order>();
+                        List<Order> asks = new List<Order>();
 
-                    var thisOrderbook = Orderbooks.First(x => x.Pair == orderbook.MarketSymbol);
-                    thisOrderbook.Bids = bids;
-                    thisOrderbook.Asks = asks;
+                        foreach (var bid in orderbook.Bids.Values)
+                        {
+                            bids.Add(new Order() { Price = bid.Price, Amount = bid.Amount });
+                        }
+                        foreach (var ask in orderbook.Asks.Values)
+                        {
+                            asks.Add(new Order() { Price = ask.Price, Amount = ask.Amount });
+                        }
+
+                        var thisOrderbook = Orderbooks.First(x => x.Pair == orderbook.MarketSymbol);
+                        thisOrderbook.Bids = bids;
+                        thisOrderbook.Asks = asks;
+                    }
+                    catch (Exception) { } //Don't let an exception kill our socket
                 });
             });
 
