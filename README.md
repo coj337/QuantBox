@@ -57,4 +57,5 @@ Lots of pretty charts, I promise.
 ### Exchange Support
 Supporting a million exchanges isn't very high on the list while this is a small project but I'll work on requested exchanges as a priority.
   - Binance  
-  Next: BtcMarkets
+  - BtcMarkets
+  Next: KuCoin and Coinjar
