@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\CoinjarApiClient\CoinjarApiClient.csproj" />
     <ProjectReference Include="..\CustomImplementations\BtcMarketsClient\BtcMarketsApiClient.csproj" />
   </ItemGroup>
 

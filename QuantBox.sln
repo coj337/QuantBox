@@ -57,11 +57,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExchangeApis", "ExchangeApi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BtcMarketsApiClient", "BuildingBlocks\ExchangeInfrastructure\CustomImplementations\BtcMarketsClient\BtcMarketsApiClient.csproj", "{71DBC02F-21CC-4721-9FF7-85780718C7F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeManager", "BuildingBlocks\ExchangeInfrastructure\ExchangeManager\ExchangeManager.csproj", "{4B7AF51E-F086-47EF-9373-804714900481}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExchangeManager", "BuildingBlocks\ExchangeInfrastructure\ExchangeManager\ExchangeManager.csproj", "{4B7AF51E-F086-47EF-9373-804714900481}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExchangeInfrastructure", "BuildingBlocks\ExchangeInfrastructure", "{0F343784-F7F4-40AD-95B6-979085AE492F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExchangeInfrastructure", "ExchangeInfrastructure", "{0F343784-F7F4-40AD-95B6-979085AE492F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomImplementations", "BuildingBlocks\ExchangeInfrastructure\CustomImplementations", "{1A568747-0799-4F85-B31A-0724FC37373B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomImplementations", "CustomImplementations", "{1A568747-0799-4F85-B31A-0724FC37373B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoinjarApiClient", "..\CoinjarApiClient\CoinjarApiClient.csproj", "{84A74888-65C9-4DF6-A8B4-D8A92C953E8F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -145,6 +147,10 @@ Global
 		{4B7AF51E-F086-47EF-9373-804714900481}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B7AF51E-F086-47EF-9373-804714900481}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B7AF51E-F086-47EF-9373-804714900481}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A74888-65C9-4DF6-A8B4-D8A92C953E8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A74888-65C9-4DF6-A8B4-D8A92C953E8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A74888-65C9-4DF6-A8B4-D8A92C953E8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A74888-65C9-4DF6-A8B4-D8A92C953E8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -175,6 +181,7 @@ Global
 		{4B7AF51E-F086-47EF-9373-804714900481} = {0F343784-F7F4-40AD-95B6-979085AE492F}
 		{0F343784-F7F4-40AD-95B6-979085AE492F} = {55A27821-4B9C-488D-B9F5-51CB66D3F5EA}
 		{1A568747-0799-4F85-B31A-0724FC37373B} = {0F343784-F7F4-40AD-95B6-979085AE492F}
+		{84A74888-65C9-4DF6-A8B4-D8A92C953E8F} = {1A568747-0799-4F85-B31A-0724FC37373B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E1D69107-5C23-469A-A8EC-5B9EEA105C0C}

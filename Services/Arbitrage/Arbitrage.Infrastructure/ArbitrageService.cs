@@ -24,6 +24,7 @@ namespace Arbitrage.Infrastructure
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
+            new KuCoin(),
             new BtcMarkets()
         };
 
@@ -255,13 +256,14 @@ namespace Arbitrage.Infrastructure
             {
                 worstProfit = result;
             }
-            if (finalAmount > baseAmount * _triProfitThreshold && (profitableTransactions.Count() == 0 || profitableTransactions.Last().Path != result.Path))
+            if (finalAmount > baseAmount * _triProfitThreshold && profitableTransactions.Last().Exchange != result.Exchange && (profitableTransactions.Count() == 0 || profitableTransactions.Last().Path != result.Path))
             {
                 profitableTransactions.Add(result);
 
                 //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
             }
-            var currentResult = currentResults.FirstOrDefault(x => x.Path == result.Path);
+
+            var currentResult = currentResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
             if (currentResult == null)
             {
                 currentResults.Add(result);

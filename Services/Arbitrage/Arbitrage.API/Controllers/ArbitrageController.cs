@@ -21,16 +21,16 @@ namespace Arbitrage.API.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public ActionResult<IEnumerable<ArbitrageResult>> GetCurrentResults()
+        public ActionResult<IEnumerable<ArbitrageResult>> GetCurrentResults(int limit = 52)
         {
-            return Ok(_arbitrageService.currentResults.OrderByDescending(x => x.Profit));
+            return Ok(_arbitrageService.currentResults.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]
         [Route("[action]")]
-        public ActionResult<IEnumerable<ArbitrageResult>> GetTriangleResults()
+        public ActionResult<IEnumerable<ArbitrageResult>> GetTriangleResults(int limit = 52)
         {
-            return Ok(_arbitrageService.profitableTransactions.OrderByDescending(x => x.Profit));
+            return Ok(_arbitrageService.profitableTransactions.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]
