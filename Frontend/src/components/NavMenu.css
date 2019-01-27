@@ -1,7 +1,9 @@
-﻿.navbar li .glyphicon {
+﻿.navbar {
+    background: #272D3A !important;
+}
+.navbar li .glyphicon {
     margin-right: 10px;
 }
-
 /* Highlighting rules for nav menu items */
 .navbar .navbar-nav .active a,
 .navbar .navbar-nav .active a:hover,
@@ -11,13 +13,7 @@
     color: white;
 }
 
-body {
-    padding-top: 25px;
-    background-color: #272D3A;
-    color: white;
-}
-
-.fa-meh {
+.svg-inline--fa {
     margin-right: 8px;
     font-size: 17px;
 }

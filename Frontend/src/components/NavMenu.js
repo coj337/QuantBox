@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Glyphicon, Nav, Navbar, NavItem } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMeh } from '@fortawesome/free-solid-svg-icons'
+import { faMeh, faChartPie } from '@fortawesome/free-solid-svg-icons'
 import { LinkContainer } from 'react-router-bootstrap';
 import './NavMenu.css';
 
@@ -30,9 +30,19 @@ export class NavMenu extends Component {
                                 <FontAwesomeIcon icon={faMeh} /> Sentiment
                             </NavItem>
                         </LinkContainer>
-                        <LinkContainer to={'/arbitrage'}>
+                        <LinkContainer to={'/arbitrage/normal'}>
                             <NavItem>
-                                <Glyphicon glyph='random' /> Arbitrage
+                                <Glyphicon glyph='random' /> Normal Arbitrage
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/arbitrage/triangle'}>
+                            <NavItem>
+                                <Glyphicon glyph='random' /> Triangle Arbitrage
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/portfolio'}>
+                            <NavItem>
+                                <FontAwesomeIcon icon={faChartPie} /> Portfolio
                             </NavItem>
                         </LinkContainer>
                         <LinkContainer to={'/settings'}>

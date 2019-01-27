@@ -2,17 +2,16 @@ import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ArbitragePanel } from './ArbitragePanel';
 
-export class Arbitrage extends Component {
-    displayName = Arbitrage.name
+export class NormalArbitrage extends Component {
+    displayName = NormalArbitrage.name
 
     constructor(props) {
         super(props);
 
         this.state = {
-            triangleArbResults: [],
             bestResult: null,
             worstResult: null,
-            normalArbMatrix: []
+            arbResults: []
         };
     }
 
@@ -26,55 +25,19 @@ export class Arbitrage extends Component {
     }
 
     getItems() {
-        //fetch("/Arbitrage/GetTriangleResults")
-        fetch("/Arbitrage/GetCurrentResults")
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        triangleArbResults: result
-                    });
-                },
-                (error) => {
-                    console.log(error);
-                }
-        );
-
-        fetch("/Arbitrage/GetBestResult")
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        bestResult: result
-                    });
-                },
-                (error) => {
-                    console.log(error);
-                }
-        );
-
-        fetch("/Arbitrage/GetWorstResult")
-            .then(res => res.json())
-            .then(
-                (result) => {
-                    this.setState({
-                        worstResult: result
-                    });
-                },
-                (error) => {
-                    console.log(error);
-                }
-            );
+        
     }
 
     render() {
         return (
             <Row>
-                <h2>Triangle Arbitrage Opportunities</h2>
+                <Row>
+                    <h3>Normal Arbitrage</h3>
+                </Row>
                 <Col xs={6}>
-                    <h4>Best</h4>
+                    <h4 className="center">Best</h4>
                     {this.state.bestResult == null ?
-                        <div>Loading...</div> :
+                        <div className="darkerContainer">Loading...</div> :
                         <ArbitragePanel
                             exchange={this.state.bestResult.exchange}
                             path={this.state.bestResult.path}
@@ -86,9 +49,9 @@ export class Arbitrage extends Component {
                     }
                 </Col>
                 <Col xs={6}>
-                    <h4>Worst</h4>
+                    <h4 className="center">Worst</h4>
                     {this.state.worstResult == null ?
-                        <div>Loading...</div> :
+                        <div className="darkerContainer">Loading...</div> :
                         <ArbitragePanel
                             exchange={this.state.worstResult.exchange}
                             path={this.state.worstResult.path}
@@ -100,8 +63,8 @@ export class Arbitrage extends Component {
                     }
                 </Col>
 
-                <h4>All Markets</h4>
-                {this.state.triangleArbResults.map((arbitrage, i) => (
+                <h4 className="subTitle">All Markets</h4>
+                {this.state.arbResults.map((arbitrage, i) => (
                     <Col xs={3} key={i}>
                         <ArbitragePanel
                             exchange={arbitrage.exchange}

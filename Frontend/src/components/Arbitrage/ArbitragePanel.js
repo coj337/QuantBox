@@ -33,10 +33,10 @@ export class ArbitragePanel extends Component {
         const { error } = this.state;
 
         if (error) {
-            return <div className="arbitragePanel">Error: {error.message}</div>;
+            return <div className="arbitragePanel darkerContainer">Error: {error.message}</div>;
         } else {
             return (
-                <div className="arbitragePanel">
+                <div className="arbitragePanel darkerContainer">
                     Exchange: {this.state.exchange}<br/>
                     Path: {this.state.path}<br />
                     Profit: {this.state.profit}<br />

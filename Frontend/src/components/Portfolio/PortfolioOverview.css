@@ -1,0 +1,24 @@
+﻿.portfolioOverview {
+    height: 450px;
+    color: white;
+    margin-right: 25px;
+    margin-top: 25px;
+}
+#breakdownChart {
+    height: 400px;
+}
+.assetBreakdown {
+    height: 50px;
+    width: calc(50% - 10px);
+    display: inline-block;
+    margin: 5px;
+    padding: 10px;
+}
+.breakdownIcon{
+    height: 30px;
+    margin-right: 5px;
+}
+.assetBreakdownValue{
+    margin-top: -5px;
+    text-align: right;
+}

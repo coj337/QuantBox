@@ -23,10 +23,19 @@
     <Content Include="public\index.html" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\manifest.json" />
+    <Content Include="src\components\Portfolio\PortfolioChart.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\components\Portfolio\PortfolioOverview.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\Settings\AccountConfig.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\components\Settings\AccountConfigCell.css">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="src\theme.css">
       <SubType>Code</SubType>
     </Content>
     <Content Include="src\index.css" />
@@ -39,7 +48,7 @@
     <Content Include="src\components\Layout.js" />
     <Content Include="src\components\NavMenu.js" />
     <Content Include="src\components\Arbitrage\Arbitrage.css" />
-    <Content Include="src\components\Arbitrage\Arbitrage.js" />
+    <Content Include="src\components\Arbitrage\TriangleArbitrage.js" />
     <Content Include="src\components\Arbitrage\ArbitragePanel.js" />
     <Content Include="src\components\Sentiment\Sentiment.css" />
     <Content Include="src\components\Sentiment\Sentiment.js" />
@@ -63,15 +72,28 @@
     <Folder Include="obj" />
     <Folder Include="obj\Docker" />
     <Folder Include="public" />
+    <Folder Include="public\img\" />
     <Folder Include="src" />
     <Folder Include="src\components" />
     <Folder Include="src\components\Arbitrage" />
+    <Folder Include="src\components\Portfolio\" />
     <Folder Include="src\components\Sentiment" />
     <Folder Include="src\components\Settings" />
     <Folder Include="src\components\Widgets" />
     <Folder Include="src\components\Widgets\Navigator" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\components\Arbitrage\NormalArbitrage.js" />
+    <Compile Include="src\components\Portfolio\AssetBreakdown.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\components\Portfolio\Portfolio.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\components\Portfolio\PortfolioChart.js" />
+    <Compile Include="src\components\Portfolio\PortfolioOverview.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\components\Settings\AccountConfig.js">
       <SubType>Code</SubType>
     </Compile>
