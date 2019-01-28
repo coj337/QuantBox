@@ -26,6 +26,14 @@ services:
     depends_on:
       - rabbitmq
 
+  portfolio.api:
+    image: ${DOCKER_REGISTRY-}portfolioapi
+    build:
+      context: .
+      dockerfile: Services/Portfolio/Portfolio.API/Dockerfile
+    depends_on:
+      - rabbitmq
+
   ## Public API Services ##
   trading-apigw:
     image: ${DOCKER_REGISTRY-}apigwbase

@@ -92,7 +92,9 @@ namespace ExchangeManager.Clients
                         thisOrderbook.Bids = bids;
                         thisOrderbook.Asks = asks;
                     }
-                    catch (Exception) { } //Don't let an exception kill our socket
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                    } //Don't let an exception kill our socket
                 });
             });
 
