@@ -65,13 +65,15 @@ export class PortfolioOverview extends Component {
                             "top": 40,
                             "right": 0,
                             "bottom": 40,
-                            "left": 0
                         }}
                         innerRadius={0.8}
-                        radialLabelsTextColor="white"
+                        radialLabelsTextColor="inherit:darker(0.5)"
                         radialLabelsLinkColor="inherit"
+                        tooltipFormat={function (e) {
+                            return e + "%"
+                        }}
                         animate={true}
-                        sliceLabel={function (e) { return e.value + "%" }}
+                        enableSlicesLabels={false}
                     />
                 </Col>
                 <Col xs={8}>
