@@ -18,34 +18,40 @@ export class PortfolioOverview extends Component {
     render() {
         const data = [
             {
-                "id": "Tron",
-                "label": "TRX",
+                "id": "Cardano",
+                "label": "ADA",
                 "value": 10,
-                "color": "hsl(198, 70%, 50%)"
+                "color": "#333333"
             },
             {
                 "id": "Ripple",
                 "label": "XRP",
                 "value": 10,
-                "color": "hsl(33, 70%, 50%)"
+                "color": "#006097"
             },
             {
                 "id": "Ethereum",
                 "label": "ETH",
                 "value": 20,
-                "color": "hsl(169, 70%, 50%)"
+                "color": "#3c3c3d"
             },
             {
                 "id": "Bitcoin",
                 "label": "BTC",
-                "value": 40,
-                "color": "hsl(184, 70%, 50%)"
+                "value": 30,
+                "color": "#f2a900"
+            },
+            {
+                "id": "Litecoin",
+                "label": "LTC",
+                "value": 10,
+                "color": "#d3d3d3"
             },
             {
                 "id": "Stellar",
                 "label": "XLM",
                 "value": 20,
-                "color": "hsl(333, 70%, 50%)"
+                "color": "#04b5e5"
             }
         ];
 
@@ -63,11 +69,9 @@ export class PortfolioOverview extends Component {
                         }}
                         innerRadius={0.8}
                         radialLabelsTextColor="white"
-                        radialLabelsLinkOffset={0}
                         radialLabelsLinkColor="inherit"
                         animate={true}
-                        motionStiffness={90}
-                        motionDamping={15}
+                        sliceLabel={function (e) { return e.value + "%" }}
                     />
                 </Col>
                 <Col xs={8}>
@@ -75,7 +79,8 @@ export class PortfolioOverview extends Component {
                     <AssetBreakdown currency="Ethereum" symbol="ETH" />
                     <AssetBreakdown currency="Ripple" symbol="XRP" />
                     <AssetBreakdown currency="Stellar" symbol="XLM" />
-                    <AssetBreakdown currency="Tron" symbol="TRX" />
+                    <AssetBreakdown currency="Cardano" symbol="ADA" />
+                    <AssetBreakdown currency="Litecoin" symbol="LTC" />
                 </Col>
             </Row>
         );

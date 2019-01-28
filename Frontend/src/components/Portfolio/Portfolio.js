@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import { PortfolioOverview } from './PortfolioOverview';
 import { PortfolioChart } from './PortfolioChart';
 
