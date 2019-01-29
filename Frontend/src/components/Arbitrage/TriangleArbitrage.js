@@ -25,8 +25,7 @@ export class TriangleArbitrage extends Component {
     }
 
     getItems() {
-        //fetch("/Arbitrage/GetTriangleResults")
-        fetch("/Arbitrage/GetCurrentResults")
+        fetch("/Arbitrage/GetTriangleResults")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -39,7 +38,7 @@ export class TriangleArbitrage extends Component {
                 }
         );
 
-        fetch("/Arbitrage/GetBestResult")
+        fetch("/Arbitrage/GetBestTriangleResult")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -52,7 +51,7 @@ export class TriangleArbitrage extends Component {
                 }
         );
 
-        fetch("/Arbitrage/GetWorstResult")
+        fetch("/Arbitrage/GetWorstTriangleResult")
             .then(res => res.json())
             .then(
                 (result) => {

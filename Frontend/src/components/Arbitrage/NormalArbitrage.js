@@ -25,7 +25,44 @@ export class NormalArbitrage extends Component {
     }
 
     getItems() {
-        
+        fetch("/Arbitrage/GetNormalResults")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        arbResults: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+
+        fetch("/Arbitrage/GetBestNormalResult")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        bestResult: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+
+        fetch("/Arbitrage/GetWorstNormalResult")
+            .then(res => res.json())
+            .then(
+                (result) => {
+                    this.setState({
+                        worstResult: result
+                    });
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
     render() {

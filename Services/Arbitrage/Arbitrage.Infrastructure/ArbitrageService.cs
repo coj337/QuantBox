@@ -16,12 +16,18 @@ namespace Arbitrage.Infrastructure
 {
     public class ArbitrageService : BackgroundService
     {
-        private Timer _timer;
         //private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
-        public readonly List<ArbitrageResult> currentResults = new List<ArbitrageResult>();
-        public readonly List<ArbitrageResult> profitableTransactions = new List<ArbitrageResult>();
-        public ArbitrageResult bestProfit = new ArbitrageResult() { Profit = -101 };
-        public ArbitrageResult worstProfit = new ArbitrageResult() { Profit = 101 };
+        public readonly List<ArbitrageResult> triangleResults = new List<ArbitrageResult>();
+        public readonly List<ArbitrageResult> normalResults = new List<ArbitrageResult>();
+
+        public readonly List<ArbitrageResult> profitableTriangleResults = new List<ArbitrageResult>();
+        public readonly List<ArbitrageResult> profitableNormalResults = new List<ArbitrageResult>();
+
+        public ArbitrageResult bestTriangleProfit = new ArbitrageResult() { Profit = -101 };
+        public ArbitrageResult worstTriangleProfit = new ArbitrageResult() { Profit = 101 };
+        public ArbitrageResult bestNormalProfit = new ArbitrageResult() { Profit = -101 };
+        public ArbitrageResult worstNormalProfit = new ArbitrageResult() { Profit = 101 };
+
         private decimal _triProfitThreshold = 1.0025m; //0.25% profit default
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
@@ -46,6 +52,10 @@ namespace Arbitrage.Infrastructure
                 StartTriangleArbitrageListener()
             );
 
+            Task.Run(() =>
+                StartNormalArbitrageListener()
+            );
+            
             return Task.CompletedTask;
         }
 
@@ -63,7 +73,7 @@ namespace Arbitrage.Infrastructure
         }
 
         //Calculate arb chances for triangle arb and pass it to the UI (?via SignalR?)
-        public async Task StartTriangleArbitrageListener()
+        public Task StartTriangleArbitrageListener()
         {
             while (true)
             {
@@ -73,8 +83,6 @@ namespace Arbitrage.Infrastructure
                     {
                         CheckExchangeForTriangleArbitrage(exchange);
                     }
-
-                    await Task.Delay(1000);
                 }
                 catch (Exception e)
                 {
@@ -91,7 +99,7 @@ namespace Arbitrage.Infrastructure
                 decimal altAmount, alt2Amount, finalAmount, baseAmount;
                 //Assuming we are testing BTC/ETH->ETH/XRP->XRP/BTC, startCurrency == BTC, middleCurrency == ETH, endCurrency == XRP
                 string startCurrency, middleCurrency, endCurrency; //The currency that's bought/sold from in the first transaction
-                var audInvested = 100; //Assume we have 1 of the starting coin
+                var audInvested = 100;
                 var orderbooks = exchange.Orderbooks;
             
 
@@ -244,7 +252,7 @@ namespace Arbitrage.Infrastructure
                             TimePerLoop = 0, //TODO: Count properly
                             TransactionFee = exchange.Fee * 3
                         };
-                        StoreResults(result, baseAmount, finalAmount);
+                        StoreTriangleResults(result, baseAmount, finalAmount);
                     }
                 }
             }
@@ -254,27 +262,137 @@ namespace Arbitrage.Infrastructure
             }
         }
 
-        public void StoreResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        //Calculate arb chances for normal arb
+        public Task StartNormalArbitrageListener()
         {
-            if (bestProfit.Profit < result.Profit)
+            while (true)
             {
-                bestProfit = result;
+                try
+                {
+                    foreach (var exchange in _exchanges)
+                    {
+                        CheckExchangeForNormalArbitrage(exchange);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    continue;
+                }
             }
-            if (worstProfit.Profit > result.Profit)
-            {
-                worstProfit = result;
-            }
-            if (finalAmount > baseAmount * _triProfitThreshold && (profitableTransactions.Count() == 0 || (profitableTransactions.Last().Exchange != result.Exchange && profitableTransactions.Last().Path != result.Path)))
-            {
-                profitableTransactions.Add(result);
+        }
 
-                //_arbitrageHub.Clients.All.ReceiveTriangleArbitrage(arbResult);
+        public void CheckExchangeForNormalArbitrage(IExchange startExchange)
+        {
+            var audInvested = 100;
+
+            try
+            {
+                foreach (var startOrderbook in startExchange.Orderbooks) {
+                    foreach (var exchange in _exchanges.Where(x => x.Name != startExchange.Name))
+                    {
+                        //Base->Alt->Base
+                        var baseAmount = ConvertAudToCrypto(startExchange.Orderbooks, startOrderbook.BaseCurrency, audInvested);
+                        if (baseAmount == 0)
+                        {
+                            continue; //Asset prices not loaded yet
+                        }
+
+                        var endOrderbook = exchange.Orderbooks.FirstOrDefault(x => x.BaseCurrency == startOrderbook.BaseCurrency && x.AltCurrency == startOrderbook.AltCurrency || x.BaseCurrency == startOrderbook.AltCurrency && x.AltCurrency == startOrderbook.BaseCurrency);
+                        if (endOrderbook == null)
+                        {
+                            continue; //Other exchange doesn't have the pair
+                        }
+
+                        var asks = startOrderbook.Asks;
+                        if (asks.Count() == 0)
+                        {
+                            continue;
+                        }
+                        var startAmountBought = baseAmount / GetPriceQuote(startOrderbook.Asks, ConvertBaseToAlt(startOrderbook.Asks.First().Price, baseAmount));
+
+                        var bids = endOrderbook.Bids;
+                        if (bids.Count() == 0)
+                        {
+                            continue;
+                        }
+                        var endAmountBought = startAmountBought * GetPriceQuote(bids, startAmountBought);
+
+                        decimal percentProfit = (endAmountBought - baseAmount) / baseAmount * 100;
+
+                        var result = new ArbitrageResult()
+                        {
+                            Exchange = startExchange.Name + " -> " + exchange.Name,
+                            Path = startOrderbook.BaseCurrency + "/" + startOrderbook.AltCurrency,
+                            NetworkFee = 0, //TODO: Get this from somewhere
+                            Profit = percentProfit,
+                            TimePerLoop = 0, //TODO: Get this from somewhere
+                            TransactionFee = exchange.Fee * 2
+                        };
+                        StoreNormalResults(result, baseAmount, endAmountBought);
+
+                        //Alt->Base->Alt
+                        //baseAmount = ConvertAudToCrypto(startExchange.Orderbooks, startOrderbook.AltCurrency, audInvested);
+                        //if (baseAmount == 0)
+                        //{
+                        //    continue; //Asset prices not loaded yet
+                        //}
+
+
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Error in CheckExchangeForNormalArbitrage (" + e.Message + ")");
+            }
+        }
+
+        public void StoreTriangleResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        {
+            if (bestTriangleProfit.Profit < result.Profit)
+            {
+                bestTriangleProfit = result;
+            }
+            if (worstTriangleProfit.Profit > result.Profit)
+            {
+                worstTriangleProfit = result;
+            }
+            if (finalAmount > baseAmount * _triProfitThreshold && (profitableTriangleResults.Count() == 0 || (profitableTriangleResults.Last().Exchange != result.Exchange && profitableTriangleResults.Last().Path != result.Path)))
+            {
+                profitableTriangleResults.Add(result);
             }
 
-            var currentResult = currentResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
+            var currentResult = triangleResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
             if (currentResult == null)
             {
-                currentResults.Add(result);
+                triangleResults.Add(result);
+            }
+            else
+            {
+                currentResult = result;
+            }
+        }
+
+        public void StoreNormalResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        {
+            if (bestNormalProfit.Profit < result.Profit)
+            {
+                bestNormalProfit = result;
+            }
+            if (worstNormalProfit.Profit > result.Profit)
+            {
+                worstNormalProfit = result;
+            }
+            if (finalAmount > baseAmount * _triProfitThreshold && (profitableNormalResults.Count() == 0 || (profitableNormalResults.Last().Exchange != result.Exchange && profitableNormalResults.Last().Path != result.Path)))
+            {
+                profitableNormalResults.Add(result);
+            }
+
+            var currentResult = normalResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
+            if (currentResult == null)
+            {
+                normalResults.Add(result);
             }
             else
             {
@@ -353,7 +471,7 @@ namespace Arbitrage.Infrastructure
                     i++;
                 }
 
-                if (i >= orders.Count())
+                if (i > orders.Count())
                 {
                     throw new Exception("Orderbook too thin, couldn't calculate price, requested " + amount + " when only " + orders.Sum(x => x.Amount) + " was available");
                 }
@@ -364,20 +482,6 @@ namespace Arbitrage.Infrastructure
             {
                 throw new Exception("Something went wrong in GetPriceQuote (" + e.Message + ")");
             }
-        }
-
-        //Calculate arb chances for normal arb and pass it to the UI via SignalR
-        public void StartNormalArbitrageListener()
-        {
-            //foreach (var exchange in Markets)
-            //{
-            //    foreach (var market in Markets[exchange.Key])
-            //    {
-                    //foreach (var market2 in Markets[exchange.Key].Where(x => x != market)){
-                        //TODO: Do math
-                    //}
-            //    }
-            //}
         }
     }
 }

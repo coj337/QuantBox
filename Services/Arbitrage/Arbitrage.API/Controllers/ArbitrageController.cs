@@ -21,30 +21,44 @@ namespace Arbitrage.API.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public ActionResult<IEnumerable<ArbitrageResult>> GetCurrentResults(int limit = 52)
-        {
-            return Ok(_arbitrageService.currentResults.OrderByDescending(x => x.Profit).Take(limit));
-        }
-
-        [HttpGet]
-        [Route("[action]")]
         public ActionResult<IEnumerable<ArbitrageResult>> GetTriangleResults(int limit = 52)
         {
-            return Ok(_arbitrageService.profitableTransactions.OrderByDescending(x => x.Profit).Take(limit));
+            return Ok(_arbitrageService.triangleResults.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]
         [Route("[action]")]
-        public ActionResult<ArbitrageResult> GetBestResult()
+        public ActionResult<IEnumerable<ArbitrageResult>> GetNormalResults(int limit = 52)
         {
-            return Ok(_arbitrageService.bestProfit);
+            return Ok(_arbitrageService.normalResults.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]
         [Route("[action]")]
-        public ActionResult<ArbitrageResult> GetWorstResult()
+        public ActionResult<ArbitrageResult> GetBestTriangleResult()
         {
-            return Ok(_arbitrageService.worstProfit);
+            return Ok(_arbitrageService.bestTriangleProfit);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<ArbitrageResult> GetWorstTriangleResult()
+        {
+            return Ok(_arbitrageService.worstTriangleProfit);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<ArbitrageResult> GetBestNormalResult()
+        {
+            return Ok(_arbitrageService.bestNormalProfit);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<ArbitrageResult> GetWorstNormalResult()
+        {
+            return Ok(_arbitrageService.worstNormalProfit);
         }
 
         [HttpGet]
