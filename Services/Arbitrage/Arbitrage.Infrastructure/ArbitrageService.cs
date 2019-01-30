@@ -32,8 +32,9 @@ namespace Arbitrage.Infrastructure
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
-            new KuCoin(),
-            new BtcMarkets()
+            //new KuCoin(),
+            new BtcMarkets(),
+            new Coinjar()
         };
 
         public ArbitrageService(/*IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub*/)
@@ -284,15 +285,17 @@ namespace Arbitrage.Infrastructure
 
         public void CheckExchangeForNormalArbitrage(IExchange startExchange)
         {
-            var audInvested = 100;
+            var orderbooks = startExchange.Orderbooks;
+            decimal endAmountBought;
+            decimal audInvested = 100;
 
             try
             {
-                foreach (var startOrderbook in startExchange.Orderbooks) {
+                foreach (var startOrderbook in orderbooks) {
                     foreach (var exchange in _exchanges.Where(x => x.Name != startExchange.Name))
                     {
                         //Base->Alt->Base
-                        var baseAmount = ConvertAudToCrypto(startExchange.Orderbooks, startOrderbook.BaseCurrency, audInvested);
+                        var baseAmount = ConvertAudToCrypto(orderbooks, startOrderbook.BaseCurrency, audInvested);
                         if (baseAmount == 0)
                         {
                             continue; //Asset prices not loaded yet
@@ -309,14 +312,26 @@ namespace Arbitrage.Infrastructure
                         {
                             continue;
                         }
-                        var startAmountBought = baseAmount / GetPriceQuote(startOrderbook.Asks, ConvertBaseToAlt(startOrderbook.Asks.First().Price, baseAmount));
+                        var startAmountBought = baseAmount / GetPriceQuote(asks, ConvertBaseToAlt(asks.First().Price, baseAmount));
 
-                        var bids = endOrderbook.Bids;
-                        if (bids.Count() == 0)
+                        if (endOrderbook.BaseCurrency == startOrderbook.BaseCurrency)
                         {
-                            continue;
+                            var endBids = endOrderbook.Bids;
+                            if (endBids.Count() == 0)
+                            {
+                                continue;
+                            }
+                            endAmountBought = startAmountBought * GetPriceQuote(endBids, startAmountBought);
                         }
-                        var endAmountBought = startAmountBought * GetPriceQuote(bids, startAmountBought);
+                        else
+                        {
+                            var endAsks = endOrderbook.Asks;
+                            if (endAsks.Count() == 0)
+                            {
+                                continue;
+                            }
+                            endAmountBought = startAmountBought / GetPriceQuote(endAsks, ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
+                        }
 
                         decimal percentProfit = (endAmountBought - baseAmount) / baseAmount * 100;
 
@@ -327,18 +342,55 @@ namespace Arbitrage.Infrastructure
                             NetworkFee = 0, //TODO: Get this from somewhere
                             Profit = percentProfit,
                             TimePerLoop = 0, //TODO: Get this from somewhere
-                            TransactionFee = exchange.Fee * 2
+                            TransactionFee = startExchange.Fee + exchange.Fee
                         };
                         StoreNormalResults(result, baseAmount, endAmountBought);
 
-                        //Alt->Base->Alt
-                        //baseAmount = ConvertAudToCrypto(startExchange.Orderbooks, startOrderbook.AltCurrency, audInvested);
-                        //if (baseAmount == 0)
-                        //{
-                        //    continue; //Asset prices not loaded yet
-                        //}
+                        //Alt->Base->Alt//
+                        baseAmount = ConvertAudToCrypto(orderbooks, startOrderbook.AltCurrency, audInvested);
+                        if (baseAmount == 0)
+                        {
+                            continue; //Asset prices not loaded yet
+                        }
 
+                        var bids = startOrderbook.Bids;
+                        if (bids.Count() == 0)
+                        {
+                            continue;
+                        }
+                        startAmountBought = baseAmount * GetPriceQuote(bids, baseAmount);
 
+                        if (endOrderbook.BaseCurrency == startOrderbook.BaseCurrency)
+                        {
+                            var endAsks = endOrderbook.Asks;
+                            if (endAsks.Count() == 0)
+                            {
+                                continue;
+                            }
+                            endAmountBought = startAmountBought / GetPriceQuote(endAsks, ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
+                        }
+                        else
+                        {
+                            var endBids = endOrderbook.Bids;
+                            if (endBids.Count() == 0)
+                            {
+                                continue;
+                            }
+                            endAmountBought = startAmountBought * GetPriceQuote(endBids, startAmountBought);
+                        }
+
+                        percentProfit = (endAmountBought - baseAmount) / baseAmount * 100;
+
+                        result = new ArbitrageResult()
+                        {
+                            Exchange = startExchange.Name + " -> " + exchange.Name,
+                            Path = startOrderbook.AltCurrency + "/" + startOrderbook.BaseCurrency,
+                            NetworkFee = 0, //TODO: Get this from somewhere
+                            Profit = percentProfit,
+                            TimePerLoop = 0, //TODO: Get this from somewhere
+                            TransactionFee = startExchange.Fee + exchange.Fee
+                        };
+                        StoreNormalResults(result, baseAmount, endAmountBought);
                     }
                 }
             }

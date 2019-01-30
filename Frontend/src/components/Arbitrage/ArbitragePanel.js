@@ -39,8 +39,8 @@ export class ArbitragePanel extends Component {
                 <div className="arbitragePanel darkerContainer">
                     Exchange: {this.state.exchange}<br/>
                     Path: {this.state.path}<br />
-                    Profit: {this.state.profit}<br />
-                    Transaction Fee: {this.state.transactionFee}<br />
+                    Profit: {this.state.profit}%<br />
+                    Transaction Fee: {this.state.transactionFee}%<br />
                     Network Fee: {this.state.networkFee}<br />
                     Est Time: {this.state.timePerLoop}<br />
                 </div>

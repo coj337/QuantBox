@@ -78,15 +78,8 @@ namespace ExchangeManager.Clients
 
                             List<Order> bids = new List<Order>();
                             List<Order> asks = new List<Order>();
-
-                            foreach (var bid in orderbook.bids)
-                            {
-                                bids.Add(new Order() { Price = bid[0], Amount = bid[1] });
-                            }
-                            foreach (var ask in orderbook.asks)
-                            {
-                                asks.Add(new Order() { Price = ask[0], Amount = ask[1] });
-                            }
+                            bids.AddRange(orderbook.bids.Select(bid => new Order() { Price = bid[0], Amount = bid[1] }));
+                            asks.AddRange(orderbook.asks.Select(ask => new Order() { Price = ask[0], Amount = ask[1] }));
 
                             var thisOrderbook = Orderbooks.First(x => x.Pair == market.Pair);
                             thisOrderbook.Bids = bids;

@@ -16,7 +16,8 @@ export class NormalArbitrage extends Component {
     }
 
     componentDidMount() {
-        this.timer = setInterval(() => this.getItems(), 10 * 1000); //Polling until I get websockets to work
+        this.getItems();
+        this.timer = setInterval(() => this.getItems(), 60 * 1000); //Polling until I get websockets to work
     }
 
     componentWillUnmount() {

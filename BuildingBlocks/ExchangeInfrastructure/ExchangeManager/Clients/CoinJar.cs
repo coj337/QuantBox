@@ -44,59 +44,43 @@ namespace ExchangeManager.Clients
             return _client.GetAccountBalance() != null;
         }
 
-        //Coinjar is a market maker and doesn't have orderbooks (I think)
+        //Coinjar is a market maker and doesn't have orderbooks (I think) so just return infinite depth
         public Task StartOrderbookListener()
         {
-            throw new NotImplementedException();
-            var markets = _client.GetMarkets();
-            /*
+            var markets = _client.GetMarketsAsync().GetAwaiter().GetResult();
+
             foreach (var market in markets)
             {
-                var orderbook = _client.GetOrderBook(market.Pair);
                 Orderbooks.Add(new Orderbook()
                 {
                     Pair = market.Pair,
-                    BaseCurrency = market.Currency,
-                    AltCurrency = market.Instrument,
-                    Asks = orderbook.asks.Select(ask => new Order() { Price = ask[0], Amount = ask[1] }).ToList(),
-                    Bids = orderbook.bids.Select(bid => new Order() { Price = bid[0], Amount = bid[1] }).ToList()
+                    BaseCurrency = market.BaseCurrency,
+                    AltCurrency = market.AltCurrency,
+                    Asks = new List<Order> { new Order() { Price = market.Ask, Amount = Decimal.MaxValue } },
+                    Bids = new List<Order> { new Order() { Price = market.Bid, Amount = Decimal.MaxValue } }
                 });
             }
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                //Subscribe to ticker websockets
-                //TODO: Implement sockets in client
+                //Get price forever
                 while (true)
                 {
                     try
                     {
+                        markets = await _client.GetMarketsAsync();
+
                         foreach (var market in markets)
                         {
-                            var orderbook = _client.GetOrderBook(market.Pair);
-                            if (orderbook == null)
-                            {
-                                continue; //It breaks sometimes so just skip the pair this loop
-                            }
-
-                            List<Order> bids = new List<Order>();
-                            List<Order> asks = new List<Order>();
-
-                            foreach (var bid in orderbook.bids)
-                            {
-                                bids.Add(new Order() { Price = bid[0], Amount = bid[1] });
-                            }
-                            foreach (var ask in orderbook.asks)
-                            {
-                                asks.Add(new Order() { Price = ask[0], Amount = ask[1] });
-                            }
-
-                            var thisOrderbook = Orderbooks.First(x => x.Pair == market.Pair);
-                            thisOrderbook.Bids = bids;
-                            thisOrderbook.Asks = asks;
+                            var orderbook = Orderbooks.First(x => x.Pair == market.Pair);
+                            orderbook.Pair = market.Pair;
+                            orderbook.BaseCurrency = market.BaseCurrency;
+                            orderbook.AltCurrency = market.AltCurrency;
+                            orderbook.Asks = new List<Order> { new Order() { Price = market.Ask, Amount = Decimal.MaxValue } };
+                            orderbook.Bids = new List<Order> { new Order() { Price = market.Bid, Amount = Decimal.MaxValue } };
                         }
 
-                        Thread.Sleep(1000);
+                        await Task.Delay(1000);
                     }
                     catch (Exception e)
                     {
@@ -104,7 +88,7 @@ namespace ExchangeManager.Clients
                     }
                 }
             });
-            */
+            
             return Task.CompletedTask;
         }
     }

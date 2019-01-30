@@ -67,7 +67,7 @@ namespace ExchangeManager.Clients
                 });
             }
 
-            Task.Run(() =>
+            Task.Run(async () =>
             {
                 while (true)
                 {
@@ -78,23 +78,17 @@ namespace ExchangeManager.Clients
                             List<Order> bids = new List<Order>();
                             List<Order> asks = new List<Order>();
 
-                            var orderbook = _client.GetOrderBookAsync(market.MarketSymbol).GetAwaiter().GetResult();
+                            var orderbook = await _client.GetOrderBookAsync(market.MarketSymbol);
 
-                            foreach (var bid in orderbook.Bids.Values)
-                            {
-                                bids.Add(new Order() { Price = bid.Price, Amount = bid.Amount });
-                            }
-                            foreach (var ask in orderbook.Asks.Values)
-                            {
-                                asks.Add(new Order() { Price = ask.Price, Amount = ask.Amount });
-                            }
+                            bids.AddRange(orderbook.Bids.Values.Select(x => new Order() { Price = x.Price, Amount = x.Amount }));
+                            asks.AddRange(orderbook.Asks.Values.Select(x => new Order() { Price = x.Price, Amount = x.Amount }));
 
                             var thisOrderbook = Orderbooks.First(x => x.Pair == market.MarketSymbol);
                             thisOrderbook.Bids = bids;
                             thisOrderbook.Asks = asks;
                         }
 
-                        Task.Delay(1000).Wait();
+                        await Task.Delay(1000);
                     }
                     catch (Exception e)
                     {
