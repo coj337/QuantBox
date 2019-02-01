@@ -6,15 +6,17 @@ using System.Threading.Tasks;
 using BtcMarketsApiClient;
 using System.Threading;
 using ExchangeManager.Models;
+using ExchangeSharp;
+using OrderType = ExchangeManager.Models.OrderType;
 
 namespace ExchangeManager.Clients
 {
     public class BtcMarkets : IExchange
     {
-        private readonly BtcMarketsClient _client;
-        
+        private readonly BtcMarketsClient _client;        
         public string Name => "BtcMarkets";
         public decimal Fee => 0.22m;
+        public bool IsAuthenticated { get; private set; }
         public List<Orderbook> Orderbooks { get; private set; }
         public List<CurrencyData> Currencies { get; private set; }
 
@@ -30,16 +32,6 @@ namespace ExchangeManager.Clients
             _client.SetCredentials(publicKey, privateKey);
 
             //Make sure auth didn't fail
-            if (!IsAuthenticated())
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool IsAuthenticated()
-        {
             return !_client.RetrieveAccountBalance().Contains("Authentication failed");
         }
 
@@ -55,8 +47,8 @@ namespace ExchangeManager.Clients
                     Pair = market.Pair,
                     BaseCurrency = market.Currency,
                     AltCurrency = market.Instrument,
-                    Asks = orderbook.asks.Select(ask => new Order() { Price = ask[0], Amount = ask[1] }).ToList(),
-                    Bids = orderbook.bids.Select(bid => new Order() { Price = bid[0], Amount = bid[1] }).ToList()
+                    Asks = orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }).ToList(),
+                    Bids = orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }).ToList()
                 });
             }
 
@@ -76,10 +68,10 @@ namespace ExchangeManager.Clients
                                 continue; //It breaks sometimes so just skip the pair this loop
                             }
 
-                            List<Order> bids = new List<Order>();
-                            List<Order> asks = new List<Order>();
-                            bids.AddRange(orderbook.bids.Select(bid => new Order() { Price = bid[0], Amount = bid[1] }));
-                            asks.AddRange(orderbook.asks.Select(ask => new Order() { Price = ask[0], Amount = ask[1] }));
+                            List<OrderbookOrder> bids = new List<OrderbookOrder>();
+                            List<OrderbookOrder> asks = new List<OrderbookOrder>();
+                            bids.AddRange(orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }));
+                            asks.AddRange(orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }));
 
                             var thisOrderbook = Orderbooks.First(x => x.Pair == market.Pair);
                             thisOrderbook.Bids = bids;
@@ -96,6 +88,20 @@ namespace ExchangeManager.Clients
             });
 
             return Task.CompletedTask;
+        }
+
+        public async Task<ExchangeOrderResult> CreateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount)
+        {
+            string[] currencies = pair.Split('/');
+            string orderSide = side == OrderSide.Buy ? "Ask" : "Bid";
+            string orderType = type == OrderType.Market ? "Market" : "Limit";
+
+            string orderId = _client.CreateNewOrder(currencies[0], currencies[1], Convert.ToInt64(price * 100000000), Convert.ToInt32(amount * 100000000), orderSide, orderType);
+
+            return new ExchangeOrderResult()
+            {
+                OrderId = orderId
+            };
         }
     }
 }

@@ -13,9 +13,9 @@ namespace ExchangeManager.Models
 
         public string AltCurrency { get; set; }
 
-        public List<Order> Bids { get; set; }
+        public List<OrderbookOrder> Bids { get; set; }
 
-        public List<Order> Asks { get; set; }
+        public List<OrderbookOrder> Asks { get; set; }
 
         public decimal BaseVolume { get; set; }
 

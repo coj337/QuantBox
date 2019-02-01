@@ -13,8 +13,6 @@ export class ArbitragePanel extends Component {
             path: props.path,
             profit: props.profit,
             transactionFee: props.transactionFee,
-            networkFee: props.networkFee,
-            timePerLoop: props.timePerLoop
         };
     }
 
@@ -24,8 +22,6 @@ export class ArbitragePanel extends Component {
             path: nextProps.path,
             profit: nextProps.profit,
             transactionFee: nextProps.transactionFee,
-            networkFee: nextProps.networkFee,
-            timePerLoop: nextProps.timePerLoop
         });
     }
 
@@ -41,8 +37,6 @@ export class ArbitragePanel extends Component {
                     Path: {this.state.path}<br />
                     Profit: {this.state.profit}%<br />
                     Transaction Fee: {this.state.transactionFee}%<br />
-                    Network Fee: {this.state.networkFee}<br />
-                    Est Time: {this.state.timePerLoop}<br />
                 </div>
             );
         }

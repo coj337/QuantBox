@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Arbitrage.Api.Services;
-using Arbitrage.API.IntegrationEvents.Events;
-using Arbitrage.Infrastructure;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using BuildingBlocks.EventBus;
@@ -16,15 +13,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using Swashbuckle.AspNetCore.Swagger;
+using Trading.API.Data;
+using Trading.API.IntegrationEvents.EventHandling;
+using Trading.API.IntegrationEvents.Events;
+using Trading.API.Services;
 
-namespace Arbitrage.API
+namespace Trading.API
 {
     public class Startup
     {
@@ -44,10 +45,10 @@ namespace Arbitrage.API
             });
 
             services.AddCustomMvc();
-            services.AddSignalR();
+            services.AddCustomDbContext(Configuration);
 
-            services.AddSingleton<ArbitrageService>(); //Workaround to keep this running in the background, solved in .NET Core 3.0
-            services.AddSingleton<IHostedService, ArbitrageService>(provider => provider.GetRequiredService<ArbitrageService>());
+            services.AddSingleton<TradingService>();
+            services.AddApplicationInsightsTelemetry(Configuration);
 
             RegisterEventBus(services);
 
@@ -67,13 +68,22 @@ namespace Arbitrage.API
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Arbitrage.API V1");
             });
 
-            app.UseSignalR(routes =>
-            {
-                routes.MapHub<ArbitrageHub>("/arbitrageHub");
-            });
-
             app.UseCors("CorsPolicy");
             app.UseMvcWithDefaultRoute();
+
+            ConfigureEventBus(app);
+
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<TradingContext>();
+                context.Database.Migrate();
+            }
+        }
+
+        private void ConfigureEventBus(IApplicationBuilder app)
+        {
+            var eventBus = app.ApplicationServices.GetRequiredService<IEventBus>();
+            eventBus.Subscribe<ArbitrageFoundIntegrationEvent, ArbitrageFoundIntegrationEventHandler>();
         }
 
         private void RegisterEventBus(IServiceCollection services)
@@ -155,27 +165,43 @@ namespace Arbitrage.API
             }
 
             services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
-            services.AddTransient<ArbitrageFoundIntegrationEvent>();
+            services.AddTransient<ArbitrageFoundIntegrationEventHandler>();
         }
     }
-}
 
-static class CustomExtensionsMethods
-{
-    public static IServiceCollection AddCustomMvc(this IServiceCollection services)
+    static class CustomExtensionsMethods
     {
-        services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-        services.AddCors(options =>
+        public static IServiceCollection AddCustomDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            options.AddPolicy("CorsPolicy",
-                builder => builder
-                .SetIsOriginAllowed((host) => true)
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials());
-        });
+            var con = configuration["ConnectionString"];
+            services.AddDbContext<TradingContext>(options =>
+            {
+                options.UseSqlServer(configuration["ConnectionString"],
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
+                    });
+            });
 
-        return services;
+            return services;
+        }
+
+        public static IServiceCollection AddCustomMvc(this IServiceCollection services)
+        {
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                    .SetIsOriginAllowed((host) => true)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
+
+            return services;
+        }
     }
 }

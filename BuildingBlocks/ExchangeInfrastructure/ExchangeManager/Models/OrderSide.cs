@@ -4,8 +4,9 @@ using System.Text;
 
 namespace ExchangeManager.Models
 {
-    public class Order
+    public enum OrderSide
     {
-
+        Buy,
+        Sell
     }
 }

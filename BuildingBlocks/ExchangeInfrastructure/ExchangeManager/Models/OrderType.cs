@@ -4,8 +4,10 @@ using System.Text;
 
 namespace ExchangeManager.Models
 {
-    public class Order
+    public enum OrderType
     {
-
+        Limit = 0,
+        Market = 1,
+        Stop = 2
     }
 }

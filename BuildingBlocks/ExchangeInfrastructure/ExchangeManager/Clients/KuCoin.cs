@@ -1,10 +1,12 @@
-﻿using ExchangeManager.Models;
+﻿using ExchangeManager.Helpers;
+using ExchangeManager.Models;
 using ExchangeSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OrderType = ExchangeManager.Models.OrderType;
 
 namespace ExchangeManager.Clients
 {
@@ -14,6 +16,7 @@ namespace ExchangeManager.Clients
 
         public string Name => "KuCoin";
         public decimal Fee => 0.1m;
+        public bool IsAuthenticated { get; private set; }
         public List<Orderbook> Orderbooks { get; private set; }
         public List<CurrencyData> Currencies { get; private set; }
 
@@ -22,6 +25,7 @@ namespace ExchangeManager.Clients
             _client = new ExchangeKucoinAPI();
             Orderbooks = new List<Orderbook>();
             Currencies = new List<CurrencyData>();
+            IsAuthenticated = false;
         }
 
         public bool Authenticate(string publicKey, string privateKey)
@@ -30,19 +34,10 @@ namespace ExchangeManager.Clients
             _client.PrivateApiKey = privateKey.ToSecureString();
 
             //Make sure auth didn't fail
-            if (!IsAuthenticated())
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool IsAuthenticated()
-        {
             try
             {
                 _client.GetDepositHistoryAsync("BTC").GetAwaiter().GetResult();
+                this.IsAuthenticated = true;
                 return true;
             }
             catch (Exception)
@@ -62,8 +57,8 @@ namespace ExchangeManager.Clients
                     Pair = market.MarketSymbol,
                     BaseCurrency = market.QuoteCurrency,
                     AltCurrency = market.BaseCurrency,
-                    Asks = new List<Order>(),
-                    Bids = new List<Order>()
+                    Asks = new List<OrderbookOrder>(),
+                    Bids = new List<OrderbookOrder>()
                 });
             }
 
@@ -75,13 +70,13 @@ namespace ExchangeManager.Clients
                     {
                         foreach (var market in markets)
                         {
-                            List<Order> bids = new List<Order>();
-                            List<Order> asks = new List<Order>();
+                            List<OrderbookOrder> bids = new List<OrderbookOrder>();
+                            List<OrderbookOrder> asks = new List<OrderbookOrder>();
 
                             var orderbook = await _client.GetOrderBookAsync(market.MarketSymbol);
 
-                            bids.AddRange(orderbook.Bids.Values.Select(x => new Order() { Price = x.Price, Amount = x.Amount }));
-                            asks.AddRange(orderbook.Asks.Values.Select(x => new Order() { Price = x.Price, Amount = x.Amount }));
+                            bids.AddRange(orderbook.Bids.Values.Select(x => new OrderbookOrder() { Price = x.Price, Amount = x.Amount }));
+                            asks.AddRange(orderbook.Asks.Values.Select(x => new OrderbookOrder() { Price = x.Price, Amount = x.Amount }));
 
                             var thisOrderbook = Orderbooks.First(x => x.Pair == market.MarketSymbol);
                             thisOrderbook.Bids = bids;
@@ -98,6 +93,21 @@ namespace ExchangeManager.Clients
             });
 
             return Task.CompletedTask;
+        }
+
+        public async Task<ExchangeOrderResult> CreateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount)
+        {
+            var resp = await _client.PlaceOrderAsync(new ExchangeOrderRequest()
+            {
+                MarketSymbol = pair,
+                Amount = amount,
+                Price = price,
+                IsBuy = side == OrderSide.Buy,
+                OrderType = type.ToExSharpType(),
+                ShouldRoundAmount = true
+            });
+
+            return resp;
         }
     }
 }

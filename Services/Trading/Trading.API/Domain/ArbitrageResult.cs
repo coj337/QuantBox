@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Arbitrage.Domain
+namespace Trading.API.Domain
 {
     public class ArbitrageResult
     {
@@ -23,12 +23,6 @@ namespace Arbitrage.Domain
     {
         public string BaseCurrency { get; set; }
         public string AltCurrency { get; set; }
-
-        public Pair(string baseCurrency, string altCurrency)
-        {
-            BaseCurrency = baseCurrency;
-            AltCurrency = altCurrency;
-        }
     }
 
     public enum ArbitrageType

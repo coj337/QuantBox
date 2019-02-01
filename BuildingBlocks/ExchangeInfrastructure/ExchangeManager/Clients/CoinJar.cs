@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CoinjarApiClient;
+using ExchangeSharp;
+using OrderType = ExchangeManager.Models.OrderType;
 
 namespace ExchangeManager.Clients
 {
@@ -14,6 +16,7 @@ namespace ExchangeManager.Clients
         private readonly CoinjarClient _client;
         public string Name => "Coinjar";
         public decimal Fee => 1m;
+        public bool IsAuthenticated { get; private set; }
         public List<Orderbook> Orderbooks { get; private set; }
         public List<CurrencyData> Currencies { get; private set; }
 
@@ -22,6 +25,7 @@ namespace ExchangeManager.Clients
             _client = new CoinjarClient();
             Orderbooks = new List<Orderbook>();
             Currencies = new List<CurrencyData>();
+            IsAuthenticated = false;
         }
 
         public bool Authenticate(string publicKey, string privateKey)
@@ -30,18 +34,9 @@ namespace ExchangeManager.Clients
             _client.SetCredentials(publicKey, privateKey);
 
             //Make sure auth didn't fail
-            if (!IsAuthenticated())
-            {
-                return false;
-            }
+            return false;
 
             return true;
-        }
-
-        public bool IsAuthenticated()
-        {
-            throw new NotImplementedException();
-            return _client.GetAccountBalance() != null;
         }
 
         //Coinjar is a market maker and doesn't have orderbooks (I think) so just return infinite depth
@@ -56,8 +51,8 @@ namespace ExchangeManager.Clients
                     Pair = market.Pair,
                     BaseCurrency = market.BaseCurrency,
                     AltCurrency = market.AltCurrency,
-                    Asks = new List<Order> { new Order() { Price = market.Ask, Amount = Decimal.MaxValue } },
-                    Bids = new List<Order> { new Order() { Price = market.Bid, Amount = Decimal.MaxValue } }
+                    Asks = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Ask ?? 0, Amount = Decimal.MaxValue } },
+                    Bids = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Bid ?? 0, Amount = Decimal.MaxValue } }
                 });
             }
 
@@ -76,8 +71,8 @@ namespace ExchangeManager.Clients
                             orderbook.Pair = market.Pair;
                             orderbook.BaseCurrency = market.BaseCurrency;
                             orderbook.AltCurrency = market.AltCurrency;
-                            orderbook.Asks = new List<Order> { new Order() { Price = market.Ask, Amount = Decimal.MaxValue } };
-                            orderbook.Bids = new List<Order> { new Order() { Price = market.Bid, Amount = Decimal.MaxValue } };
+                            orderbook.Asks = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Ask ?? orderbook.Asks.First().Price, Amount = Decimal.MaxValue } }; //Sometimes the API returns null for no reason so just leave the price the same if it does
+                            orderbook.Bids = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Bid ?? orderbook.Bids.First().Price, Amount = Decimal.MaxValue } }; 
                         }
 
                         await Task.Delay(1000);
@@ -90,6 +85,11 @@ namespace ExchangeManager.Clients
             });
             
             return Task.CompletedTask;
+        }
+
+        public Task<ExchangeOrderResult> CreateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount)
+        {
+            throw new NotImplementedException();
         }
     }
 }

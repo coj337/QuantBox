@@ -34,6 +34,15 @@ services:
     depends_on:
       - rabbitmq
 
+  trading.api:
+    image: ${DOCKER_REGISTRY-}tradingapi
+    build:
+      context: .
+      dockerfile: Services/Trading/Trading.API/Dockerfile
+    depends_on:
+      - rabbitmq
+      - sql.data
+
   ## Public API Services ##
   trading-apigw:
     image: ${DOCKER_REGISTRY-}apigwbase

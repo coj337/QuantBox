@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Arbitrage.Api.Services;
 using Arbitrage.Domain;
-using Arbitrage.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Arbitrage.API.Controllers

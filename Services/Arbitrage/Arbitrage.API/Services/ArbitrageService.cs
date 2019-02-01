@@ -1,4 +1,6 @@
-﻿using Arbitrage.Domain;
+﻿using Arbitrage.API.IntegrationEvents.Events;
+using Arbitrage.Domain;
+using BuildingBlocks.EventBus.Abstractions;
 using ExchangeManager.Clients;
 using ExchangeManager.Models;
 using Microsoft.AspNetCore.SignalR;
@@ -12,11 +14,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Arbitrage.Infrastructure
+namespace Arbitrage.Api.Services
 {
     public class ArbitrageService : BackgroundService
     {
+        private readonly IEventBus _eventBus;
         //private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
+
         public readonly List<ArbitrageResult> triangleResults = new List<ArbitrageResult>();
         public readonly List<ArbitrageResult> normalResults = new List<ArbitrageResult>();
 
@@ -28,7 +32,8 @@ namespace Arbitrage.Infrastructure
         public ArbitrageResult bestNormalProfit = new ArbitrageResult() { Profit = -101 };
         public ArbitrageResult worstNormalProfit = new ArbitrageResult() { Profit = 101 };
 
-        private decimal _triProfitThreshold = 1.0025m; //0.25% profit default
+        private decimal _profitThreshold = 1.0025m; //0.25% profit default
+        private bool TradingEnabled { get; set; }
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -37,9 +42,13 @@ namespace Arbitrage.Infrastructure
             new Coinjar()
         };
 
-        public ArbitrageService(/*IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub*/)
+
+        public ArbitrageService(IEventBus eventBus/*, IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub*/)
         {
+            _eventBus = eventBus;
             //_arbitrageHub = arbitrageHub;
+
+            this.TradingEnabled = false;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -64,13 +73,13 @@ namespace Arbitrage.Infrastructure
         {
             if(newThreshold > 0)
             {
-                _triProfitThreshold = newThreshold;
+                _profitThreshold = newThreshold;
             }
         }
 
         public decimal GetTriangleThreshold()
         {
-            return _triProfitThreshold;
+            return _profitThreshold;
         }
 
         //Calculate arb chances for triangle arb and pass it to the UI (?via SignalR?)
@@ -113,6 +122,7 @@ namespace Arbitrage.Infrastructure
                         if (market.BaseCurrency == market2.BaseCurrency || market.BaseCurrency == market2.AltCurrency)
                         {
                             baseAmount = ConvertAudToCrypto(orderbooks, market.AltCurrency, audInvested);
+
                             if(baseAmount == 0)
                             {
                                 continue; //Asset prices not loaded yet
@@ -246,12 +256,17 @@ namespace Arbitrage.Infrastructure
                         decimal percentProfit = (finalAmount - baseAmount) / baseAmount * 100;
                         var result = new ArbitrageResult()
                         {
-                            Exchange = exchange.Name,
-                            Path = market.BaseCurrency + "/" + market.AltCurrency + " -> " + market2.BaseCurrency + "/" + market2.AltCurrency + " -> " + finalMarket.BaseCurrency + "/" + finalMarket.AltCurrency,
-                            NetworkFee = 0,
+                            Exchanges = new List<string>() { exchange.Name },
+                            Pairs = new List<Pair>() {
+                                new Pair(market.BaseCurrency, market.AltCurrency),
+                                new Pair(market2.BaseCurrency, market2.AltCurrency),
+                                new Pair(finalMarket.BaseCurrency, finalMarket.AltCurrency)
+                            },
                             Profit = percentProfit,
-                            TimePerLoop = 0, //TODO: Count properly
-                            TransactionFee = exchange.Fee * 3
+                            TransactionFee = exchange.Fee * 3,
+                            InitialCurrency = startCurrency,
+                            InitialLiquidity = baseAmount,
+                            Type = ArbitrageType.Triangle
                         };
                         StoreTriangleResults(result, baseAmount, finalAmount);
                     }
@@ -337,16 +352,17 @@ namespace Arbitrage.Infrastructure
 
                         var result = new ArbitrageResult()
                         {
-                            Exchange = startExchange.Name + " -> " + exchange.Name,
-                            Path = startOrderbook.BaseCurrency + "/" + startOrderbook.AltCurrency,
-                            NetworkFee = 0, //TODO: Get this from somewhere
+                            Exchanges = new List<string>() { startExchange.Name, exchange.Name },
+                            Pairs = new List<Pair>() { new Pair(startOrderbook.BaseCurrency, startOrderbook.AltCurrency) },
                             Profit = percentProfit,
-                            TimePerLoop = 0, //TODO: Get this from somewhere
-                            TransactionFee = startExchange.Fee + exchange.Fee
+                            TransactionFee = startExchange.Fee + exchange.Fee,
+                            InitialCurrency = startOrderbook.BaseCurrency,
+                            InitialLiquidity = baseAmount,
+                            Type = ArbitrageType.Normal
                         };
                         StoreNormalResults(result, baseAmount, endAmountBought);
 
-                        //Alt->Base->Alt//
+                        //Alt->Base->Alt
                         baseAmount = ConvertAudToCrypto(orderbooks, startOrderbook.AltCurrency, audInvested);
                         if (baseAmount == 0)
                         {
@@ -383,12 +399,13 @@ namespace Arbitrage.Infrastructure
 
                         result = new ArbitrageResult()
                         {
-                            Exchange = startExchange.Name + " -> " + exchange.Name,
-                            Path = startOrderbook.AltCurrency + "/" + startOrderbook.BaseCurrency,
-                            NetworkFee = 0, //TODO: Get this from somewhere
+                            Exchanges = new List<string>() { startExchange.Name, exchange.Name },
+                            Pairs = new List<Pair>() { new Pair(startOrderbook.AltCurrency, startOrderbook.BaseCurrency) },
                             Profit = percentProfit,
-                            TimePerLoop = 0, //TODO: Get this from somewhere
-                            TransactionFee = startExchange.Fee + exchange.Fee
+                            TransactionFee = startExchange.Fee + exchange.Fee,
+                            InitialCurrency = startOrderbook.AltCurrency,
+                            InitialLiquidity = baseAmount,
+                            Type = ArbitrageType.Normal
                         };
                         StoreNormalResults(result, baseAmount, endAmountBought);
                     }
@@ -410,12 +427,8 @@ namespace Arbitrage.Infrastructure
             {
                 worstTriangleProfit = result;
             }
-            if (finalAmount > baseAmount * _triProfitThreshold && (profitableTriangleResults.Count() == 0 || (profitableTriangleResults.Last().Exchange != result.Exchange && profitableTriangleResults.Last().Path != result.Path)))
-            {
-                profitableTriangleResults.Add(result);
-            }
 
-            var currentResult = triangleResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
+            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges == result.Exchanges && x.Pairs == result.Pairs);
             if (currentResult == null)
             {
                 triangleResults.Add(result);
@@ -423,6 +436,19 @@ namespace Arbitrage.Infrastructure
             else
             {
                 currentResult = result;
+            }
+
+            if(result.Profit > result.TransactionFee)
+            {
+                if (this.TradingEnabled && _exchanges.Where(x => result.Exchanges.Contains(x.Name)).All(y => y.IsAuthenticated))
+                {
+                    var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
+                    _eventBus.Publish(@newTradeEvent);
+                }
+                if(profitableTriangleResults.Count() == 0 || (profitableTriangleResults.Last().Exchanges != result.Exchanges && profitableTriangleResults.Last().Pairs != result.Pairs))
+                {
+                    profitableTriangleResults.Add(result);
+                }
             }
         }
 
@@ -436,12 +462,8 @@ namespace Arbitrage.Infrastructure
             {
                 worstNormalProfit = result;
             }
-            if (finalAmount > baseAmount * _triProfitThreshold && (profitableNormalResults.Count() == 0 || (profitableNormalResults.Last().Exchange != result.Exchange && profitableNormalResults.Last().Path != result.Path)))
-            {
-                profitableNormalResults.Add(result);
-            }
 
-            var currentResult = normalResults.FirstOrDefault(x => x.Exchange == result.Exchange && x.Path == result.Path);
+            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges == result.Exchanges && x.Pairs == result.Pairs);
             if (currentResult == null)
             {
                 normalResults.Add(result);
@@ -449,6 +471,19 @@ namespace Arbitrage.Infrastructure
             else
             {
                 currentResult = result;
+            }
+
+            if (result.Profit > result.TransactionFee)
+            {
+                if (this.TradingEnabled && _exchanges.Where(x => result.Exchanges.Contains(x.Name)).All(y => y.IsAuthenticated))
+                {
+                    var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
+                    _eventBus.Publish(@newTradeEvent);
+                }
+                if (profitableNormalResults.Count() == 0 || (profitableNormalResults.Last().Exchanges != result.Exchanges && profitableNormalResults.Last().Pairs != result.Pairs))
+                {
+                    profitableNormalResults.Add(result);
+                }
             }
         }
 
@@ -491,7 +526,7 @@ namespace Arbitrage.Infrastructure
         }
 
         //Note: Amount should be the amount in the alt, not the amount in the base currency
-        public decimal GetPriceQuote(List<Order> orders, decimal amount)
+        public decimal GetPriceQuote(List<OrderbookOrder> orders, decimal amount)
         {
             try
             {

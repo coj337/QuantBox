@@ -11,7 +11,8 @@ export class TriangleArbitrage extends Component {
         this.state = {
             bestResult: null,
             worstResult: null,
-            arbResults: []
+            arbResults: [],
+            lastUpdate: null
         };
     }
 
@@ -31,8 +32,13 @@ export class TriangleArbitrage extends Component {
             .then(
                 (result) => {
                     this.setState({
-                        arbResults: result
+                        arbResults: result,
                     });
+                    if (result.length != 0) {
+                        this.setState({
+                            lastUpdate: new Date().toLocaleTimeString()
+                        });
+                    }
                 },
                 (error) => {
                     console.log(error);
@@ -71,14 +77,17 @@ export class TriangleArbitrage extends Component {
             <Row>
                 <Row>
                     <h3>Triangle Arbitrage</h3>
+                    <p className="right m-r-30">Last Update {this.state.lastUpdate}</p>
                 </Row>
                 <Col xs={6}>
                     <h4 className="center">Best</h4>
                     {this.state.bestResult == null ?
                         <div className="darkerContainer">Loading...</div> :
                         <ArbitragePanel
-                            exchange={this.state.bestResult.exchange}
-                            path={this.state.bestResult.path}
+                            exchange={this.state.bestResult.exchanges.join(" -> ")}
+                            path={this.state.bestResult.pairs.map(function (x) {
+                                return x.altCurrency + "/" + x.baseCurrency
+                            }).join(" -> ")}
                             transactionFee={this.state.bestResult.transactionFee}
                             networkFee={this.state.bestResult.networkFee}
                             profit={parseFloat((this.state.bestResult.profit).toFixed(4))}
@@ -91,8 +100,10 @@ export class TriangleArbitrage extends Component {
                     {this.state.worstResult == null ?
                         <div className="darkerContainer">Loading...</div> :
                         <ArbitragePanel
-                            exchange={this.state.worstResult.exchange}
-                            path={this.state.worstResult.path}
+                            exchange={this.state.worstResult.exchanges.join(" -> ")}
+                            path={this.state.worstResult.pairs.map(function (x) {
+                                return x.altCurrency + "/" + x.baseCurrency
+                            }).join(" -> ")}
                             transactionFee={this.state.worstResult.transactionFee}
                             networkFee={this.state.worstResult.networkFee}
                             profit={parseFloat((this.state.worstResult.profit).toFixed(4))}
@@ -105,28 +116,15 @@ export class TriangleArbitrage extends Component {
                 {this.state.arbResults.map((arbitrage, i) => (
                     <Col xs={3} key={i}>
                         <ArbitragePanel
-                            exchange={arbitrage.exchange}
-                            path={arbitrage.path}
+                            exchange={arbitrage.exchanges.join(" -> ")}
+                            path={arbitrage.pairs.map(function (x) {
+                                return x.altCurrency + "/" + x.baseCurrency
+                            }).join(" -> ")}
                             transactionFee={arbitrage.transactionFee}
-                            networkFee={arbitrage.networkFee}
                             profit={parseFloat((arbitrage.profit).toFixed(4))}
-                            timePerLoop={arbitrage.timePerLoop}
                         />
                     </Col>
                 ))}
-
-                {/*<div>Two-Way Arbs</div>
-                {this.state.normalArbMatrix.map((arbitrage, i) => (
-                    <Col xs={6} md={4} lg={3} key={i}>
-                        <ArbitragePanel
-                            exchange={arbitrage.exchange}
-                            path={arbitrage.path}
-                            transactionFee={arbitrage.transactionFee}
-                            networkFee={arbitrage.networkFee}
-                            timePerLoop={arbitrage.timePerLoop}
-                        />
-                    </Col>
-                ))}*/}
             </Row>
         );
     }
