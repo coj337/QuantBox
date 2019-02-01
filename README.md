@@ -57,9 +57,9 @@ Lots of pretty charts, I promise.
 ### Exchange Support
 Supporting a million exchanges isn't very high on the list right now but I'll work on requested exchanges as a priority.
 
-| Exchange  | Price Data | Authentication | Arbitrage | Portfolio |
-| --------- | ----------- | ----------- | -- | -- |
-| Binance   | Yes         | In-Progress | No | No |
-| BtcMarkets| Yes         | In-Progress | No | No |
-| KuCoin    | In-Progress | In-Progress | No | No |
-| Coinjar   | No          | No          | No | No |
+| Exchange  | Price Data  | Authentication | Arbitrage | Portfolio |
+| --------- | ----------- | -------------- | --------- | --------- |
+| Binance   | Yes         | In-Progress    | No        | No        |
+| BtcMarkets| Yes         | In-Progress    | No        | No        |
+| KuCoin    | In-Progress | In-Progress    | No        | No        |
+| Coinjar   | Yes         | In-Progress    | No        | No        |
