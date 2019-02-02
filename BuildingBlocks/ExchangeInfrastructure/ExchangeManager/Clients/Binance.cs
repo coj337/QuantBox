@@ -19,14 +19,14 @@ namespace ExchangeManager.Clients
         public string Name => "Binance";
         public decimal Fee => 0.1m;
         public bool IsAuthenticated { get; private set; }
-        public List<Orderbook> Orderbooks { get; private set; }
-        public List<CurrencyData> Currencies { get; private set; }
+        public Dictionary<string, Orderbook> Orderbooks { get; private set; }
+        public Dictionary<string, CurrencyData> Currencies { get; private set; }
 
         public Binance()
         {
             _client = new ExchangeBinanceAPI();
-            Orderbooks = new List<Orderbook>();
-            Currencies = new List<CurrencyData>();
+            Orderbooks = new Dictionary<string, Orderbook>();
+            Currencies = new Dictionary<string, CurrencyData>();
             this.IsAuthenticated = false; //TODO: Pull from a DB for this
         }
 
@@ -54,7 +54,7 @@ namespace ExchangeManager.Clients
 
             foreach (var market in markets)
             {
-                Orderbooks.Add(new Orderbook()
+                Orderbooks.Add(market.BaseCurrency + "/" + market.QuoteCurrency, new Orderbook()
                 {
                     Pair = market.MarketSymbol,
                     BaseCurrency = market.QuoteCurrency,
@@ -83,7 +83,7 @@ namespace ExchangeManager.Clients
                             asks.Add(new OrderbookOrder() { Price = ask.Price, Amount = ask.Amount });
                         }
 
-                        var thisOrderbook = Orderbooks.First(x => x.Pair == orderbook.MarketSymbol);
+                        var thisOrderbook = Orderbooks.Values.First(x => x.Pair == orderbook.MarketSymbol);
                         thisOrderbook.Bids = bids;
                         thisOrderbook.Asks = asks;
                     }

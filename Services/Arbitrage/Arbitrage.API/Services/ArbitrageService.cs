@@ -104,10 +104,10 @@ namespace Arbitrage.Api.Services
                 var orderbooks = exchange.Orderbooks;
             
 
-                foreach (var market in orderbooks)
+                foreach (var market in orderbooks.Values)
                 {
                     //Loop every market with a matching currency except itself (this could start on the base or alt currency)
-                    foreach (var market2 in orderbooks.Where(x => x.Pair != market.Pair && (x.AltCurrency == market.AltCurrency || x.BaseCurrency == market.AltCurrency || x.AltCurrency == market.BaseCurrency || x.BaseCurrency == market.BaseCurrency)))
+                    foreach (var market2 in orderbooks.Values.Where(x => x.Pair != market.Pair && (x.AltCurrency == market.AltCurrency || x.BaseCurrency == market.AltCurrency || x.AltCurrency == market.BaseCurrency || x.BaseCurrency == market.BaseCurrency)))
                     {
                         //If the base/alt currency for the next market is the base currency, we need to bid (i.e. Buy for first trade)
                         if (market.BaseCurrency == market2.BaseCurrency || market.BaseCurrency == market2.AltCurrency)
@@ -121,7 +121,7 @@ namespace Arbitrage.Api.Services
 
                             try
                             {
-                                var bids = orderbooks.First(x => x.Pair == market.Pair).Bids;
+                                var bids = orderbooks[market.AltCurrency + "/" + market.BaseCurrency].Bids;
                                 if(bids.Count() == 0)
                                 {
                                     continue;
@@ -146,7 +146,7 @@ namespace Arbitrage.Api.Services
 
                             try
                             {
-                                var asks = orderbooks.First(x => x.Pair == market.Pair).Asks;
+                                var asks = orderbooks[market.AltCurrency + "/" + market.BaseCurrency].Asks;
                                 if (asks.Count() == 0)
                                 {
                                     continue; //Prices not loaded yet
@@ -168,7 +168,7 @@ namespace Arbitrage.Api.Services
                             endCurrency = market2.AltCurrency;
                             try
                             {
-                                var asks = orderbooks.First(x => x.Pair == market2.Pair).Asks;
+                                var asks = orderbooks[market2.AltCurrency + "/" + market2.BaseCurrency].Asks;
                                 if (asks.Count() == 0)
                                 {
                                     continue; //Prices not loaded yet
@@ -186,7 +186,7 @@ namespace Arbitrage.Api.Services
                             endCurrency = market2.BaseCurrency;
                             try
                             {
-                                var bids = orderbooks.First(x => x.Pair == market2.Pair).Bids;
+                                var bids = orderbooks[market2.AltCurrency + "/" + market2.BaseCurrency].Bids;
                                 if(bids.Count() == 0)
                                 {
                                     continue; //Not loaded yet
@@ -200,7 +200,7 @@ namespace Arbitrage.Api.Services
                             }
                         }
                         //Find the final market (i.e. the market that has the middle and end currencies)
-                        finalMarket = orderbooks.FirstOrDefault(x => (x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
+                        finalMarket = orderbooks.Values.FirstOrDefault(x => (x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
 
                         //If null, there's no pairs to finish the arb
                         if (finalMarket == null)
@@ -213,7 +213,7 @@ namespace Arbitrage.Api.Services
                         {
                             try
                             {
-                                var bids = orderbooks.First(x => x.Pair == finalMarket.Pair).Bids;
+                                var bids = orderbooks[finalMarket.AltCurrency + "/" + finalMarket.BaseCurrency].Bids;
                                 if(bids.Count() == 0)
                                 {
                                     continue; //Not loaded yet
@@ -230,7 +230,7 @@ namespace Arbitrage.Api.Services
                         {
                             try
                             {
-                                var asks = orderbooks.First(x => x.Pair == finalMarket.Pair).Asks;
+                                var asks = orderbooks[finalMarket.AltCurrency + "/" + finalMarket.BaseCurrency].Asks;
                                 if (asks.Count() == 0)
                                 {
                                     continue; //Prices not loaded yet
@@ -297,7 +297,7 @@ namespace Arbitrage.Api.Services
 
             try
             {
-                foreach (var startOrderbook in orderbooks) {
+                foreach (var startOrderbook in orderbooks.Values) {
                     foreach (var exchange in _exchanges.Where(x => x.Name != startExchange.Name))
                     {
                         //Base->Alt->Base
@@ -307,7 +307,10 @@ namespace Arbitrage.Api.Services
                             continue; //Asset prices not loaded yet
                         }
 
-                        var endOrderbook = exchange.Orderbooks.FirstOrDefault(x => x.BaseCurrency == startOrderbook.BaseCurrency && x.AltCurrency == startOrderbook.AltCurrency || x.BaseCurrency == startOrderbook.AltCurrency && x.AltCurrency == startOrderbook.BaseCurrency);
+                        if(!exchange.Orderbooks.TryGetValue(startOrderbook.AltCurrency + "/" + startOrderbook.BaseCurrency, out Orderbook endOrderbook))
+                        {
+                            exchange.Orderbooks.TryGetValue(startOrderbook.BaseCurrency + "/" + startOrderbook.AltCurrency, out endOrderbook);
+                        }
                         if (endOrderbook == null)
                         {
                             continue; //Other exchange doesn't have the pair
@@ -418,8 +421,8 @@ namespace Arbitrage.Api.Services
             {
                 worstTriangleProfit = result;
             }
-
-            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs));
+            
+            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs, new PairComparer()));
             if (currentResult == null)
             {
                 triangleResults.Add(result);
@@ -436,7 +439,7 @@ namespace Arbitrage.Api.Services
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
                 }
-                if(profitableTriangleResults.Count() == 0 || (!profitableTriangleResults.Last().Exchanges.SequenceEqual(result.Exchanges) && !profitableTriangleResults.Last().Pairs.SequenceEqual(result.Pairs)))
+                if(profitableTriangleResults.Count() == 0 || (!profitableTriangleResults.Last().Exchanges.SequenceEqual(result.Exchanges) || !profitableTriangleResults.Last().Pairs.SequenceEqual(result.Pairs, new PairComparer())))
                 {
                     profitableTriangleResults.Add(result);
                 }
@@ -454,7 +457,7 @@ namespace Arbitrage.Api.Services
                 worstNormalProfit = result;
             }
 
-            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs));
+            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs, new PairComparer()));
             if (currentResult == null)
             {
                 normalResults.Add(result);
@@ -471,7 +474,7 @@ namespace Arbitrage.Api.Services
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
                 }
-                if (profitableNormalResults.Count() == 0 || (!profitableNormalResults.Last().Exchanges.SequenceEqual(result.Exchanges) && !profitableNormalResults.Last().Pairs.SequenceEqual(result.Pairs)))
+                if (profitableNormalResults.Count() == 0 || (!profitableNormalResults.Last().Exchanges.SequenceEqual(result.Exchanges) || !profitableNormalResults.Last().Pairs.SequenceEqual(result.Pairs, new PairComparer())))
                 {
                     profitableNormalResults.Add(result);
                 }
@@ -487,11 +490,11 @@ namespace Arbitrage.Api.Services
         }
 
         //Converts AUD to crypto at the market rate
-        public decimal ConvertAudToCrypto(List<Orderbook> orderbooks, string asset, decimal audAmount)
+        public decimal ConvertAudToCrypto(Dictionary<string, Orderbook> orderbooks, string asset, decimal audAmount)
         {
             try
             {
-                decimal btcAudPrice = _exchanges.First(x => x.Name == "BtcMarkets").Orderbooks.First(x => x.Pair == "BTC/AUD").Asks.First().Price; //Use BtcMarkets as BTC/AUD price reference since they have the most volume
+                decimal btcAudPrice = _exchanges.First(x => x.Name == "BtcMarkets").Orderbooks["BTC/AUD"].Asks.First().Price; //Use BtcMarkets as BTC/AUD price reference since they have the most volume
                 decimal btcFromAud = audAmount / btcAudPrice;
 
                 if (asset == "BTC")
@@ -499,7 +502,10 @@ namespace Arbitrage.Api.Services
                     return btcFromAud;
                 }
 
-                var btcAsset = orderbooks.FirstOrDefault(x => x.BaseCurrency == "BTC" && x.AltCurrency == asset || x.AltCurrency == "BTC" && x.BaseCurrency == asset);
+                if (!orderbooks.TryGetValue(asset + "/BTC", out Orderbook btcAsset))
+                {
+                    orderbooks.TryGetValue("BTC/" + asset, out btcAsset);
+                }
                 if (btcAsset == null || btcAsset.Asks.Count() == 0)
                 {
                     return 0; //Not populated yet

@@ -17,14 +17,14 @@ namespace ExchangeManager.Clients
         public string Name => "BtcMarkets";
         public decimal Fee => 0.22m;
         public bool IsAuthenticated { get; private set; }
-        public List<Orderbook> Orderbooks { get; private set; }
-        public List<CurrencyData> Currencies { get; private set; }
+        public Dictionary<string, Orderbook> Orderbooks { get; private set; }
+        public Dictionary<string, CurrencyData> Currencies { get; private set; }
 
         public BtcMarkets()
         {
             _client = new BtcMarketsClient();
-            Orderbooks = new List<Orderbook>();
-            Currencies = new List<CurrencyData>();
+            Orderbooks = new Dictionary<string, Orderbook>();
+            Currencies = new Dictionary<string, CurrencyData>();
         }
 
         public bool Authenticate(string publicKey, string privateKey)
@@ -42,14 +42,16 @@ namespace ExchangeManager.Clients
             foreach(var market in markets)
             {
                 var orderbook = _client.GetOrderBook(market.Pair);
-                Orderbooks.Add(new Orderbook()
-                {
-                    Pair = market.Pair,
-                    BaseCurrency = market.Currency,
-                    AltCurrency = market.Instrument,
-                    Asks = orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }).ToList(),
-                    Bids = orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }).ToList()
-                });
+                Orderbooks.Add(market.Instrument + "/" + market.Currency, 
+                    new Orderbook()
+                    {
+                        Pair = market.Pair,
+                        BaseCurrency = market.Currency,
+                        AltCurrency = market.Instrument,
+                        Asks = orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }).ToList(),
+                        Bids = orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }).ToList()
+                    }
+                );
             }
 
             Task.Run(() =>
@@ -73,7 +75,7 @@ namespace ExchangeManager.Clients
                             bids.AddRange(orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }));
                             asks.AddRange(orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }));
 
-                            var thisOrderbook = Orderbooks.First(x => x.Pair == market.Pair);
+                            var thisOrderbook = Orderbooks[market.Instrument + "/" + market.Currency];
                             thisOrderbook.Bids = bids;
                             thisOrderbook.Asks = asks;
                         }

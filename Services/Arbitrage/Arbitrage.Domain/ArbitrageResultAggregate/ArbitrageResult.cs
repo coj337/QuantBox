@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Arbitrage.Domain
 {
@@ -28,6 +29,42 @@ namespace Arbitrage.Domain
         {
             BaseCurrency = baseCurrency;
             AltCurrency = altCurrency;
+        }
+    }
+
+    // Custom comparer for the Product class
+    public class PairComparer : IEqualityComparer<Pair>
+    {
+        // Products are equal if their names and product numbers are equal.
+        public bool Equals(Pair x, Pair y)
+        {
+
+            //Check whether the compared objects reference the same data.
+            if (Object.ReferenceEquals(x, y)) return true;
+
+            //Check whether any of the compared objects is null.
+            if (x is null || y is null)
+                return false;
+
+            //Check whether the products' properties are equal.
+            return x.BaseCurrency == y.BaseCurrency && x.AltCurrency == y.AltCurrency;
+        }
+
+        // If Equals() returns true for a pair of objects 
+        // then GetHashCode() must return the same value for these objects.
+        public int GetHashCode(Pair pair)
+        {
+            //Check whether the object is null
+            if (pair is null) return 0;
+            
+            //Get hash code for the BaseCurrency field if it is not null.
+            int hashPairBase = string.IsNullOrEmpty(pair.BaseCurrency) ? 0 : pair.BaseCurrency.GetHashCode();
+
+            //Get hash code for the AltCurrency field.
+            int hashPairAlt = string.IsNullOrEmpty(pair.AltCurrency) ? 0 : pair.AltCurrency.GetHashCode();
+
+            //Calculate the hash code for the product.
+            return hashPairBase ^ hashPairAlt;
         }
     }
 

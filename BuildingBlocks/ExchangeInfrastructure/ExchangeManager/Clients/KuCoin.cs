@@ -17,14 +17,14 @@ namespace ExchangeManager.Clients
         public string Name => "KuCoin";
         public decimal Fee => 0.1m;
         public bool IsAuthenticated { get; private set; }
-        public List<Orderbook> Orderbooks { get; private set; }
-        public List<CurrencyData> Currencies { get; private set; }
+        public Dictionary<string, Orderbook> Orderbooks { get; private set; }
+        public Dictionary<string, CurrencyData> Currencies { get; private set; }
 
         public KuCoin()
         {
             _client = new ExchangeKucoinAPI();
-            Orderbooks = new List<Orderbook>();
-            Currencies = new List<CurrencyData>();
+            Orderbooks = new Dictionary<string, Orderbook>();
+            Currencies = new Dictionary<string, CurrencyData>();
             IsAuthenticated = false;
         }
 
@@ -52,14 +52,16 @@ namespace ExchangeManager.Clients
 
             foreach (var market in markets)
             {
-                Orderbooks.Add(new Orderbook()
-                {
-                    Pair = market.MarketSymbol,
-                    BaseCurrency = market.QuoteCurrency,
-                    AltCurrency = market.BaseCurrency,
-                    Asks = new List<OrderbookOrder>(),
-                    Bids = new List<OrderbookOrder>()
-                });
+                Orderbooks.Add(market.BaseCurrency + "/" + market.QuoteCurrency, 
+                    new Orderbook()
+                    {
+                        Pair = market.MarketSymbol,
+                        BaseCurrency = market.QuoteCurrency,
+                        AltCurrency = market.BaseCurrency,
+                        Asks = new List<OrderbookOrder>(),
+                        Bids = new List<OrderbookOrder>()
+                    }
+                );
             }
 
             Task.Run(async () =>
@@ -78,7 +80,7 @@ namespace ExchangeManager.Clients
                             bids.AddRange(orderbook.Bids.Values.Select(x => new OrderbookOrder() { Price = x.Price, Amount = x.Amount }));
                             asks.AddRange(orderbook.Asks.Values.Select(x => new OrderbookOrder() { Price = x.Price, Amount = x.Amount }));
 
-                            var thisOrderbook = Orderbooks.First(x => x.Pair == market.MarketSymbol);
+                            var thisOrderbook = Orderbooks[market.BaseCurrency + "/" + market.QuoteCurrency];
                             thisOrderbook.Bids = bids;
                             thisOrderbook.Asks = asks;
                         }

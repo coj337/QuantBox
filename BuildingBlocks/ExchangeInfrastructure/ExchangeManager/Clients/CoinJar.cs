@@ -17,14 +17,14 @@ namespace ExchangeManager.Clients
         public string Name => "Coinjar";
         public decimal Fee => 1m;
         public bool IsAuthenticated { get; private set; }
-        public List<Orderbook> Orderbooks { get; private set; }
-        public List<CurrencyData> Currencies { get; private set; }
+        public Dictionary<string, Orderbook> Orderbooks { get; private set; }
+        public Dictionary<string, CurrencyData> Currencies { get; private set; }
 
         public Coinjar()
         {
             _client = new CoinjarClient();
-            Orderbooks = new List<Orderbook>();
-            Currencies = new List<CurrencyData>();
+            Orderbooks = new Dictionary<string, Orderbook>();
+            Currencies = new Dictionary<string, CurrencyData>();
             IsAuthenticated = false;
         }
 
@@ -46,14 +46,16 @@ namespace ExchangeManager.Clients
 
             foreach (var market in markets)
             {
-                Orderbooks.Add(new Orderbook()
-                {
-                    Pair = market.Pair,
-                    BaseCurrency = market.BaseCurrency,
-                    AltCurrency = market.AltCurrency,
-                    Asks = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Ask ?? 0, Amount = Decimal.MaxValue } },
-                    Bids = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Bid ?? 0, Amount = Decimal.MaxValue } }
-                });
+                Orderbooks.Add(market.AltCurrency + "/" + market.BaseCurrency, 
+                    new Orderbook()
+                    {
+                        Pair = market.Pair,
+                        BaseCurrency = market.BaseCurrency,
+                        AltCurrency = market.AltCurrency,
+                        Asks = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Ask ?? 0, Amount = Decimal.MaxValue } },
+                        Bids = new List<OrderbookOrder> { new OrderbookOrder() { Price = market.Bid ?? 0, Amount = Decimal.MaxValue } }
+                    }
+                );
             }
 
             Task.Run(async () =>
@@ -67,7 +69,7 @@ namespace ExchangeManager.Clients
 
                         foreach (var market in markets)
                         {
-                            var orderbook = Orderbooks.First(x => x.Pair == market.Pair);
+                            var orderbook = Orderbooks[market.AltCurrency + "/" + market.BaseCurrency];
                             orderbook.Pair = market.Pair;
                             orderbook.BaseCurrency = market.BaseCurrency;
                             orderbook.AltCurrency = market.AltCurrency;

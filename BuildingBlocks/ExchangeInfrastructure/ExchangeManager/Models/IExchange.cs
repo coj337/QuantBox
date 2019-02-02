@@ -13,9 +13,9 @@ namespace ExchangeManager.Models
 
         bool IsAuthenticated { get; }
 
-        List<Orderbook> Orderbooks { get; }
+        Dictionary<string, Orderbook> Orderbooks { get; }
 
-        List<CurrencyData> Currencies { get; }
+        Dictionary<string, CurrencyData> Currencies { get; }
 
         bool Authenticate(string publicKey, string privateKey);
 

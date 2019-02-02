@@ -46,7 +46,10 @@ namespace Trading.API.Services
                 //Step 3: Swap misc coin back to original
                 foreach (var pair in result.Pairs)
                 {
-                    var exchangePair = ex.Orderbooks.First(x => x.BaseCurrency == pair.BaseCurrency && x.AltCurrency == pair.AltCurrency || x.BaseCurrency == pair.AltCurrency && x.AltCurrency == pair.BaseCurrency);
+                    if (ex.Orderbooks.TryGetValue(pair.AltCurrency + "/" + pair.BaseCurrency, out Orderbook exchangePair))
+                    {
+                        ex.Orderbooks.TryGetValue(pair.BaseCurrency + "/" + pair.AltCurrency, out exchangePair);
+                    }
 
                     //If we start on the base, we want to buy the alt
                     var side = exchangePair.BaseCurrency == result.InitialCurrency ? OrderSide.Buy : OrderSide.Sell;
