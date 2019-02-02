@@ -32,8 +32,8 @@ namespace Arbitrage.Api.Services
         public ArbitrageResult bestNormalProfit = new ArbitrageResult() { Profit = -101 };
         public ArbitrageResult worstNormalProfit = new ArbitrageResult() { Profit = 101 };
 
-        private decimal _profitThreshold = 1.0025m; //0.25% profit default
         private bool TradingEnabled { get; set; }
+
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -42,13 +42,17 @@ namespace Arbitrage.Api.Services
             new Coinjar()
         };
 
+        public ArbitrageService()
+        {
+            TradingEnabled = false;
+        }
 
         public ArbitrageService(IEventBus eventBus/*, IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub*/)
         {
             _eventBus = eventBus;
             //_arbitrageHub = arbitrageHub;
 
-            this.TradingEnabled = false;
+            TradingEnabled = false;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -67,19 +71,6 @@ namespace Arbitrage.Api.Services
             );
             
             return Task.CompletedTask;
-        }
-
-        public void UpdateTriArbThreshold(decimal newThreshold)
-        {
-            if(newThreshold > 0)
-            {
-                _profitThreshold = newThreshold;
-            }
-        }
-
-        public decimal GetTriangleThreshold()
-        {
-            return _profitThreshold;
         }
 
         //Calculate arb chances for triangle arb and pass it to the UI (?via SignalR?)
@@ -268,7 +259,7 @@ namespace Arbitrage.Api.Services
                             InitialLiquidity = baseAmount,
                             Type = ArbitrageType.Triangle
                         };
-                        StoreTriangleResults(result, baseAmount, finalAmount);
+                        StoreTriangleResults(result);
                     }
                 }
             }
@@ -360,7 +351,7 @@ namespace Arbitrage.Api.Services
                             InitialLiquidity = baseAmount,
                             Type = ArbitrageType.Normal
                         };
-                        StoreNormalResults(result, baseAmount, endAmountBought);
+                        StoreNormalResults(result);
 
                         //Alt->Base->Alt
                         baseAmount = ConvertAudToCrypto(orderbooks, startOrderbook.AltCurrency, audInvested);
@@ -407,7 +398,7 @@ namespace Arbitrage.Api.Services
                             InitialLiquidity = baseAmount,
                             Type = ArbitrageType.Normal
                         };
-                        StoreNormalResults(result, baseAmount, endAmountBought);
+                        StoreNormalResults(result);
                     }
                 }
             }
@@ -417,7 +408,7 @@ namespace Arbitrage.Api.Services
             }
         }
 
-        public void StoreTriangleResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        public void StoreTriangleResults(ArbitrageResult result)
         {
             if (bestTriangleProfit.Profit < result.Profit)
             {
@@ -428,7 +419,7 @@ namespace Arbitrage.Api.Services
                 worstTriangleProfit = result;
             }
 
-            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges == result.Exchanges && x.Pairs == result.Pairs);
+            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs));
             if (currentResult == null)
             {
                 triangleResults.Add(result);
@@ -440,19 +431,19 @@ namespace Arbitrage.Api.Services
 
             if(result.Profit > result.TransactionFee)
             {
-                if (this.TradingEnabled && _exchanges.Where(x => result.Exchanges.Contains(x.Name)).All(y => y.IsAuthenticated))
+                if (this.TradingEnabled)
                 {
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
                 }
-                if(profitableTriangleResults.Count() == 0 || (profitableTriangleResults.Last().Exchanges != result.Exchanges && profitableTriangleResults.Last().Pairs != result.Pairs))
+                if(profitableTriangleResults.Count() == 0 || (!profitableTriangleResults.Last().Exchanges.SequenceEqual(result.Exchanges) && !profitableTriangleResults.Last().Pairs.SequenceEqual(result.Pairs)))
                 {
                     profitableTriangleResults.Add(result);
                 }
             }
         }
 
-        public void StoreNormalResults(ArbitrageResult result, decimal baseAmount, decimal finalAmount)
+        public void StoreNormalResults(ArbitrageResult result)
         {
             if (bestNormalProfit.Profit < result.Profit)
             {
@@ -463,7 +454,7 @@ namespace Arbitrage.Api.Services
                 worstNormalProfit = result;
             }
 
-            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges == result.Exchanges && x.Pairs == result.Pairs);
+            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs));
             if (currentResult == null)
             {
                 normalResults.Add(result);
@@ -475,12 +466,12 @@ namespace Arbitrage.Api.Services
 
             if (result.Profit > result.TransactionFee)
             {
-                if (this.TradingEnabled && _exchanges.Where(x => result.Exchanges.Contains(x.Name)).All(y => y.IsAuthenticated))
+                if (this.TradingEnabled)
                 {
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
                 }
-                if (profitableNormalResults.Count() == 0 || (profitableNormalResults.Last().Exchanges != result.Exchanges && profitableNormalResults.Last().Pairs != result.Pairs))
+                if (profitableNormalResults.Count() == 0 || (!profitableNormalResults.Last().Exchanges.SequenceEqual(result.Exchanges) && !profitableNormalResults.Last().Pairs.SequenceEqual(result.Pairs)))
                 {
                     profitableNormalResults.Add(result);
                 }

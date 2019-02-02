@@ -13,7 +13,10 @@ namespace Trading.API.Data
     {
         public TradingContext(DbContextOptions<TradingContext> options) : base(options) { }
 
+        public DbSet<ExchangeConfig> ExchangeCredentials { get; set; }
+        public DbSet<Exchange> Exchanges { get; set; }
         public DbSet<ArbitrageTradeResults> ArbitrageResults { get; set; }
+        
 
         public class TradingContextDesignFactory : IDesignTimeDbContextFactory<TradingContext>
         {

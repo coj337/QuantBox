@@ -34,7 +34,7 @@ export class TriangleArbitrage extends Component {
                     this.setState({
                         arbResults: result,
                     });
-                    if (result.length != 0) {
+                    if (result.length !== 0) {
                         this.setState({
                             lastUpdate: new Date().toLocaleTimeString()
                         });

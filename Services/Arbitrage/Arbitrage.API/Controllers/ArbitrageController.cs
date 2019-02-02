@@ -60,20 +60,5 @@ namespace Arbitrage.API.Controllers
         {
             return Ok(_arbitrageService.worstNormalProfit);
         }
-
-        [HttpGet]
-        [Route("[action]")]
-        public ActionResult<decimal> GetTriangleThreshold()
-        {
-            return Ok(_arbitrageService.GetTriangleThreshold());
-        }
-
-        [HttpPost]
-        [Route("[action]")]
-        public ActionResult UpdateTriangleThreshold(decimal threshold)
-        {
-            _arbitrageService.UpdateTriArbThreshold(threshold);
-            return Ok();
-        }
     }
 }

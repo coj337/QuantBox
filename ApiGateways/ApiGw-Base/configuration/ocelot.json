@@ -23,6 +23,18 @@
       ],
       "UpstreamPathTemplate": "/api/{version}/sentiment/{everything}",
       "UpstreamHttpMethod": [ "POST", "GET" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/{version}/settings/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "trading.api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/{version}/settings/{everything}",
+      "UpstreamHttpMethod": [ "POST", "GET" ]
     }
   ],
   "GlobalConfiguration": {

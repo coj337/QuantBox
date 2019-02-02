@@ -24,3 +24,15 @@
 .m-r-30{
     margin-right: 30px;
 }
+.m-l-20 {
+    margin-left: 20px;
+}
+.m-t-10{
+    margin-top: 10px;
+}
+.customModal {
+    height: 100%;
+    width: 100%;
+    background-color: #2E3543;
+    padding: 15px;
+}

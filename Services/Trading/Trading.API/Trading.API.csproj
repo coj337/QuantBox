@@ -23,8 +23,4 @@
     <ProjectReference Include="..\..\..\BuildingBlocks\ExchangeInfrastructure\ExchangeManager\ExchangeManager.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
 </Project>
