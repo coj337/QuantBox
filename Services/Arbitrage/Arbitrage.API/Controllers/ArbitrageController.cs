@@ -23,14 +23,14 @@ namespace Arbitrage.API.Controllers
         [Route("[action]")]
         public ActionResult<IEnumerable<ArbitrageResult>> GetTriangleResults(int limit = 52)
         {
-            return Ok(_arbitrageService.triangleResults.OrderByDescending(x => x.Profit).Take(limit));
+            return Ok(_arbitrageService.triangleResults.Values.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]
         [Route("[action]")]
         public ActionResult<IEnumerable<ArbitrageResult>> GetNormalResults(int limit = 52)
         {
-            return Ok(_arbitrageService.normalResults.OrderByDescending(x => x.Profit).Take(limit));
+            return Ok(_arbitrageService.normalResults.Values.OrderByDescending(x => x.Profit).Take(limit));
         }
 
         [HttpGet]

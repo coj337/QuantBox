@@ -21,8 +21,8 @@ namespace Arbitrage.Api.Services
         private readonly IEventBus _eventBus;
         //private readonly IHubContext<ArbitrageHub, IArbitrageHub> _arbitrageHub;
 
-        public readonly List<ArbitrageResult> triangleResults = new List<ArbitrageResult>();
-        public readonly List<ArbitrageResult> normalResults = new List<ArbitrageResult>();
+        public readonly Dictionary<string, ArbitrageResult> triangleResults = new Dictionary<string, ArbitrageResult>();
+        public readonly Dictionary<string, ArbitrageResult> normalResults = new Dictionary<string, ArbitrageResult>();
 
         public readonly List<ArbitrageResult> profitableTriangleResults = new List<ArbitrageResult>();
         public readonly List<ArbitrageResult> profitableNormalResults = new List<ArbitrageResult>();
@@ -413,6 +413,9 @@ namespace Arbitrage.Api.Services
 
         public void StoreTriangleResults(ArbitrageResult result)
         {
+            //Generate a result key so we can match the same results later with an O(1) lookup
+            string resultKey = string.Join(',', result.Exchanges) + '-' + string.Join(',', result.Pairs.Select(x => x.AltCurrency + "/" + x.BaseCurrency));
+
             if (bestTriangleProfit.Profit < result.Profit)
             {
                 bestTriangleProfit = result;
@@ -421,11 +424,10 @@ namespace Arbitrage.Api.Services
             {
                 worstTriangleProfit = result;
             }
-            
-            var currentResult = triangleResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs, new PairComparer()));
-            if (currentResult == null)
+
+            if (!triangleResults.TryGetValue(resultKey, out ArbitrageResult currentResult))
             {
-                triangleResults.Add(result);
+                triangleResults.Add(resultKey, result);
             }
             else
             {
@@ -448,6 +450,9 @@ namespace Arbitrage.Api.Services
 
         public void StoreNormalResults(ArbitrageResult result)
         {
+            //Generate a result key so we can match the same results later with an O(1) lookup
+            string resultKey = string.Join(',', result.Exchanges) + '-' + string.Join(',', result.Pairs.Select(x => x.AltCurrency + "/" + x.BaseCurrency));
+
             if (bestNormalProfit.Profit < result.Profit)
             {
                 bestNormalProfit = result;
@@ -457,10 +462,9 @@ namespace Arbitrage.Api.Services
                 worstNormalProfit = result;
             }
 
-            var currentResult = normalResults.FirstOrDefault(x => x.Exchanges.SequenceEqual(result.Exchanges) && x.Pairs.SequenceEqual(result.Pairs, new PairComparer()));
-            if (currentResult == null)
+            if (!normalResults.TryGetValue(resultKey, out ArbitrageResult currentResult))
             {
-                normalResults.Add(result);
+                normalResults.Add(resultKey, result);
             }
             else
             {
