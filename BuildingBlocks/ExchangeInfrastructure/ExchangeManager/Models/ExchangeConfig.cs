@@ -10,6 +10,8 @@ namespace ExchangeManager.Models
 
         public string Name { get; set; }
 
+        public string Nickname { get; set; }
+
         public string PublicKey { get; set; }
 
         public string PrivateKey { get; set; }

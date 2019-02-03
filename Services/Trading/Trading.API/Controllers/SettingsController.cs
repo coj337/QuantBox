@@ -35,14 +35,57 @@ namespace Trading.API.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public IActionResult AddExchangeConfig(string exchange, string publicKey, string privateKey)
+        public IActionResult AddExchangeConfig([FromBody]ExchangeConfig config)
         {
+            //Check we've been given enough info
+            if(string.IsNullOrEmpty(config.Name))
+            {
+                return UnprocessableEntity("Please choose an exchange");
+            }
+            else if (string.IsNullOrEmpty(config.PublicKey))
+            {
+                return UnprocessableEntity("Public Key must have a value");
+            }
+            else if (string.IsNullOrEmpty(config.PrivateKey))
+            {
+                return UnprocessableEntity("Private Key must have a value");
+            }
+
+            //Make sure we don't already have the creds
+            if(_context.ExchangeCredentials.Any(x => x.Name == config.Name && x.PublicKey == config.PublicKey))
+            {
+                return UnprocessableEntity("Credentials already exist");
+            }
+
+            //Add creds to the db
             _context.ExchangeCredentials.Add(new ExchangeConfig()
             {
-                Name = exchange,
-                PublicKey = publicKey,
-                PrivateKey = privateKey
+                Name = config.Name,
+                Nickname = config.Nickname,
+                PublicKey = config.PublicKey,
+                PrivateKey = config.PrivateKey
             });
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult RemoveExchangeConfig([FromBody]ExchangeConfig config)
+        {
+            if (string.IsNullOrEmpty(config.PublicKey) || string.IsNullOrEmpty(config.Name))
+            {
+                return UnprocessableEntity("Exchange and public key must be provided");
+            }
+
+            var configToDelete = _context.ExchangeCredentials.FirstOrDefault(x => x.PublicKey == config.PublicKey && x.Name == config.Name);
+            if(configToDelete == null)
+            {
+                return UnprocessableEntity("Specified key doesn't exist");
+            }
+
+            _context.ExchangeCredentials.Remove(configToDelete);
             _context.SaveChanges();
 
             return Ok();

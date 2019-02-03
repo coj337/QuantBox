@@ -1,0 +1,44 @@
+﻿.field {
+    width: 100%;
+    height: 38px;
+    border-radius: 4px;
+    position: relative;
+    background-color: white;
+    transition: 0.3s background-color ease-in-out, 0.3s box-shadow ease-in-out;
+    margin-top: 15px;
+    color: black;
+}
+.field.active {
+    background-color: #ffffff;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+}
+.field.locked {
+    pointer-events: none;
+}
+.field input {
+    width: 100%;
+    height: 38px;
+    position: relative;
+    padding: 0px 16px;
+    border: none;
+    border-radius: 4px;
+    font-family: "Gotham SSm A", "Gotham SSm B", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    outline: none;
+    box-shadow: 0px 4px 20px 0px transparent;
+    -webkit-appearance: none;
+}
+.field input::-webkit-input-placeholder {
+    color: rgb(128, 128, 128);
+}
+.field input::-moz-placeholder {
+    color: rgb(128, 128, 128);
+}
+.field input:-ms-input-placeholder {
+    color: rgb(128, 128, 128);
+}
+.field input:-moz-placeholder {
+    color: rgb(128, 128, 128);
+}

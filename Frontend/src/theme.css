@@ -35,4 +35,9 @@
     width: 100%;
     background-color: #2E3543;
     padding: 15px;
+    color: black;
+}
+.darkButton {
+    background-color: #262c37;
+    border: none;
 }

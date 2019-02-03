@@ -1,8 +1,13 @@
 ﻿import React, { Component } from 'react';
-import Modal from 'react-awesome-modal';
-import Select from 'react-select';
 import { AccountConfig } from './AccountConfig';
 import './AccountConfig.css';
+import { Input } from '../Forms/Input';
+
+import Modal from 'react-awesome-modal';
+import Select from 'react-select';
+import Axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 export class ExchangeAccountConfigTable extends Component {
     displayName = ExchangeAccountConfigTable.name
@@ -20,6 +25,7 @@ export class ExchangeAccountConfigTable extends Component {
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.saveCreds = this.saveCreds.bind(this);
+        this.deleteCreds = this.deleteCreds.bind(this);
     }
 
     componentDidMount() {
@@ -27,8 +33,11 @@ export class ExchangeAccountConfigTable extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
+                    var exchangeOptioins = result.map(function (exchange, i) {
+                        return { value: exchange, label: exchange }
+                    });
                     this.setState({
-                        supportedExchanges: result,
+                        supportedExchanges: exchangeOptioins,
                         exchangesLoaded: true
                     });
                 },
@@ -49,7 +58,6 @@ export class ExchangeAccountConfigTable extends Component {
                     console.log(error);
                 }
             );
-
     }
 
     openModal() {
@@ -65,20 +73,58 @@ export class ExchangeAccountConfigTable extends Component {
     }
 
     saveCreds() {
-        //TODO: Find creds
+        var publicKey = document.getElementsByName("publicKey")[0].value;
+        var privateKey = document.getElementsByName("privateKey")[0].value;
+        var exchange = document.getElementsByName("exchange")[0].value;
+        var nickname = document.getElementsByName("nickname")[0].value;
 
-        //TODO: Post creds to server
+        Axios.post('/Settings/AddExchangeConfig', {
+            Name: exchange,
+            NickName: nickname,
+            PublicKey: publicKey,
+            PrivateKey: privateKey
+        })
+        .then((response) => {
+            this.setState(previousState => ({
+                exchangeConfigs: [...previousState.exchangeConfigs, { name: exchange, nickname: nickname, publicKey: publicKey, privateKey: privateKey }],
+                modalVisible: false
+            }));
+        })
+        .catch((error) => {
+            this.setState({
+                modalVisible: false
+            });
+            toast.error(error.response.data);
+        });
 
-        this.setState(previousState => ({
-            exchangeConfigs: [...previousState.exchangeConfigs, { name: "c", publicKey: "a", privateKey: "b" }],
-            modalVisible: false
-        }));
+        //Clear the boxes now
+        document.getElementsByName("publicKey")[0].value = "";
+        document.getElementsByName("privateKey")[0].value = "";
+        document.getElementsByName("nickname")[0].value = "";
+    }
+
+    deleteCreds(name, key) {
+        Axios.post('/Settings/RemoveExchangeConfig', {
+            Name: name,
+            PublicKey: key
+        })
+        .then((response) => {
+            this.setState({
+                exchangeConfigs: this.state.exchangeConfigs.filter((config, i) => config.name !== name || config.publicKey !== key)
+            });
+        })
+        .catch((error) => {
+            toast.error(error.response.data);
+        });
     }
 
     render() {
         return (
             <div className="configTable">
                 <div className="configTableTitle">
+                    <span className="configTableTitleHeading">
+                        Nickname
+                    </span>
                     <span className="configTableTitleHeading">
                         Exchange
                     </span>
@@ -91,17 +137,18 @@ export class ExchangeAccountConfigTable extends Component {
                 </div>
 
                 {this.state.exchangeConfigs.length > 0 ?
-                    this.state.exchangeConfigs.map(function (config, i) {
-                        return <AccountConfig key={i} name={config.name} publicKey={config.publicKey} />
+                    this.state.exchangeConfigs.map((config, i) => {
+                        return <AccountConfig key={i} name={config.name} nickname={config.nickname} publicKey={config.publicKey} onDelete={this.deleteCreds} />
                     }) :
                     <div className="m-l-20 m-t-10 fadedText">No exchanges, click the button below to add one!</div>
                 }
                 
                 <button id="addAccount" className="darkerContainer" onClick={() => this.openModal()}> + </button>
                 <Modal visible={this.state.modalVisible} width="400" height="300" effect="fadeInUp" onClickAway={() => this.closeModal()}>
-                    <div className="customModal">
+                    <div id="exchangeConfig" className="customModal">
                         <Select
-                            className="exchangeSelect"
+                            id="exchangeSelect"
+                            className="modalSelect"
                             defaultValue="Choose an exchange"
                             isLoading={!this.state.exchangesLoaded}
                             isDisabled={!this.state.exchangesLoaded}
@@ -109,13 +156,27 @@ export class ExchangeAccountConfigTable extends Component {
                             name="exchange"
                             options={this.state.supportedExchanges}
                         />
+                        <Input
+                            name="nickname"
+                            label="Nickname"
+                            locked={!this.state.exchangesLoaded}
+                        />
+                        <Input
+                            name="publicKey"
+                            label="Public Key"
+                            locked={!this.state.exchangesLoaded}
+                        />
+                        <Input
+                            name="privateKey"
+                            label="Private Key"
+                            locked={!this.state.exchangesLoaded}
+                        />
 
-                        <input id="publicKeyInput" type="text" /><br/>
-                        <input id="privateKeyInput" type="text" /><br />
-
-                        <button onClick={this.saveCreds}>Save</button>
+                        <button className="m-t-10" onClick={this.saveCreds}>Save</button>
                     </div>
                 </Modal>
+
+                <ToastContainer/>
             </div>
         );
     }

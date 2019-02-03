@@ -37,7 +37,7 @@ namespace Arbitrage.Api.Services
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
-            //new KuCoin(),
+            new KuCoin(),
             new BtcMarkets(),
             new Coinjar()
         };

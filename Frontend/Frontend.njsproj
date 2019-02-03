@@ -23,6 +23,9 @@
     <Content Include="public\index.html" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\manifest.json" />
+    <Content Include="src\components\Forms\input.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\Portfolio\PortfolioChart.css">
       <SubType>Code</SubType>
     </Content>
@@ -76,6 +79,7 @@
     <Folder Include="src" />
     <Folder Include="src\components" />
     <Folder Include="src\components\Arbitrage" />
+    <Folder Include="src\components\Forms\" />
     <Folder Include="src\components\Portfolio\" />
     <Folder Include="src\components\Sentiment" />
     <Folder Include="src\components\Settings" />
@@ -84,6 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\components\Arbitrage\NormalArbitrage.js" />
+    <Compile Include="src\components\Forms\Input.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\components\Portfolio\AssetBreakdown.js">
       <SubType>Code</SubType>
     </Compile>
