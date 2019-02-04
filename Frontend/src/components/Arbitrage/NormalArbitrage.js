@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { ArbitragePanel } from './ArbitragePanel';
+import { ArbitrageSettings } from './ArbitrageSettings';
+import { ArbitrageTrades } from './ArbitrageTrades';
 
 export class NormalArbitrage extends Component {
     displayName = NormalArbitrage.name
@@ -18,7 +20,7 @@ export class NormalArbitrage extends Component {
 
     componentDidMount() {
         this.getItems();
-        this.timer = setInterval(() => this.getItems(), 60 * 1000); //Polling until I get websockets to work
+        this.timer = setInterval(() => this.getItems(), 30 * 1000); //Polling until I get websockets to work
     }
 
     componentWillUnmount() {
@@ -108,7 +110,7 @@ export class NormalArbitrage extends Component {
                     }
                 </Col>
 
-                <h4 className="subTitle">All Markets</h4>
+                <h4 className="subTitle">Top Markets</h4>
                 {this.state.arbResults.map((arbitrage, i) => (
                     <Col xs={3} key={i}>
                         <ArbitragePanel
@@ -121,6 +123,10 @@ export class NormalArbitrage extends Component {
                         />
                     </Col>
                 ))}
+
+                <ArbitrageSettings />
+
+                <ArbitrageTrades />
             </Row>
         );
     }

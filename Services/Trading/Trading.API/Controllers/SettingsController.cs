@@ -62,6 +62,7 @@ namespace Trading.API.Controllers
             {
                 Name = config.Name,
                 Nickname = config.Nickname,
+                Simulated = config.Simulated,
                 PublicKey = config.PublicKey,
                 PrivateKey = config.PrivateKey
             });

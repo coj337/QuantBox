@@ -23,6 +23,9 @@
     <Content Include="public\index.html" />
     <Content Include="public\favicon.ico" />
     <Content Include="public\manifest.json" />
+    <Content Include="src\components\Arbitrage\ExchangeChooser.css">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="src\components\Forms\input.css">
       <SubType>Code</SubType>
     </Content>
@@ -87,6 +90,15 @@
     <Folder Include="src\components\Widgets\Navigator" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\components\Arbitrage\ArbitrageSettings.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\components\Arbitrage\ArbitrageTrades.js">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\components\Arbitrage\ExchangeChooser.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\components\Arbitrage\NormalArbitrage.js" />
     <Compile Include="src\components\Forms\Input.js">
       <SubType>Code</SubType>

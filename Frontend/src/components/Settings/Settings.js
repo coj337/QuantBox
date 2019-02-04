@@ -8,18 +8,6 @@ import { WalletAccountConfigTable } from './WalletAccountConfigTable';
 export class Settings extends Component {
     displayName = Settings.name
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-
-        };
-    }
-
-    componentDidMount() {
-        
-    }
-
     render() {
         return (
             <Tabs>

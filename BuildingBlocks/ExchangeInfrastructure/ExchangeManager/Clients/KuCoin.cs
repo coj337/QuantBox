@@ -22,6 +22,8 @@ namespace ExchangeManager.Clients
 
         public KuCoin()
         {
+            ExchangeAPI.UseDefaultMethodCachePolicy = false;
+
             _client = new ExchangeKucoinAPI();
             Orderbooks = new Dictionary<string, Orderbook>();
             Currencies = new Dictionary<string, CurrencyData>();

@@ -11,3 +11,11 @@
     text-align: center;
     margin-top: 25px;
 }
+#arbitrageSettings {
+    padding: 5px;
+    height: 240px;
+}
+.react-toggle{
+    top: 5px;
+    left: 5px;
+}

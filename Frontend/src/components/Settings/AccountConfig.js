@@ -1,7 +1,6 @@
 ﻿import React, { Component } from 'react';
 import './AccountConfig.css';
 import { AccountConfigCell } from './AccountConfigCell';
-import { Axios } from 'axios';
 
 export class AccountConfig extends Component {
     displayName = AccountConfig.name

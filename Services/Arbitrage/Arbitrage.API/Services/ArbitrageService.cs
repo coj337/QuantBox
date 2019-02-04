@@ -24,9 +24,6 @@ namespace Arbitrage.Api.Services
         public readonly Dictionary<string, ArbitrageResult> triangleResults = new Dictionary<string, ArbitrageResult>();
         public readonly Dictionary<string, ArbitrageResult> normalResults = new Dictionary<string, ArbitrageResult>();
 
-        public readonly List<ArbitrageResult> profitableTriangleResults = new List<ArbitrageResult>();
-        public readonly List<ArbitrageResult> profitableNormalResults = new List<ArbitrageResult>();
-
         public ArbitrageResult bestTriangleProfit = new ArbitrageResult() { Profit = -101 };
         public ArbitrageResult worstTriangleProfit = new ArbitrageResult() { Profit = 101 };
         public ArbitrageResult bestNormalProfit = new ArbitrageResult() { Profit = -101 };
@@ -96,7 +93,6 @@ namespace Arbitrage.Api.Services
         public void CheckExchangeForTriangleArbitrage(IExchange exchange)
         {
             try {
-                Orderbook finalMarket;
                 decimal altAmount, alt2Amount, finalAmount, baseAmount;
                 //Assuming we are testing BTC/ETH->ETH/XRP->XRP/BTC, startCurrency == BTC, middleCurrency == ETH, endCurrency == XRP
                 string startCurrency, middleCurrency, endCurrency; //The currency that's bought/sold from in the first transaction
@@ -200,7 +196,10 @@ namespace Arbitrage.Api.Services
                             }
                         }
                         //Find the final market (i.e. the market that has the middle and end currencies)
-                        finalMarket = orderbooks.Values.FirstOrDefault(x => (x.BaseCurrency == startCurrency || x.AltCurrency == startCurrency) && (x.BaseCurrency == endCurrency || x.AltCurrency == endCurrency));
+                        if (!orderbooks.TryGetValue(startCurrency + "/" + endCurrency, out Orderbook finalMarket))
+                        {
+                            orderbooks.TryGetValue(endCurrency + "/" + startCurrency, out finalMarket);
+                        }
 
                         //If null, there's no pairs to finish the arb
                         if (finalMarket == null)
@@ -441,10 +440,6 @@ namespace Arbitrage.Api.Services
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
                 }
-                if(profitableTriangleResults.Count() == 0 || (!profitableTriangleResults.Last().Exchanges.SequenceEqual(result.Exchanges) || !profitableTriangleResults.Last().Pairs.SequenceEqual(result.Pairs, new PairComparer())))
-                {
-                    profitableTriangleResults.Add(result);
-                }
             }
         }
 
@@ -477,10 +472,6 @@ namespace Arbitrage.Api.Services
                 {
                     var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
                     _eventBus.Publish(@newTradeEvent);
-                }
-                if (profitableNormalResults.Count() == 0 || (!profitableNormalResults.Last().Exchanges.SequenceEqual(result.Exchanges) || !profitableNormalResults.Last().Pairs.SequenceEqual(result.Pairs, new PairComparer())))
-                {
-                    profitableNormalResults.Add(result);
                 }
             }
         }

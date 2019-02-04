@@ -33,11 +33,11 @@ export class ExchangeAccountConfigTable extends Component {
             .then(res => res.json())
             .then(
                 (result) => {
-                    var exchangeOptioins = result.map(function (exchange, i) {
+                    var exchangeOptions = result.map(function (exchange, i) {
                         return { value: exchange, label: exchange }
                     });
                     this.setState({
-                        supportedExchanges: exchangeOptioins,
+                        supportedExchanges: exchangeOptions,
                         exchangesLoaded: true
                     });
                 },
@@ -149,7 +149,7 @@ export class ExchangeAccountConfigTable extends Component {
                         <Select
                             id="exchangeSelect"
                             className="modalSelect"
-                            defaultValue="Choose an exchange"
+                            placeholder="Choose an exchange"
                             isLoading={!this.state.exchangesLoaded}
                             isDisabled={!this.state.exchangesLoaded}
                             isSearchable={true}
@@ -171,6 +171,7 @@ export class ExchangeAccountConfigTable extends Component {
                             label="Private Key"
                             locked={!this.state.exchangesLoaded}
                         />
+                        <label>Simulated</label> <input type="checkbox" name="simulated" /><br/>
 
                         <button className="m-t-10" onClick={this.saveCreds}>Save</button>
                     </div>

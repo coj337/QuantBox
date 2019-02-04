@@ -24,6 +24,8 @@ namespace ExchangeManager.Clients
 
         public Binance()
         {
+            ExchangeAPI.UseDefaultMethodCachePolicy = false;
+
             _client = new ExchangeBinanceAPI();
             Orderbooks = new Dictionary<string, Orderbook>();
             Currencies = new Dictionary<string, CurrencyData>();

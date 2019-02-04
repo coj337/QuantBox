@@ -37,6 +37,9 @@
     padding: 15px;
     color: black;
 }
+.customModal label{
+    color: white;
+}
 .darkButton {
     background-color: #262c37;
     border: none;
