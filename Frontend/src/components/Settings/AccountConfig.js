@@ -13,6 +13,7 @@ export class AccountConfig extends Component {
             nickname: props.nickname,
             disabled: props.disabled,
             publicKey: props.publicKey,
+            simulated: props.simulated
         };
     }
 
@@ -22,6 +23,7 @@ export class AccountConfig extends Component {
             nickname: nextProps.nickname,
             disabled: nextProps.disabled,
             publicKey: nextProps.publicKey,
+            simulated: nextProps.simulated
         });
     }
 
@@ -29,7 +31,7 @@ export class AccountConfig extends Component {
         return (
             <div className={`accountConfig${this.state.disabled ? " disabled" : ""}`}>
                 <span className="accountNickname">{this.state.nickname}</span>
-                <span className="accountName">{this.state.name}</span>
+                <span className="accountName">{this.state.name} {this.state.simulated ? "(Simulated)" : ""}</span>
                 <span>
                     <span className="keyContainers">
                         <AccountConfigCell private={false} active={this.state.active} text={this.state.publicKey} id={`${this.state.name}PublicKeyInput`}/>

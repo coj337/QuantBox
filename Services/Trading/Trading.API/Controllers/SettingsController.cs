@@ -30,7 +30,14 @@ namespace Trading.API.Controllers
         [Route("[action]")]
         public ActionResult<IEnumerable<ExchangeConfig>> ExchangeConfigs()
         {
-            return Ok(_context.ExchangeCredentials);
+            return Ok(_context.ExchangeCredentials.Select(x => new { x.Name, x.Nickname, x.PublicKey, x.Simulated }));
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<IEnumerable<ExchangeConfig>> Accounts()
+        {
+            return Ok(_context.ExchangeCredentials.Select(x => new { x.Name, x.Nickname, x.Simulated }));
         }
 
         [HttpPost]
@@ -38,21 +45,23 @@ namespace Trading.API.Controllers
         public IActionResult AddExchangeConfig([FromBody]ExchangeConfig config)
         {
             //Check we've been given enough info
-            if(string.IsNullOrEmpty(config.Name))
+            if (string.IsNullOrEmpty(config.Name))
             {
                 return UnprocessableEntity("Please choose an exchange");
             }
-            else if (string.IsNullOrEmpty(config.PublicKey))
-            {
-                return UnprocessableEntity("Public Key must have a value");
-            }
-            else if (string.IsNullOrEmpty(config.PrivateKey))
-            {
-                return UnprocessableEntity("Private Key must have a value");
+            if (!config.Simulated) {
+                if (string.IsNullOrEmpty(config.PublicKey))
+                {
+                    return UnprocessableEntity("Public Key must have a value");
+                }
+                else if (string.IsNullOrEmpty(config.PrivateKey))
+                {
+                    return UnprocessableEntity("Private Key must have a value");
+                }
             }
 
             //Make sure we don't already have the creds
-            if(_context.ExchangeCredentials.Any(x => x.Name == config.Name && x.PublicKey == config.PublicKey))
+            if (_context.ExchangeCredentials.Any(x => x.Name == config.Name && x.PublicKey == config.PublicKey))
             {
                 return UnprocessableEntity("Credentials already exist");
             }
@@ -81,7 +90,7 @@ namespace Trading.API.Controllers
             }
 
             var configToDelete = _context.ExchangeCredentials.FirstOrDefault(x => x.PublicKey == config.PublicKey && x.Name == config.Name);
-            if(configToDelete == null)
+            if (configToDelete == null)
             {
                 return UnprocessableEntity("Specified key doesn't exist");
             }

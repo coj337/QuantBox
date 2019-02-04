@@ -15,7 +15,7 @@ export class ExchangeChooser extends Component {
     }
 
     componentDidMount() {
-        fetch("/Settings/SupportedExchanges")
+        fetch("/Settings/Accounts")
             .then(res => res.json())
             .then(
                 (result) => {
@@ -31,25 +31,37 @@ export class ExchangeChooser extends Component {
     }
 
     render() {
-        const options = [
-            { value: 'test', label: 'test' }
-        ]
+        if (this.state.exchangesLoaded) {
+            var options = {};
+            for (var i = 0; i < this.state.exchanges.length; i++) {
+                if (!(this.state.exchanges[i].name in options)) {
+                    options[this.state.exchanges[i].name] = [];
+                }
+                var nickname = this.state.exchanges[i].nickname;
+                if (this.state.exchanges[i].simulated) {
+                    nickname += " (Simulated)";
+                }
+                options[this.state.exchanges[i].name].push({ value: this.state.exchanges[i].nickname, label: nickname });
+            }
+        }
 
         return (
             <div>
-                {this.state.exchanges.map((exchange, i) => {
+                {this.state.exchangesLoaded ?
+                    Object.keys(options).map((key, i) => {
                         return <div key={i}>
-                            <span>{exchange}</span>
+                            <span>{key}</span>
                             <Select
                                 className="exchangeSelect"
                                 placeholder="Choose an account"
                                 isLoading={!this.state.exchangesLoaded}
                                 isDisabled={!this.state.exchangesLoaded}
                                 isSearchable={true}
-                                options={options}
+                                options={options[key]}
                             />
                         </div>
-                    })
+                    }) :
+                    ""
                 }
             </div>
         );

@@ -19,13 +19,15 @@ export class ExchangeAccountConfigTable extends Component {
             supportedExchanges: [],
             exchangeConfigs: [],
             modalVisible: false,
-            exchangesLoaded: false
+            exchangesLoaded: false,
+            simulatedTicked: false
         };
 
         this.openModal = this.openModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
         this.saveCreds = this.saveCreds.bind(this);
         this.deleteCreds = this.deleteCreds.bind(this);
+        this.toggleKeyFields = this.toggleKeyFields.bind(this);
     }
 
     componentDidMount() {
@@ -77,12 +79,14 @@ export class ExchangeAccountConfigTable extends Component {
         var privateKey = document.getElementsByName("privateKey")[0].value;
         var exchange = document.getElementsByName("exchange")[0].value;
         var nickname = document.getElementsByName("nickname")[0].value;
+        var simulated = document.getElementsByName("simulated")[0].checked;
 
         Axios.post('/Settings/AddExchangeConfig', {
             Name: exchange,
             NickName: nickname,
             PublicKey: publicKey,
-            PrivateKey: privateKey
+            PrivateKey: privateKey,
+            Simulated: simulated
         })
         .then((response) => {
             this.setState(previousState => ({
@@ -97,10 +101,11 @@ export class ExchangeAccountConfigTable extends Component {
             toast.error(error.response.data);
         });
 
-        //Clear the boxes now
+        //Clear the fields
         document.getElementsByName("publicKey")[0].value = "";
         document.getElementsByName("privateKey")[0].value = "";
         document.getElementsByName("nickname")[0].value = "";
+        document.getElementsByName("simulated")[0].checked = false;
     }
 
     deleteCreds(name, key) {
@@ -116,6 +121,19 @@ export class ExchangeAccountConfigTable extends Component {
         .catch((error) => {
             toast.error(error.response.data);
         });
+    }
+
+    toggleKeyFields() {
+        var box = document.getElementsByName("simulated")[0];
+
+        if (box.checked) {
+            document.getElementsByName("publicKey")[0].parentElement.style.display = 'none';
+            document.getElementsByName("privateKey")[0].parentElement.style.display = 'none';
+        }
+        else {
+            document.getElementsByName("publicKey")[0].parentElement.style.display = 'block';
+            document.getElementsByName("privateKey")[0].parentElement.style.display = 'block';
+        }
     }
 
     render() {
@@ -138,7 +156,7 @@ export class ExchangeAccountConfigTable extends Component {
 
                 {this.state.exchangeConfigs.length > 0 ?
                     this.state.exchangeConfigs.map((config, i) => {
-                        return <AccountConfig key={i} name={config.name} nickname={config.nickname} publicKey={config.publicKey} onDelete={this.deleteCreds} />
+                        return <AccountConfig key={i} name={config.name} nickname={config.nickname} publicKey={config.publicKey} simulated={config.simulated} onDelete={this.deleteCreds} />
                     }) :
                     <div className="m-l-20 m-t-10 fadedText">No exchanges, click the button below to add one!</div>
                 }
@@ -165,13 +183,14 @@ export class ExchangeAccountConfigTable extends Component {
                             name="publicKey"
                             label="Public Key"
                             locked={!this.state.exchangesLoaded}
+                            
                         />
                         <Input
                             name="privateKey"
                             label="Private Key"
                             locked={!this.state.exchangesLoaded}
                         />
-                        <label>Simulated</label> <input type="checkbox" name="simulated" /><br/>
+                        <label>Simulated</label> <input type="checkbox" name="simulated" onClick={this.toggleKeyFields} /><br/>
 
                         <button className="m-t-10" onClick={this.saveCreds}>Save</button>
                     </div>
