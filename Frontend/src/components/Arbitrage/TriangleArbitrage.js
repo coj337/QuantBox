@@ -14,7 +14,8 @@ export class TriangleArbitrage extends Component {
             bestResult: null,
             worstResult: null,
             arbResults: [],
-            lastUpdate: null
+            lastUpdate: null,
+            botId: "Triangle Arbitrage"
         };
     }
 
@@ -128,7 +129,7 @@ export class TriangleArbitrage extends Component {
                     </Col>
                 ))}
 
-                <ArbitrageSettings />
+                <ArbitrageSettings botId={this.state.botId} />
 
                 <ArbitrageTrades />
             </Row>

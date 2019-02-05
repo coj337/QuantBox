@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ExchangeManager.Models;
 using Microsoft.AspNetCore.Mvc;
 using Trading.API.Data;
+using Trading.API.Domain;
 
 namespace Trading.API.Controllers
 {
@@ -40,6 +41,62 @@ namespace Trading.API.Controllers
             return Ok(_context.ExchangeCredentials.Select(x => new { x.Name, x.Nickname, x.Simulated }));
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<Dictionary<string, string>> BotAccounts(string botId)
+        {
+            var bot = _context.Bots.First(x => x.Name == botId);
+            var accounts = new Dictionary<string, string>();
+
+            if (bot.Accounts != null)
+            {
+                foreach (var account in bot.Accounts)
+                {
+                    accounts.Add(account.Name, account.Nickname);
+                }
+            }
+
+            return Ok(accounts);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult UpdateBotAccount([FromBody]BotAccountUpdate botUpdate)
+        {
+            var bot = _context.Bots.First(x => x.Name == botUpdate.BotId);
+            var account = bot.Accounts.FirstOrDefault(x => x.Nickname == botUpdate.Exchange);
+            if (account == null)
+            {
+                return UnprocessableEntity("Invalid bot name");
+            }
+            account = _context.ExchangeCredentials.First(x => x.Nickname == botUpdate.Account);
+
+            _context.Bots.Update(bot);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<bool> GetTradingState(string botId)
+        {
+            return Ok(_context.Bots.First(x => x.Name == botId).TradingEnabled);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public IActionResult SetTradingState([FromBody]BotStateUpdate update)
+        {
+            var bot = _context.Bots.First(x => x.Name == update.BotId);
+            bot.TradingEnabled = update.State;
+
+            _context.Bots.Update(bot);
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
         [HttpPost]
         [Route("[action]")]
         public IActionResult AddExchangeConfig([FromBody]ExchangeConfig config)
@@ -48,6 +105,10 @@ namespace Trading.API.Controllers
             if (string.IsNullOrEmpty(config.Name))
             {
                 return UnprocessableEntity("Please choose an exchange");
+            }
+            if (string.IsNullOrEmpty(config.Nickname))
+            {
+                return UnprocessableEntity("Please enter a nickname for this account");
             }
             if (!config.Simulated) {
                 if (string.IsNullOrEmpty(config.PublicKey))
@@ -61,7 +122,7 @@ namespace Trading.API.Controllers
             }
 
             //Make sure we don't already have the creds
-            if (_context.ExchangeCredentials.Any(x => x.Name == config.Name && x.PublicKey == config.PublicKey))
+            if (_context.ExchangeCredentials.Any(x => x.Name == config.Name && (x.PublicKey == config.PublicKey || x.Nickname == config.Nickname)))
             {
                 return UnprocessableEntity("Credentials already exist");
             }

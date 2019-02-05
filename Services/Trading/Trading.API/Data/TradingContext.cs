@@ -16,7 +16,7 @@ namespace Trading.API.Data
         public DbSet<ExchangeConfig> ExchangeCredentials { get; set; }
         public DbSet<Exchange> Exchanges { get; set; }
         public DbSet<ArbitrageTradeResults> ArbitrageResults { get; set; }
-        
+        public DbSet<Bot> Bots { get; set; }
 
         public class TradingContextDesignFactory : IDesignTimeDbContextFactory<TradingContext>
         {

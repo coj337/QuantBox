@@ -14,7 +14,8 @@ export class NormalArbitrage extends Component {
             bestResult: null,
             worstResult: null,
             arbResults: [],
-            lastUpdate: null
+            lastUpdate: null,
+            botId: "Normal Arbitrage"
         };
     }
 
@@ -124,7 +125,7 @@ export class NormalArbitrage extends Component {
                     </Col>
                 ))}
 
-                <ArbitrageSettings />
+                <ArbitrageSettings botId={this.state.botId} />
 
                 <ArbitrageTrades />
             </Row>

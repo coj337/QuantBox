@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using ExchangeManager.Models;
+using Microsoft.AspNetCore.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,22 @@ namespace Trading.API.Data
                     Name = "Coinjar",
                     TradingEnabled = true
                 },
+            });
+
+            context.Bots.AddRange(new List<Bot>()
+            {
+                new Bot()
+                {
+                    Name = "Triangle Arbitrage",
+                    TradingEnabled = false,
+                    Accounts = new List<ExchangeConfig>()
+                },
+                new Bot()
+                {
+                    Name = "Normal Arbitrage",
+                    TradingEnabled = false,
+                    Accounts = new List<ExchangeConfig>()
+                }
             });
             context.SaveChanges();
         }

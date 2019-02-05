@@ -1,6 +1,9 @@
 ﻿import React, { Component } from 'react';
 import Select from 'react-select';
 import './ExchangeChooser.css';
+import Axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 export class ExchangeChooser extends Component {
     displayName = ExchangeChooser.name
@@ -10,7 +13,10 @@ export class ExchangeChooser extends Component {
 
         this.state = {
             exchanges: [],
-            exchangesLoaded: false
+            selectedAccounts: [],
+            accountsLoaded: false,
+            botAccountsLoaded: false,
+            botId: this.props.botId
         };
     }
 
@@ -21,17 +27,63 @@ export class ExchangeChooser extends Component {
                 (result) => {
                     this.setState({
                         exchanges: result,
-                        exchangesLoaded: true
+                        accountsLoaded: true
                     });
                 },
                 (error) => {
-                    console.log(error);
+                    if (error.response.data) {
+                        toast.error(error.response.data);
+                    }
+                    else {
+                        toast.error("Couldn't get accounts. (" + error.response.status + " " + error.response.statusText + ")");
+                    }
                 }
-            );
+        );
+
+        Axios.get('/Settings/BotAccounts?botId=' + this.state.botId)
+            .then((response) => {
+                this.setState({
+                    selectedAccounts: response,
+                    botAccountsLoaded: true
+                });
+            })
+            .catch((error) => {
+                if (error.response.data) {
+                    toast.error(error.response.data);
+                }
+                else {
+                    toast.error("Couldn't get bot accounts. (" + error.response.status + " " + error.response.statusText + ")");
+                }
+            });
+    }
+
+    updateSelectedAccount(exchange, account) {
+        Axios.post('/Settings/UpdateBotAccount', {
+            BotId: this.state.botId,
+            Exchange: exchange,
+            Account: account
+        })
+            .then((response) => {
+                this.setState(prevState => ({
+                    selectedAccounts: {
+                        ...prevState.selectedAccounts,
+                        [exchange]: account
+                    }
+                }));
+            toast.success("Account updated");
+        })
+        .catch((error) => {
+            if (error.response.data) {
+                toast.error(error.response.data);
+            }
+            else {
+                toast.error("Couldn't update account. (" + error.response.status + " " + error.response.statusText + ")");
+            }
+        });
     }
 
     render() {
-        if (this.state.exchangesLoaded) {
+        if (this.state.botAccountsLoaded && this.state.accountsLoaded) {
             var options = {};
             for (var i = 0; i < this.state.exchanges.length; i++) {
                 if (!(this.state.exchanges[i].name in options)) {
@@ -47,22 +99,27 @@ export class ExchangeChooser extends Component {
 
         return (
             <div>
-                {this.state.exchangesLoaded ?
+                {this.state.botAccountsLoaded && this.state.accountsLoaded ?
                     Object.keys(options).map((key, i) => {
+                        var defaultValue = this.state.selectedAccounts[key] ? this.state.selectedAccounts[key] : "Choose an account";
                         return <div key={i}>
                             <span>{key}</span>
                             <Select
                                 className="exchangeSelect"
                                 placeholder="Choose an account"
-                                isLoading={!this.state.exchangesLoaded}
-                                isDisabled={!this.state.exchangesLoaded}
+                                isLoading={!this.state.botAccountsLoaded || !this.state.accountsLoaded}
+                                isDisabled={!this.state.botAccountsLoaded || !this.state.accountsLoaded}
                                 isSearchable={true}
                                 options={options[key]}
+                                onChange={value => this.updateSelectedAccount(value)}
+                                value={defaultValue}
                             />
                         </div>
                     }) :
                     ""
                 }
+
+                <ToastContainer />
             </div>
         );
     }
