@@ -9,10 +9,13 @@ namespace Trading.API.Domain
     public class ArbitrageTradeResults
     {
         public string Id { get; set; }
+        public string BotId { get; set; }
         public List<TradeResult> Trades { get; set; }
         public string InitialCurrency { get; set; }
         public decimal EstimatedProfit { get; set; }
         public decimal ActualProfit { get; set; }
         public decimal Dust { get; set; }
+        public DateTime TimeStarted { get; set; }
+        public DateTime TimeFinished { get; set; }
     }
 }

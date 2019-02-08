@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Trading.API.Data;
 
 namespace Trading.API.Migrations
 {
     [DbContext(typeof(TradingContext))]
-    partial class TradingContextModelSnapshot : ModelSnapshot
+    [Migration("20190208103930_MakeTimeTakenLong")]
+    partial class MakeTimeTakenLong
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,9 +104,7 @@ namespace Trading.API.Migrations
 
                     b.Property<string>("InitialCurrency");
 
-                    b.Property<DateTime>("TimeFinished");
-
-                    b.Property<DateTime>("TimeStarted");
+                    b.Property<long>("TimeTaken");
 
                     b.HasKey("Id");
 

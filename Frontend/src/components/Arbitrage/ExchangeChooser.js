@@ -61,7 +61,7 @@ export class ExchangeChooser extends Component {
         Axios.post('/Settings/UpdateBotAccount', {
             BotId: this.state.botId,
             Exchange: exchange,
-            Account: account
+            Account: account.value
         })
             .then((response) => {
                 this.setState(prevState => ({
@@ -111,7 +111,7 @@ export class ExchangeChooser extends Component {
                                 isDisabled={!this.state.botAccountsLoaded || !this.state.accountsLoaded}
                                 isSearchable={true}
                                 options={options[key]}
-                                onChange={value => this.updateSelectedAccount(value)}
+                                onChange={value => this.updateSelectedAccount(key, value)}
                                 value={defaultValue}
                             />
                         </div>

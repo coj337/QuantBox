@@ -93,5 +93,10 @@ namespace ExchangeManager.Clients
         {
             throw new NotImplementedException();
         }
+
+        public Task<ExchangeOrderResult> SimulateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount, double delaySeconds = 0)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -22,11 +22,13 @@ namespace Arbitrage.Domain
 
     public class Pair
     {
+        public string MarketSymbol { get; set; }
         public string BaseCurrency { get; set; }
         public string AltCurrency { get; set; }
 
-        public Pair(string baseCurrency, string altCurrency)
+        public Pair(string marketSymbol, string baseCurrency, string altCurrency)
         {
+            MarketSymbol = marketSymbol;
             BaseCurrency = baseCurrency;
             AltCurrency = altCurrency;
         }

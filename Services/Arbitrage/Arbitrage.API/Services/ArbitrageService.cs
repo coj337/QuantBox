@@ -2,6 +2,7 @@
 using Arbitrage.Domain;
 using BuildingBlocks.EventBus.Abstractions;
 using ExchangeManager.Clients;
+using ExchangeManager.Helpers;
 using ExchangeManager.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
@@ -29,8 +30,6 @@ namespace Arbitrage.Api.Services
         public ArbitrageResult bestNormalProfit = new ArbitrageResult() { Profit = -101 };
         public ArbitrageResult worstNormalProfit = new ArbitrageResult() { Profit = 101 };
 
-        private bool TradingEnabled { get; set; }
-
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -41,7 +40,6 @@ namespace Arbitrage.Api.Services
 
         public ArbitrageService()
         {
-            TradingEnabled = false;
         }
 
         public ArbitrageService(IEventBus eventBus/*, IHubContext<ArbitrageHub, IArbitrageHub> arbitrageHub*/)
@@ -49,7 +47,6 @@ namespace Arbitrage.Api.Services
             _eventBus = eventBus;
             //_arbitrageHub = arbitrageHub;
 
-            TradingEnabled = false;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -122,7 +119,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue;
                                 }
-                                altAmount = baseAmount * GetPriceQuote(bids, baseAmount);
+                                altAmount = baseAmount * PriceCalculator.GetPriceQuote(bids, baseAmount);
                             }
                             catch(Exception e)
                             {
@@ -147,7 +144,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue; //Prices not loaded yet
                                 }
-                                altAmount = baseAmount / GetPriceQuote(asks, ConvertBaseToAlt(asks.First().Price, baseAmount)); //~3000 ETH from 100 BTC
+                                altAmount = baseAmount / PriceCalculator.GetPriceQuote(asks, PriceCalculator.ConvertBaseToAlt(asks.First().Price, baseAmount)); //~3000 ETH from 100 BTC
                             }
                             catch (Exception e)
                             {
@@ -169,7 +166,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue; //Prices not loaded yet
                                 }
-                                alt2Amount = altAmount / GetPriceQuote(asks, ConvertBaseToAlt(asks.First().Price, altAmount));
+                                alt2Amount = altAmount / PriceCalculator.GetPriceQuote(asks, PriceCalculator.ConvertBaseToAlt(asks.First().Price, altAmount));
                             }
                             catch (Exception e)
                             {
@@ -187,7 +184,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue; //Not loaded yet
                                 }
-                                alt2Amount = altAmount * GetPriceQuote(bids, altAmount);
+                                alt2Amount = altAmount * PriceCalculator.GetPriceQuote(bids, altAmount);
                             }
                             catch (Exception e)
                             {
@@ -217,7 +214,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue; //Not loaded yet
                                 }
-                                finalAmount = alt2Amount * GetPriceQuote(bids, alt2Amount);
+                                finalAmount = alt2Amount * PriceCalculator.GetPriceQuote(bids, alt2Amount);
                             }
                             catch (Exception e)
                             {
@@ -234,7 +231,7 @@ namespace Arbitrage.Api.Services
                                 {
                                     continue; //Prices not loaded yet
                                 }
-                                finalAmount = alt2Amount / GetPriceQuote(asks, ConvertBaseToAlt(asks.First().Price, alt2Amount));
+                                finalAmount = alt2Amount / PriceCalculator.GetPriceQuote(asks, PriceCalculator.ConvertBaseToAlt(asks.First().Price, alt2Amount));
                             }
                             catch (Exception e)
                             {
@@ -248,9 +245,9 @@ namespace Arbitrage.Api.Services
                         {
                             Exchanges = new List<string>() { exchange.Name },
                             Pairs = new List<Pair>() {
-                                new Pair(market.BaseCurrency, market.AltCurrency),
-                                new Pair(market2.BaseCurrency, market2.AltCurrency),
-                                new Pair(finalMarket.BaseCurrency, finalMarket.AltCurrency)
+                                new Pair(market.Pair, market.BaseCurrency, market.AltCurrency),
+                                new Pair(market2.Pair, market2.BaseCurrency, market2.AltCurrency),
+                                new Pair(finalMarket.Pair, finalMarket.BaseCurrency, finalMarket.AltCurrency)
                             },
                             Profit = percentProfit,
                             TransactionFee = exchange.Fee * 3,
@@ -320,7 +317,7 @@ namespace Arbitrage.Api.Services
                         {
                             continue;
                         }
-                        var startAmountBought = baseAmount / GetPriceQuote(asks, ConvertBaseToAlt(asks.First().Price, baseAmount));
+                        var startAmountBought = baseAmount / PriceCalculator.GetPriceQuote(asks, PriceCalculator.ConvertBaseToAlt(asks.First().Price, baseAmount));
 
                         if (endOrderbook.BaseCurrency == startOrderbook.BaseCurrency)
                         {
@@ -329,7 +326,7 @@ namespace Arbitrage.Api.Services
                             {
                                 continue;
                             }
-                            endAmountBought = startAmountBought * GetPriceQuote(endBids, startAmountBought);
+                            endAmountBought = startAmountBought * PriceCalculator.GetPriceQuote(endBids, startAmountBought);
                         }
                         else
                         {
@@ -338,7 +335,7 @@ namespace Arbitrage.Api.Services
                             {
                                 continue;
                             }
-                            endAmountBought = startAmountBought / GetPriceQuote(endAsks, ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
+                            endAmountBought = startAmountBought / PriceCalculator.GetPriceQuote(endAsks, PriceCalculator.ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
                         }
 
                         decimal percentProfit = (endAmountBought - baseAmount) / baseAmount * 100;
@@ -346,7 +343,7 @@ namespace Arbitrage.Api.Services
                         var result = new ArbitrageResult()
                         {
                             Exchanges = new List<string>() { startExchange.Name, exchange.Name },
-                            Pairs = new List<Pair>() { new Pair(startOrderbook.BaseCurrency, startOrderbook.AltCurrency) },
+                            Pairs = new List<Pair>() { new Pair(startOrderbook.Pair, startOrderbook.BaseCurrency, startOrderbook.AltCurrency) },
                             Profit = percentProfit,
                             TransactionFee = startExchange.Fee + exchange.Fee,
                             InitialCurrency = startOrderbook.BaseCurrency,
@@ -367,7 +364,7 @@ namespace Arbitrage.Api.Services
                         {
                             continue;
                         }
-                        startAmountBought = baseAmount * GetPriceQuote(bids, baseAmount);
+                        startAmountBought = baseAmount * PriceCalculator.GetPriceQuote(bids, baseAmount);
 
                         if (endOrderbook.BaseCurrency == startOrderbook.BaseCurrency)
                         {
@@ -376,7 +373,7 @@ namespace Arbitrage.Api.Services
                             {
                                 continue;
                             }
-                            endAmountBought = startAmountBought / GetPriceQuote(endAsks, ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
+                            endAmountBought = startAmountBought / PriceCalculator.GetPriceQuote(endAsks, PriceCalculator.ConvertBaseToAlt(endAsks.First().Price, startAmountBought));
                         }
                         else
                         {
@@ -385,7 +382,7 @@ namespace Arbitrage.Api.Services
                             {
                                 continue;
                             }
-                            endAmountBought = startAmountBought * GetPriceQuote(endBids, startAmountBought);
+                            endAmountBought = startAmountBought * PriceCalculator.GetPriceQuote(endBids, startAmountBought);
                         }
 
                         percentProfit = (endAmountBought - baseAmount) / baseAmount * 100;
@@ -393,7 +390,7 @@ namespace Arbitrage.Api.Services
                         result = new ArbitrageResult()
                         {
                             Exchanges = new List<string>() { startExchange.Name, exchange.Name },
-                            Pairs = new List<Pair>() { new Pair(startOrderbook.AltCurrency, startOrderbook.BaseCurrency) },
+                            Pairs = new List<Pair>() { new Pair(startOrderbook.Pair, startOrderbook.AltCurrency, startOrderbook.BaseCurrency) },
                             Profit = percentProfit,
                             TransactionFee = startExchange.Fee + exchange.Fee,
                             InitialCurrency = startOrderbook.AltCurrency,
@@ -435,11 +432,8 @@ namespace Arbitrage.Api.Services
 
             if(result.Profit > result.TransactionFee)
             {
-                if (this.TradingEnabled)
-                {
-                    var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
-                    _eventBus.Publish(@newTradeEvent);
-                }
+                var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
+                _eventBus.Publish(@newTradeEvent);
             }
         }
 
@@ -468,20 +462,9 @@ namespace Arbitrage.Api.Services
 
             if (result.Profit > result.TransactionFee)
             {
-                if (this.TradingEnabled)
-                {
-                    var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
-                    _eventBus.Publish(@newTradeEvent);
-                }
+                var @newTradeEvent = new ArbitrageFoundIntegrationEvent(result);
+                _eventBus.Publish(@newTradeEvent);
             }
-        }
-
-        //Converts a base currency to an alt currency at the market rate
-        public decimal ConvertBaseToAlt(decimal price, decimal baseCurrencyAmount)
-        {
-            var altCurrencyAmount = baseCurrencyAmount / price;
-
-            return altCurrencyAmount;
         }
 
         //Converts AUD to crypto at the market rate
@@ -505,8 +488,18 @@ namespace Arbitrage.Api.Services
                 {
                     return 0; //Not populated yet
                 }
-                decimal btcAssetPrice = btcAsset.Asks.First().Price;
-                decimal assetFromBtc = btcFromAud / btcAssetPrice;
+
+                decimal assetFromBtc;
+                if (btcAsset.AltCurrency == "BTC")
+                {
+                    decimal btcAssetPrice = btcAsset.Bids.First().Price;
+                    assetFromBtc = btcFromAud * btcAssetPrice;
+                }
+                else
+                {
+                    decimal btcAssetPrice = btcAsset.Asks.First().Price;
+                    assetFromBtc = btcFromAud / btcAssetPrice;
+                }
 
                 return assetFromBtc;
             }
@@ -514,52 +507,6 @@ namespace Arbitrage.Api.Services
             {
                 Console.WriteLine("Something went wrong in ConvertAudToCrypto (" + e.Message + ")");
                 return 0;
-            }
-        }
-
-        //Note: Amount should be the amount in the alt, not the amount in the base currency
-        public decimal GetPriceQuote(List<OrderbookOrder> orders, decimal amount)
-        {
-            try
-            {
-                decimal price = 0;
-
-                decimal amountLeft = amount;
-                int i = 0;
-
-                //Loop until our order's filled or we run out of orderbook
-                while (amountLeft > 0 && i < orders.Count())
-                {
-                    decimal altAmount = orders[i].Amount;
-                    //if (pair.EndsWith("USDT"))
-                    //{
-                    //    altAmount *= orders[i].Price;
-                    //}
-                    decimal amountBought = altAmount;
-                    if (altAmount > amountLeft) //Make sure we only partial fill the last of the order
-                    {
-                        amountBought = amountLeft;
-                    }
-
-                    //Keep track of how much is left
-                    amountLeft -= amountBought;
-
-                    //Track average price payed for the amount filled
-                    price += (orders[i].Price / (amount / amountBought));
-
-                    i++;
-                }
-
-                if (i > orders.Count())
-                {
-                    throw new Exception("Orderbook too thin, couldn't calculate price, requested " + amount + " when only " + orders.Sum(x => x.Amount) + " was available");
-                }
-
-                return price;
-            }
-            catch(Exception e)
-            {
-                throw new Exception("Something went wrong in GetPriceQuote (" + e.Message + ")");
             }
         }
     }

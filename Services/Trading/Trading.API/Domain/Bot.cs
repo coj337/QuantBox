@@ -12,5 +12,10 @@ namespace Trading.API.Domain
         public string Name { get; set; }
         public List<ExchangeConfig> Accounts { get; set; }
         public bool TradingEnabled { get; set; }
+
+        public Bot()
+        {
+            Accounts = new List<ExchangeConfig>();
+        }
     }
 }

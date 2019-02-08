@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -179,7 +180,7 @@ namespace Trading.API
                 options.UseSqlServer(configuration["ConnectionString"],
                     sqlServerOptionsAction: sqlOptions =>
                     {
-                        //sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
+                        sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 10, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
                     });
             });

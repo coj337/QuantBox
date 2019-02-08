@@ -1,13 +1,15 @@
 version: '3.4'
 
 services:
-  ## Databases ##
+  ## Database ##
   sql.data:
     environment:
       - SA_PASSWORD=Pass@word
       - ACCEPT_EULA=Y
     ports:
-      - "5433:1433" # Important: In a production environment your should remove the external port
+      - "5433:1433"
+    volumes:
+      - ${APPDATA}/QuantBox/mssql:/var/opt/mssql
 
   ## Internal API Services ##
   arbitrage.api:

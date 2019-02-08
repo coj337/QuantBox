@@ -8,6 +8,7 @@ using System.Threading;
 using ExchangeManager.Models;
 using ExchangeSharp;
 using OrderType = ExchangeManager.Models.OrderType;
+using ExchangeManager.Helpers;
 
 namespace ExchangeManager.Clients
 {
@@ -104,6 +105,67 @@ namespace ExchangeManager.Clients
             {
                 OrderId = orderId
             };
+        }
+
+        public async Task<ExchangeOrderResult> SimulateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount, double delaySeconds = 0)
+        {
+            await Task.Delay((int)(delaySeconds * 1000)); //Wait to simulate real order lag
+
+            ExchangeOrderResult result = new ExchangeOrderResult();
+
+            if (type == OrderType.Limit)
+            {
+                var ticker = _client.GetTicker(pair);
+
+                if (side == OrderSide.Buy)
+                {
+                    var bestAsk = ticker.Ask;
+
+                }
+                else
+                {
+                    var bestBid = ticker.Bid;
+
+                }
+
+                //TODO: Figure out how to simulate limit orders (Just take best price? Wait for theoretical fill?)
+                throw new NotSupportedException();
+            }
+            else if (type == OrderType.Market)
+            {
+                var orderbook = _client.GetOrderBook(pair); //1 request, just like a real order TODO: Pull this from memory once supported (arb services->bots and prices->trading service)
+
+                if (side == OrderSide.Buy)
+                {
+                    price = PriceCalculator.GetPriceQuote(orderbook.asks.Select(ask => new OrderbookOrder() { Price = ask[0], Amount = ask[1] }).ToList(), PriceCalculator.ConvertBaseToAlt(orderbook.asks.First()[0], amount));
+                    amount /= price;
+                }
+                else
+                {
+                    price = PriceCalculator.GetPriceQuote(orderbook.bids.Select(bid => new OrderbookOrder() { Price = bid[0], Amount = bid[1] }).ToList(), amount);
+                    amount *= price;
+                }
+                result = new ExchangeOrderResult()
+                {
+                    MarketSymbol = pair,
+                    Price = price,
+                    IsBuy = side == OrderSide.Buy,
+                    Amount = amount,
+                    AmountFilled = amount,
+                    AveragePrice = price,
+                    Fees = amount * (this.Fee / 100),
+                    FeesCurrency = "Alt",
+                    FillDate = DateTime.Now,
+                    OrderDate = DateTime.Now,
+                    Result = ExchangeAPIOrderResult.Filled,
+                };
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+
+            return result;
         }
     }
 }

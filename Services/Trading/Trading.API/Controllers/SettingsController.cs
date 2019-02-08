@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ExchangeManager.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Trading.API.Data;
 using Trading.API.Domain;
 
@@ -14,10 +16,12 @@ namespace Trading.API.Controllers
     public class SettingsController : Controller
     {
         private readonly TradingContext _context;
+        private readonly ILogger<SettingsController> _logger;
 
-        public SettingsController(TradingContext context)
+        public SettingsController(TradingContext context, ILogger<SettingsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -45,43 +49,107 @@ namespace Trading.API.Controllers
         [Route("[action]")]
         public ActionResult<Dictionary<string, string>> BotAccounts(string botId)
         {
-            var bot = _context.Bots.First(x => x.Name == botId);
-            var accounts = new Dictionary<string, string>();
-
-            if (bot.Accounts != null)
+            try
             {
-                foreach (var account in bot.Accounts)
-                {
-                    accounts.Add(account.Name, account.Nickname);
-                }
-            }
+                var bot = _context.Bots
+                    .Include(x => x.Accounts)
+                    .First(x => x.Name == botId);
+                var accounts = new Dictionary<string, string>();
 
-            return Ok(accounts);
+                if (bot.Accounts != null)
+                {
+                    foreach (var account in bot.Accounts)
+                    {
+                        accounts.Add(account.Name, account.Nickname);
+                    }
+                }
+
+                return Ok(accounts);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("BotAccounts threw an exception: " + e.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpPost]
         [Route("[action]")]
         public IActionResult UpdateBotAccount([FromBody]BotAccountUpdate botUpdate)
         {
-            var bot = _context.Bots.First(x => x.Name == botUpdate.BotId);
-            var account = bot.Accounts.FirstOrDefault(x => x.Nickname == botUpdate.Exchange);
-            if (account == null)
-            {
-                return UnprocessableEntity("Invalid bot name");
+            try { 
+                var bot = _context.Bots
+                    .Include(x => x.Accounts)
+                    .FirstOrDefault(x => x.Name == botUpdate.BotId);
+                if (bot == null)
+                {
+                    return UnprocessableEntity("Invalid bot name.");
+                }
+
+                var config = _context.ExchangeCredentials.FirstOrDefault(x => x.Nickname == botUpdate.Account);
+                if (config == null)
+                {
+                    return UnprocessableEntity("Invalid account name.");
+                }
+
+                var account = bot.Accounts.FirstOrDefault(x => x.Nickname == botUpdate.Account);
+                if(account == null)
+                {
+                    bot.Accounts.Add(config);
+                }
+                else
+                {
+                    account = config;
+                }
+
+                _context.Bots.Update(bot);
+                _context.SaveChanges();
+
+                return Ok();
             }
-            account = _context.ExchangeCredentials.First(x => x.Nickname == botUpdate.Account);
+            catch (Exception e)
+            {
+                _logger.LogCritical("UpdateBotAccount threw an exception: " + e.Message);
+                return StatusCode(500);
+            }
+        }
 
-            _context.Bots.Update(bot);
-            _context.SaveChanges();
-
-            return Ok();
+        [HttpGet]
+        [Route("[action]")]
+        public ActionResult<IOrderedEnumerable<ArbitrageTradeResults>> GetTrades(string botId)
+        {
+            try
+            {
+                var bot = _context.Bots.FirstOrDefault(x => x.Name == botId);
+                if (bot == null)
+                {
+                    return UnprocessableEntity("Can't get trades for a bot that doesn't exist.");
+                }
+                else
+                {
+                    return Ok(_context.ArbitrageResults.Include(x => x.Trades).Where(x => x.BotId == botId).OrderBy(x => x.TimeFinished));
+                }
+            }
+            catch(Exception e)
+            {
+                _logger.LogCritical("GetTrades threw an exception: " + e.Message);
+                return StatusCode(500);
+            }
         }
 
         [HttpGet]
         [Route("[action]")]
         public ActionResult<bool> GetTradingState(string botId)
         {
-            return Ok(_context.Bots.First(x => x.Name == botId).TradingEnabled);
+            var bot = _context.Bots.FirstOrDefault(x => x.Name == botId);
+            if (bot == null)
+            {
+                return UnprocessableEntity("Can't get trading state for a bot that doesn't exist.");
+            }
+            else
+            {
+                return Ok(bot.TradingEnabled);
+            }
         }
 
         [HttpPost]

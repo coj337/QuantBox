@@ -21,6 +21,7 @@ namespace Trading.API.Domain
 
     public class Pair
     {
+        public string MarketSymbol { get; set; }
         public string BaseCurrency { get; set; }
         public string AltCurrency { get; set; }
     }

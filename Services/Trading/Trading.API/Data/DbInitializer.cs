@@ -12,47 +12,49 @@ namespace Trading.API.Data
     {
         public static void Seed(TradingContext context)
         {
-            if (context.Exchanges.Any())
+            if (!context.Exchanges.Any())
             {
-                return; //Already seeded
+                context.Exchanges.AddRange(new List<Exchange>()
+                {
+                    new Exchange(){
+                        Name = "Binance",
+                        TradingEnabled = true
+                    },
+                    new Exchange(){
+                        Name = "BtcMarkets",
+                        TradingEnabled = true
+                    },
+                    new Exchange(){
+                        Name = "KuCoin",
+                        TradingEnabled = true
+                    },
+                    new Exchange(){
+                        Name = "Coinjar",
+                        TradingEnabled = true
+                    },
+                });
+                context.SaveChanges();
             }
 
-            context.Exchanges.AddRange(new List<Exchange>()
+            if (!context.Bots.Any())
             {
-                new Exchange(){
-                    Name = "Binance",
-                    TradingEnabled = true
-                },
-                new Exchange(){
-                    Name = "BtcMarkets",
-                    TradingEnabled = true
-                },
-                new Exchange(){
-                    Name = "KuCoin",
-                    TradingEnabled = true
-                },
-                new Exchange(){
-                    Name = "Coinjar",
-                    TradingEnabled = true
-                },
-            });
-
-            context.Bots.AddRange(new List<Bot>()
-            {
-                new Bot()
+                context.Bots.AddRange(new List<Bot>()
                 {
-                    Name = "Triangle Arbitrage",
-                    TradingEnabled = false,
-                    Accounts = new List<ExchangeConfig>()
-                },
-                new Bot()
-                {
-                    Name = "Normal Arbitrage",
-                    TradingEnabled = false,
-                    Accounts = new List<ExchangeConfig>()
-                }
-            });
-            context.SaveChanges();
+                    new Bot()
+                    {
+                        Name = "Triangle Arbitrage",
+                        TradingEnabled = false,
+                        Accounts = new List<ExchangeConfig>()
+                    },
+                    new Bot()
+                    {
+                        Name = "Normal Arbitrage",
+                        TradingEnabled = false,
+                        Accounts = new List<ExchangeConfig>()
+                    }
+                });
+                context.SaveChanges();
+            }
         }
     }
 }

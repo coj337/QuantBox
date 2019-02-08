@@ -131,7 +131,7 @@ export class TriangleArbitrage extends Component {
 
                 <ArbitrageSettings botId={this.state.botId} />
 
-                <ArbitrageTrades />
+                <ArbitrageTrades botId={this.state.botId} />
             </Row>
         );
     }

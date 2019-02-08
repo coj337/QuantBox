@@ -17,6 +17,7 @@ services:
       dockerfile: Services/Arbitrage/Arbitrage.API/Dockerfile
     depends_on:
       - rabbitmq
+      - trading.api
 
   sentiment.api:
     image: ${DOCKER_REGISTRY-}sentimentapi

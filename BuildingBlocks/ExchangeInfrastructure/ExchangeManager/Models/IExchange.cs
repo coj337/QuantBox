@@ -22,5 +22,7 @@ namespace ExchangeManager.Models
         Task StartOrderbookListener();
 
         Task<ExchangeOrderResult> CreateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount);
+
+        Task<ExchangeOrderResult> SimulateOrder(string pair, OrderSide side, OrderType type, decimal price, decimal amount, double delaySeconds = 0);
     }
 }
