@@ -26,6 +26,9 @@
     <Content Include="src\components\Arbitrage\ExchangeChooser.css">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="src\components\Bots\BotDashboard\BotDashboard.css" />
+    <Content Include="src\components\Bots\BotDashboard\BotPreview.css" />
+    <Content Include="src\components\Bots\TemplateChooser\TemplatePreview.css" />
     <Content Include="src\components\Forms\input.css">
       <SubType>Code</SubType>
     </Content>
@@ -82,7 +85,10 @@
     <Folder Include="src" />
     <Folder Include="src\components" />
     <Folder Include="src\components\Arbitrage" />
+    <Folder Include="src\components\Bots\BotDashboard\" />
+    <Folder Include="src\components\Bots\TemplateChooser\" />
     <Folder Include="src\components\Forms\" />
+    <Folder Include="src\components\Bots\" />
     <Folder Include="src\components\Portfolio\" />
     <Folder Include="src\components\Sentiment" />
     <Folder Include="src\components\Settings" />
@@ -100,6 +106,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\components\Arbitrage\NormalArbitrage.js" />
+    <Compile Include="src\components\Bots\BotDashboard\BotDashboard.js" />
+    <Compile Include="src\components\Bots\BotDashboard\BotPreview.js" />
+    <Compile Include="src\components\Bots\TemplateChooser\TemplateChooser.js" />
+    <Compile Include="src\components\Bots\TemplateChooser\TemplatePreview.js" />
     <Compile Include="src\components\Forms\Input.js">
       <SubType>Code</SubType>
     </Compile>

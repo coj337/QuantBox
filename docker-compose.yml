@@ -10,14 +10,14 @@ services:
     image: rabbitmq:3-management-alpine
 
   ## Internal API Services ##
-  arbitrage.api:
-    image: ${DOCKER_REGISTRY-}arbitrageapi
-    build:
-      context: .
-      dockerfile: Services/Arbitrage/Arbitrage.API/Dockerfile
-    depends_on:
-      - rabbitmq
-      - trading.api
+  #arbitrage.api:
+  #  image: ${DOCKER_REGISTRY-}arbitrageapi
+  #  build:
+  #    context: .
+  #    dockerfile: Services/Arbitrage/Arbitrage.API/Dockerfile
+  #  depends_on:
+  #    - rabbitmq
+  #    - trading.api
 
   sentiment.api:
     image: ${DOCKER_REGISTRY-}sentimentapi
@@ -51,6 +51,6 @@ services:
       context: .
       dockerfile: ApiGateways/ApiGw-Base/Dockerfile
     depends_on:
-      - arbitrage.api
+    #  - arbitrage.api
       - sentiment.api
       - rabbitmq

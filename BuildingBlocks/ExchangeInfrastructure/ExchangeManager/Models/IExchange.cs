@@ -11,6 +11,8 @@ namespace ExchangeManager.Models
 
         decimal Fee { get; } //The % trade fee on the exchange (e.g. 0.1 for 0.1%) 
 
+        bool TradingEnabled { get; }
+
         bool IsAuthenticated { get; }
 
         Dictionary<string, Orderbook> Orderbooks { get; }

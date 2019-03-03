@@ -24,6 +24,8 @@ namespace ExchangeManager.Models
         public string OrderId { get; set; }
         public string FeesCurrency { get; set; }
         public string CorrelationId { get; set; } //Id to link trade with other trades made at the same time
+        public ErrorReason ErrorReason { get; set; } //Reason a trade didn't execute or failed
+        public string ErrorMessage { get; set; }
     }
 
     public enum OrderResult
@@ -35,5 +37,14 @@ namespace ExchangeManager.Models
         Error = 4,
         Canceled = 5,
         PendingCancel = 6
+    }
+
+    public enum ErrorReason
+    {
+        None,
+        NoAccount,
+        NoExchange,
+        TradingDisabled,
+        TradeError
     }
 }

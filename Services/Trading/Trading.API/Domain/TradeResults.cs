@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Trading.API.Domain
 {
-    public class ArbitrageTradeResults
+    public class TradeResults
     {
         public string Id { get; set; }
         public string BotId { get; set; }
@@ -17,5 +17,11 @@ namespace Trading.API.Domain
         public decimal Dust { get; set; }
         public DateTime TimeStarted { get; set; }
         public DateTime TimeFinished { get; set; }
+
+        public TradeResults()
+        {
+            Trades = new List<TradeResult>();
+            TimeStarted = DateTime.Now;
+        }
     }
 }

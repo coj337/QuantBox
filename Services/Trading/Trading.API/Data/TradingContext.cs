@@ -1,11 +1,8 @@
 ﻿using ExchangeManager.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Trading.API.Domain;
+using Trading.API.Domain.BotTemplateAggregate;
 
 namespace Trading.API.Data
 {
@@ -15,7 +12,8 @@ namespace Trading.API.Data
 
         public DbSet<ExchangeConfig> ExchangeCredentials { get; set; }
         public DbSet<Exchange> Exchanges { get; set; }
-        public DbSet<ArbitrageTradeResults> ArbitrageResults { get; set; }
+        public DbSet<TradeResults> ArbitrageResults { get; set; }
+        public DbSet<BotTemplate> Templates { get; set; }
         public DbSet<Bot> Bots { get; set; }
 
         public class TradingContextDesignFactory : IDesignTimeDbContextFactory<TradingContext>

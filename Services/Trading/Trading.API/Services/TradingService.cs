@@ -3,6 +3,7 @@ using ExchangeManager.Helpers;
 using ExchangeManager.Models;
 using ExchangeSharp;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -17,6 +18,7 @@ namespace Trading.API.Services
     public class TradingService
     {
         private readonly TradingContext _context;
+        private readonly ILogger<TradingService> _logger;
         private readonly List<IExchange> _exchanges = new List<IExchange>()
         {
             new Binance(),
@@ -25,9 +27,10 @@ namespace Trading.API.Services
             new Coinjar()
         };
 
-        public TradingService(TradingContext context)
+        public TradingService(TradingContext context, ILogger<TradingService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task ExecuteArbitrage(ArbitrageResult result)
@@ -36,34 +39,38 @@ namespace Trading.API.Services
             {
                 //Temp bot grabbing so we can check settings (to be called from bot later?)
                 Bot bot;
+                ExchangeConfig account;
 
                 if (result.Type == ArbitrageType.Triangle)
                 {
                     bot = _context.Bots
-                        .Include(x => x.Accounts)
+                        .Include(x => x.TradeSettings)
+                        .Include(x => x.Exchanges)
                         .First(x => x.Name == "Triangle Arbitrage");
                 }
                 else
                 {
-                    return; //Do this later
                     bot = _context.Bots
-                        .Include(x => x.Accounts)
+                        .Include(x => x.TradeSettings)
+                        .Include(x => x.Exchanges)
                         .First(x => x.Name == "Normal Arbitrage");
                 }
 
-                if (bot.TradingEnabled)
+                if (bot.TradeSettings.TradingEnabled)
                 {
                     //Grab bot accounts for this trade
-                    var account = bot.Accounts.FirstOrDefault(x => x.Name == result.Exchanges.First());
-                    if (account == null)
+                    var exchange = bot.Exchanges.FirstOrDefault(x => x.Name == result.Exchanges.First());
+                    if (exchange == null || exchange.SelectedConfig == null)
                     {
-                        //_logger.LogWarn("No account chosen for " + result.Exchanges.First());
+                        //_logger.LogWarning("No account chosen for " + result.Exchanges.First());
                         return;
                     }
-
-                    var arbitrageTradeResults = new ArbitrageTradeResults();
-                    arbitrageTradeResults.Trades = new List<TradeResult>();
-                    arbitrageTradeResults.TimeStarted = DateTime.Now;
+                    else
+                    {
+                        account = exchange.SelectedConfig;
+                    }
+                    
+                    var arbitrageTradeResults = new TradeResults();
 
                     if (result.Type == ArbitrageType.Triangle)
                     {
@@ -190,8 +197,7 @@ namespace Trading.API.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine("Something went wrong executing arbitrage. " + e.Message);
-                //_logger.LogCritical("Something went wrong executing arbitrage", ex);
+                _logger.LogCritical("Something went wrong executing arbitrage", e);
             }
         }
     }

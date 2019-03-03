@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { Glyphicon, Nav, Navbar, NavItem } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMeh, faChartPie } from '@fortawesome/free-solid-svg-icons'
+import { faMeh, faChartPie, faRobot } from '@fortawesome/free-solid-svg-icons'
 import { LinkContainer } from 'react-router-bootstrap';
 import './NavMenu.css';
 
@@ -23,6 +23,11 @@ export class NavMenu extends Component {
                         <LinkContainer to={'/'} exact>
                             <NavItem>
                                 <Glyphicon glyph='home' /> Dashboard
+                            </NavItem>
+                        </LinkContainer>
+                        <LinkContainer to={'/bots'}>
+                            <NavItem>
+                                <FontAwesomeIcon icon={faRobot} /> Bots
                             </NavItem>
                         </LinkContainer>
                         <LinkContainer to={'/sentiment'}>

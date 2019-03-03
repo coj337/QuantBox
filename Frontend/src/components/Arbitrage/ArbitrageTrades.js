@@ -28,7 +28,7 @@ export class ArbitrageTrades extends Component {
     }
 
     getItems() {
-        Axios.get('/Settings/GetTrades?botId=' + this.state.botId)
+        Axios.get('/Bot/' + this.state.botId + '/Trades')
             .then((response) => {
                 console.log(response);
                 this.setState({
@@ -63,10 +63,10 @@ export class ArbitrageTrades extends Component {
                             this.state.trades.map((trade, i) => {
                                 console.log(trade);
                                 return <div key={i}>
-                                    <Col xs={3}>{trade.trades[0].marketSymbol + " -> " + trade.trades[1].marketSymbol + " -> " + trade.trades[2].marketSymbol}</Col>
+                                    <Col xs={3}>{trade.trades ? <span>None?</span> : trade.trades[0].marketSymbol + " -> " + trade.trades[1].marketSymbol + " -> " + trade.trades[2].marketSymbol}</Col>
                                     <Col xs={2}>{trade.estimatedProfit}</Col>
                                     <Col xs={2}>{trade.actualProfit}</Col>
-                                    <Col xs={2}>{(new Date(trade.timeStarted).getTime() / 1000) - (new Date(trade.timeFinished).getTime() / 1000)} seconds</Col>
+                                    <Col xs={2}>{((new Date(trade.timeFinished).getTime() / 1000) - (new Date(trade.timeStarted).getTime() / 1000)).toFixed(4)} seconds</Col>
                                     <Col xs={2}>{trade.timeFinished}</Col>
                                     <Col xs={1}>{}N/A</Col>
                                 </div>

@@ -1,0 +1,15 @@
+﻿.botPreview {
+    margin-right: 15px;
+    text-align: center;
+    width: calc(25% - 5px);
+    padding: 15px;
+    display: inline-block;
+    height: 200px;
+    color: white;
+}
+.botPreview:hover {
+    cursor: pointer;
+    background-color: #1f242e;
+    text-decoration: none;
+    color: white;
+}

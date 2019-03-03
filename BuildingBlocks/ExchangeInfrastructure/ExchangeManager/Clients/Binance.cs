@@ -18,6 +18,7 @@ namespace ExchangeManager.Clients
 
         public string Name => "Binance";
         public decimal Fee => 0.1m;
+        public bool TradingEnabled => true;
         public bool IsAuthenticated { get; private set; }
         public Dictionary<string, Orderbook> Orderbooks { get; private set; }
         public Dictionary<string, CurrencyData> Currencies { get; private set; }

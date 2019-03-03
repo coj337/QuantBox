@@ -17,6 +17,7 @@ namespace ExchangeManager.Clients
         private readonly BtcMarketsClient _client;        
         public string Name => "BtcMarkets";
         public decimal Fee => 0.22m;
+        public bool TradingEnabled => true;
         public bool IsAuthenticated { get; private set; }
         public Dictionary<string, Orderbook> Orderbooks { get; private set; }
         public Dictionary<string, CurrencyData> Currencies { get; private set; }

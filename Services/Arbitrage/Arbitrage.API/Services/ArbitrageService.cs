@@ -46,7 +46,6 @@ namespace Arbitrage.Api.Services
         {
             _eventBus = eventBus;
             //_arbitrageHub = arbitrageHub;
-
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -95,7 +94,6 @@ namespace Arbitrage.Api.Services
                 string startCurrency, middleCurrency, endCurrency; //The currency that's bought/sold from in the first transaction
                 var audInvested = 100;
                 var orderbooks = exchange.Orderbooks;
-            
 
                 foreach (var market in orderbooks.Values)
                 {

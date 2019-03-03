@@ -5,6 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Trading.API.Domain;
+using Trading.API.Domain.Actions;
+using Trading.API.Domain.BotTemplateAggregate;
+using Trading.API.Domain.Indicators;
+using Trading.API.Domain.Insurances;
+using Trading.API.Domain.Safeties;
+using Trading.API.Domain.TradeSettingsAggregate;
+using OrderType = ExchangeManager.Models.OrderType;
 
 namespace Trading.API.Data
 {
@@ -36,21 +43,57 @@ namespace Trading.API.Data
                 context.SaveChanges();
             }
 
-            if (!context.Bots.Any())
+            if (!context.Templates.Any())
             {
-                context.Bots.AddRange(new List<Bot>()
+                context.Templates.AddRange(new List<BotTemplate>()
                 {
-                    new Bot()
+                    new BotTemplate("Blank"),
+                    new BotTemplate("Triangle Arbitrage")
                     {
-                        Name = "Triangle Arbitrage",
-                        TradingEnabled = false,
-                        Accounts = new List<ExchangeConfig>()
+                        //TODO: Complete templates
                     },
-                    new Bot()
+                    new BotTemplate("Normal Arbitrage")
                     {
-                        Name = "Normal Arbitrage",
-                        TradingEnabled = false,
-                        Accounts = new List<ExchangeConfig>()
+                        Indicators = new List<IIndicator>()
+                        {
+                            new PriceCondition()
+                            {
+                                StartExchange = "Binance",
+                                StartSide = OrderSide.Buy,
+                                StartPair = "ETH/BTC",
+                                EndExchange = "KuCoin",
+                                EndSide = OrderSide.Sell,
+                                EndPair = "ETH/BTC",
+                                ConditionType = PriceConditionType.Higher
+                            }
+                        },
+                        Actions = new List<IAction>()
+                        {
+                            new CreateOrder()
+                            {
+                                Exchange = "Binance",
+                                OrderType = OrderType.Market,
+                                Pair = new Pair()
+                                {
+                                    MarketSymbol = "ETH/BTC",
+                                    BaseCurrency = "BTC",
+                                    AltCurrency = "ETH"
+                                },
+                                ExistingCurrency = "BTC"
+                            },
+                            new CreateOrder()
+                            {
+                                Exchange = "KuCoin",
+                                OrderType = OrderType.Market,
+                                Pair = new Pair()
+                                {
+                                    MarketSymbol = "ETH/BTC",
+                                    BaseCurrency = "BTC",
+                                    AltCurrency = "ETH"
+                                },
+                                ExistingCurrency = "ETH"
+                            }
+                        }
                     }
                 });
                 context.SaveChanges();

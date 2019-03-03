@@ -16,6 +16,7 @@ namespace ExchangeManager.Clients
 
         public string Name => "KuCoin";
         public decimal Fee => 0.1m;
+        public bool TradingEnabled { get; private set; }
         public bool IsAuthenticated { get; private set; }
         public Dictionary<string, Orderbook> Orderbooks { get; private set; }
         public Dictionary<string, CurrencyData> Currencies { get; private set; }
@@ -27,7 +28,9 @@ namespace ExchangeManager.Clients
             _client = new ExchangeKucoinAPI();
             Orderbooks = new Dictionary<string, Orderbook>();
             Currencies = new Dictionary<string, CurrencyData>();
+
             IsAuthenticated = false;
+            TradingEnabled = true;
         }
 
         public bool Authenticate(string publicKey, string privateKey)

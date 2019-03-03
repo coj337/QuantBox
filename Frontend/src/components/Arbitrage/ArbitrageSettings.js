@@ -22,7 +22,7 @@ export class ArbitrageSettings extends Component {
     }
 
     componentDidMount() {
-        Axios.get('/Settings/GetTradingState?botId=' + this.state.botId)
+        Axios.get('/Bot/' + this.state.botId + '/TradingState')
             .then((response) => {
                 this.setState({
                     tradingEnabled: response.data
@@ -39,7 +39,7 @@ export class ArbitrageSettings extends Component {
     }
 
     handleTradingEnabledChange(e) {
-        Axios.post('/Settings/SetTradingState', { botId: this.state.botId, state: e.target.checked })
+        Axios.post('/Bot/' + this.state.botId + '/TradingState', { state: e.target.checked })
             .then((response) => {
                 this.setState({
                     tradingEnabled: e.target.checked

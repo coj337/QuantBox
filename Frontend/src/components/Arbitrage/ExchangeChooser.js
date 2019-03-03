@@ -40,7 +40,7 @@ export class ExchangeChooser extends Component {
                 }
         );
 
-        Axios.get('/Settings/BotAccounts?botId=' + this.state.botId)
+        Axios.get('/Bot/' + this.state.botId + '/Accounts')
             .then((response) => {
                 this.setState({
                     selectedAccounts: response,
@@ -58,8 +58,7 @@ export class ExchangeChooser extends Component {
     }
 
     updateSelectedAccount(exchange, account) {
-        Axios.post('/Settings/UpdateBotAccount', {
-            BotId: this.state.botId,
+        Axios.post('/Bot/' + this.state.botId + '/Account', {
             Exchange: exchange,
             Account: account.value
         })
